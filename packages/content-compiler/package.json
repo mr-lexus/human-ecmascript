@@ -1,0 +1,11 @@
+{
+  "name": "@human-ecmascript/content-compiler",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@human-ecmascript/model": "workspace:*",
+    "yaml": "2.9.0"
+  }
+}

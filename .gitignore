@@ -1,0 +1,9 @@
+.toolchains/
+node_modules/
+.next/
+out/
+coverage/
+.cache/
+*.tsbuildinfo
+.DS_Store
+

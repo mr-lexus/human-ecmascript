@@ -1,0 +1,418 @@
+id: reference-call-this-ru
+slug: reference-call-this
+locale: ru
+translationOf: reference-call-this
+sourceContentHash: cd536c686ffae3b6
+title: "Почему this зависит от способа вызова"
+eyebrow: "От obj.method до запуска функции"
+dek: >-
+  `this` не записан внутри метода навсегда. Чтобы понять, откуда он берётся,
+  разберём по шагам, что JavaScript делает с выражением `obj.method()`.
+status: READY
+sourceSnapshot: ECMA-262-ES2026
+readingMinutes: 20
+learningObjectives:
+  - Понимать, зачем спецификации нужен Reference Record и какие данные он хранит.
+  - Объяснять, почему `obj.method()` и вызов той же функции через переменную дают разный `this`.
+  - "Видеть порядок: имя свойства, чтение свойства, аргументы, тело функции."
+prerequisites:
+  - Некоторые промежуточные результаты существуют только в описании языка, а не как объекты JavaScript.
+  - В strict mode обычный вызов функции получает `undefined` в качестве `this`.
+sections:
+  - id: mental-model
+    title: "Сначала JavaScript запоминает объект"
+    mode: human
+    blocks:
+      - id: mental-model-prose
+        type: prose
+        body: >-
+          Вычисляя `obj.method`, JavaScript не отбрасывает `obj` сразу. В спецификации результат
+          описан как служебная запись Reference Record: в ней остаются объект `obj` и имя свойства
+          `method`. Поэтому следующие за выражением скобки понимают: функцию нужно вызвать именно
+          как метод объекта `obj`. Если же сначала сохранить `obj.method` в переменную, в ней
+          останется только функция — связи с `obj` уже не будет.
+      - id: mental-model-claims
+        type: claims
+        claims:
+          - id: claim-reference-record
+            classification: NORMATIVE
+            text: "Reference Record для свойства хранит значение, в котором ищут свойство, и имя этого свойства. Это служебная конструкция спецификации: получить её из JavaScript-кода нельзя."
+            citationIds: [reference-record]
+            sourceFingerprint: a4eddf680870da11
+            confidence: 1
+            reviewStatus: READY
+          - id: claim-member-reference
+            classification: DERIVED
+            text: "Промежуточная запись позволяет отличить вызов `obj.method()` от вызова той же функции после присваивания переменной."
+            citationIds: [property-accessors, evaluate-call]
+            sourceFingerprint: f20b9c5fb2e6163c
+            confidence: 0.98
+            reviewStatus: READY
+      - id: operation-map
+        type: operations
+        operations:
+          - id: op-reference-record
+            name: Reference Record
+            kind: record
+            summary: "Связывает объект `obj` с именем свойства `method`."
+            citationId: reference-record
+          - id: op-get-value
+            name: GetValue
+            kind: abstract-operation
+            summary: "Получает из Reference обычное значение JavaScript — в нашем случае функцию."
+            citationId: get-value
+          - id: op-evaluate-call
+            name: EvaluateCall
+            kind: runtime-semantics
+            summary: "Определяет функцию и значение `this`, а затем вычисляет аргументы."
+            citationId: evaluate-call
+          - id: op-call
+            name: Call
+            kind: abstract-operation
+            summary: "Запускает функцию и передаёт ей выбранное значение `this`."
+            citationId: call
+  - id: normative-trace
+    title: "Как спецификация разбирает `obj.method()`"
+    mode: normative
+    blocks:
+      - id: normative-prose
+        type: prose
+        body: >-
+          Всё важное происходит ещё до входа в тело метода. Сначала выражение доступа к свойству
+          создаёт Reference. Затем EvaluateCall получает из него функцию и будущий `this`.
+          Только после этого вычисляются аргументы и выполняется Call.
+      - id: call-trace
+        type: trace
+        steps:
+          - id: trace-base
+            label: "1. Вычислить `obj`"
+            operation: MemberExpression
+            detail: "Получить объект, в котором JavaScript будет искать свойство `method`."
+            citationId: property-accessors
+          - id: trace-key
+            label: "2. Подготовить имя свойства"
+            operation: ToPropertyKey
+            detail: "В записи через квадратные скобки вычислить выражение и преобразовать результат в ключ свойства."
+            citationId: to-property-key
+          - id: trace-reference
+            label: "3. Запомнить связь с объектом"
+            operation: Reference Record
+            detail: "Создать Reference Record, в котором связаны `obj` и имя `method`."
+            citationId: reference-record
+          - id: trace-value
+            label: "4. Получить функцию"
+            operation: GetValue
+            detail: "GetValue обращается к внутреннему методу [[Get]] объекта `obj` и получает значение свойства."
+            citationId: get-value
+          - id: trace-this
+            label: "5. Определить `this`"
+            operation: EvaluateCall
+            detail: "Поскольку вызов начался со ссылки на свойство, объект `obj` становится значением `this`."
+            citationId: evaluate-call
+          - id: trace-arguments
+            label: "6. Вычислить аргументы"
+            operation: ArgumentListEvaluation
+            detail: "Выражения внутри скобок выполняются после того, как функция и `this` уже определены."
+            citationId: evaluate-call
+          - id: trace-call
+            label: "7. Запустить функцию"
+            operation: Call
+            detail: "Операция Call передаёт функции найденный `this` и готовые аргументы."
+            citationId: call
+      - id: normative-claims
+        type: claims
+        claims:
+          - id: claim-evaluatecall-this
+            classification: NORMATIVE
+            text: "Если выражение перед скобками вернуло ссылку на свойство, EvaluateCall берёт `this` из этой ссылки. Аргументы вычисляются уже после этого."
+            citationIds: [evaluate-call, get-this-value]
+            sourceFingerprint: eef6eb3136422ebc
+            confidence: 1
+            reviewStatus: READY
+          - id: claim-getvalue-receiver
+            classification: NORMATIVE
+            text: "GetValue получает значение свойства через внутренний метод [[Get]] и передаёт ему receiver, сохранённый в Reference."
+            citationIds: [get-value, object-get]
+            sourceFingerprint: d833185a549caf49
+            confidence: 1
+            reviewStatus: READY
+  - id: observable-cases
+    title: "Проверьте это на семи примерах"
+    mode: observable
+    blocks:
+      - id: observable-prose
+        type: prose
+        body: >-
+          Каждый пример меняет только одну деталь вызова. Запускайте код, редактируйте его и
+          сравнивайте вывод с ожидаемым. Результат справа получен в вашем браузере; ниже отдельно
+          показаны результаты, заранее проверенные в конкретных версиях движков.
+      - id: observable-claims
+        type: claims
+        claims:
+          - id: claim-detach-loses-reference
+            classification: OBSERVABLE
+            text: "После присваивания `const fn = obj.method` переменная хранит только функцию. При вызове `fn()` объект `obj` уже не становится значением `this`."
+            citationIds: [get-value, evaluate-call]
+            sourceFingerprint: f98c12c16ad837bd
+            confidence: 0.99
+            reviewStatus: READY
+          - id: claim-evaluation-order
+            classification: OBSERVABLE
+            text: "JavaScript сначала читает свойство, затем вычисляет аргументы и только потом входит в тело функции."
+            citationIds: [property-accessors, evaluate-call]
+            sourceFingerprint: 142a00c38ed74623
+            confidence: 0.99
+            reviewStatus: READY
+      - id: evaluation-order-note
+        type: note
+        tone: insight
+        title: "Даже getter не обязательно теряет `this`"
+        body: >-
+          Getter может вернуть функцию, но запись `obj.method()` всё равно остаётся вызовом свойства
+          объекта `obj`. Поэтому возвращённая функция получит `obj` в качестве `this`.
+  - id: implementation-boundary
+    title: "Как это может выглядеть внутри V8"
+    mode: v8
+    blocks:
+      - id: v8-prose
+        type: prose
+        body: >-
+          Reference Record — модель из спецификации, а не обязательный объект в памяти. V8 может
+          передать те же данные через байткод Ignition, inline cache или оптимизированный машинный
+          код. Важно только сохранить поведение программы. Поэтому материалы о V8 всегда привязаны
+          к конкретной версии и не заменяют требования стандарта.
+      - id: v8-claims
+        type: claims
+        claims:
+          - id: claim-v8-boundary
+            classification: V8_IMPLEMENTATION
+            text: "Ignition выполняет байткод V8. Набор инструкций и работа оптимизирующих уровней относятся к реализации и могут измениться в следующей версии движка."
+            citationIds: [v8-ignition]
+            sourceFingerprint: 50f2ac0e841920ca
+            confidence: 0.95
+            reviewStatus: READY
+      - id: v8-warning
+        type: note
+        tone: implementation
+        title: "Реализация — не стандарт"
+        body: "Этот раздел помогает понять одну закреплённую версию V8. Другие движки вправе устроить выполнение совсем иначе."
+citations:
+  - id: reference-record
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-reference-record-specification-type
+    label: "ECMA-262 §6.2.5 — Reference Record Specification Type"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-reference-record-specification-type
+    relevance: "Здесь перечислены данные, которые хранит Reference Record."
+    evidenceHash: a4eddf680870da11
+  - id: get-value
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-getvalue
+    label: "ECMA-262 — GetValue"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-getvalue
+    relevance: "Показывает, как из Reference получают обычное значение и читают свойство через [[Get]]."
+    evidenceHash: d833185a549caf49
+  - id: get-this-value
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-getthisvalue
+    label: "ECMA-262 — GetThisValue"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-getthisvalue
+    relevance: "Объясняет, какое значение Reference свойства передаёт как `this`."
+    evidenceHash: eef6eb3136422ebc
+  - id: property-accessors
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-property-accessors-runtime-semantics-evaluation
+    label: "ECMA-262 — Property Accessors: Evaluation"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-property-accessors-runtime-semantics-evaluation
+    relevance: "Описывает результат доступа к свойству через точку и квадратные скобки."
+    evidenceHash: f20b9c5fb2e6163c
+  - id: evaluate-call
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-evaluatecall
+    label: "ECMA-262 — EvaluateCall"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-evaluatecall
+    relevance: "Задаёт порядок: получить функцию и `this`, вычислить аргументы, выполнить вызов."
+    evidenceHash: 142a00c38ed74623
+  - id: to-property-key
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-topropertykey
+    label: "ECMA-262 — ToPropertyKey"
+    url: https://tc39.es/ecma262/2026/multipage/abstract-operations.html#sec-topropertykey
+    relevance: "Показывает, как вычисленное значение превращается в имя свойства."
+    evidenceHash: 2f10ea080ccd04aa
+  - id: object-get
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-object-internal-methods-and-internal-slots-get-p-receiver
+    label: "ECMA-262 — [[Get]] (P, Receiver)"
+    url: https://tc39.es/ecma262/2026/multipage/ordinary-and-exotic-objects-behaviours.html#sec-object-internal-methods-and-internal-slots-get-p-receiver
+    relevance: "Описывает внутреннее чтение свойства с учётом receiver."
+    evidenceHash: 4856ab1818924d45
+  - id: call
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-call
+    label: "ECMA-262 — Call"
+    url: https://tc39.es/ecma262/2026/multipage/abstract-operations.html#sec-call
+    relevance: "Описывает запуск функции через её внутренний метод [[Call]]."
+    evidenceHash: 3cac0f01c3730a0b
+  - id: v8-ignition
+    snapshot: V8-DOCUMENTATION-2026-08
+    nodeId: ignition
+    label: "Документация V8 — Ignition"
+    url: https://v8.dev/docs/ignition
+    relevance: "Документация V8 о байткоде и интерпретаторе Ignition."
+    evidenceHash: 50f2ac0e841920ca
+examples:
+  - id: method-call
+    title: "Обычный вызов метода"
+    goal: "Проверить, что в `obj.method()` значением `this` становится объект `obj`."
+    sourcePath: examples/method-call.js
+    timeoutMs: 1200
+    expectedOutput: ["true", "reference"]
+    claimIds: [claim-member-reference, claim-evaluatecall-this]
+    citationIds: [evaluate-call]
+  - id: detached-call
+    title: "Функция отдельно от объекта"
+    goal: "Увидеть, что после присваивания переменной функция больше не связана с `obj`."
+    sourcePath: examples/detached-call.js
+    timeoutMs: 1200
+    expectedOutput: ["true"]
+    claimIds: [claim-detach-loses-reference]
+    citationIds: [get-value, evaluate-call]
+  - id: comma-call
+    title: "Запятая убирает связь с объектом"
+    goal: "Проверить, что оператор запятая оставляет только значение функции, без исходного объекта."
+    sourcePath: examples/comma-call.js
+    timeoutMs: 1200
+    expectedOutput: ["true"]
+    claimIds: [claim-detach-loses-reference]
+    citationIds: [get-value, evaluate-call]
+  - id: getter-call
+    title: "Метод, полученный через getter"
+    goal: "Проверить, что запись `obj.method()` всё равно передаёт `obj` как `this`."
+    sourcePath: examples/getter-call.js
+    timeoutMs: 1200
+    expectedOutput: ["true"]
+    claimIds: [claim-getvalue-receiver, claim-evaluatecall-this]
+    citationIds: [get-value, evaluate-call]
+  - id: computed-key
+    title: "Вычисляемое имя свойства"
+    goal: "Увидеть, что имя свойства вычисляется до запуска метода."
+    sourcePath: examples/computed-key.js
+    timeoutMs: 1200
+    expectedOutput: ["key → call"]
+    claimIds: [claim-evaluation-order]
+    citationIds: [to-property-key, property-accessors]
+  - id: proxy-order
+    title: "Сначала свойство, потом аргументы"
+    goal: "Проверить порядок: чтение свойства, вычисление аргумента, тело функции."
+    sourcePath: examples/proxy-order.js
+    timeoutMs: 1200
+    expectedOutput: ["get:method → argument → call:7"]
+    claimIds: [claim-evaluation-order]
+    citationIds: [evaluate-call]
+  - id: non-callable
+    title: "Свойство не является функцией"
+    goal: "Увидеть TypeError, если найденное значение нельзя вызвать."
+    sourcePath: examples/non-callable.js
+    timeoutMs: 1200
+    expectedOutput: ["TypeError"]
+    claimIds: [claim-evaluatecall-this]
+    citationIds: [evaluate-call, call]
+engineResults:
+  - exampleId: method-call
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["true", "reference"]
+    capturedAt: "2026-08-06"
+    note: "Результат проверен в закреплённой версии Linux Node.js. Отдельный запуск через d8 будет добавлен позже."
+  - exampleId: detached-call
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["true"]
+    capturedAt: "2026-08-06"
+  - exampleId: comma-call
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["true"]
+    capturedAt: "2026-08-06"
+  - exampleId: getter-call
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["true"]
+    capturedAt: "2026-08-06"
+  - exampleId: computed-key
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["key → call"]
+    capturedAt: "2026-08-06"
+  - exampleId: proxy-order
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["get:method → argument → call:7"]
+    capturedAt: "2026-08-06"
+  - exampleId: non-callable
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["TypeError"]
+    capturedAt: "2026-08-06"
+  - exampleId: method-call
+    engine: SpiderMonkey
+    version: not-installed
+    binaryHash: unavailable
+    status: pending
+    output: []
+    capturedAt: "2026-08-06"
+    note: "Результат появится после установки и проверки точной версии SpiderMonkey shell."
+  - exampleId: method-call
+    engine: JavaScriptCore
+    version: not-installed
+    binaryHash: unavailable
+    status: pending
+    output: []
+    capturedAt: "2026-08-06"
+    note: "Результат появится после установки и проверки точной версии JavaScriptCore shell."
+graph:
+  nodes:
+    - {
+        id: member-expression,
+        label: "MemberExpression",
+        kind: syntax,
+        citationId: property-accessors,
+      }
+    - {
+        id: reference-record,
+        label: "Reference Record",
+        kind: record,
+        citationId: reference-record,
+      }
+    - { id: get-value, label: "GetValue", kind: operation, citationId: get-value }
+    - { id: object-get, label: "[[Get]]", kind: internal-method, citationId: object-get }
+    - { id: evaluate-call, label: "EvaluateCall", kind: call, citationId: evaluate-call }
+    - { id: get-this-value, label: "GetThisValue", kind: operation, citationId: get-this-value }
+    - { id: call, label: "Call", kind: call, citationId: call }
+  edges:
+    - { id: e1, source: member-expression, target: reference-record, kind: produces, weight: 3 }
+    - { id: e2, source: evaluate-call, target: get-value, kind: calls, weight: 3 }
+    - { id: e3, source: get-value, target: object-get, kind: calls, weight: 2 }
+    - { id: e4, source: evaluate-call, target: get-this-value, kind: calls, weight: 3 }
+    - {
+        id: e5,
+        source: reference-record,
+        target: get-this-value,
+        kind: supplies-receiver,
+        weight: 3,
+      }
+    - { id: e6, source: evaluate-call, target: call, kind: calls, weight: 3 }

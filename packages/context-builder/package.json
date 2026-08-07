@@ -1,0 +1,11 @@
+{
+  "name": "@human-ecmascript/context-builder",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@human-ecmascript/knowledge-graph": "workspace:*",
+    "@human-ecmascript/model": "workspace:*"
+  }
+}

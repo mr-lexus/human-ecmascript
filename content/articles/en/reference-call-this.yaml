@@ -1,0 +1,416 @@
+id: reference-call-this
+slug: reference-call-this
+locale: en
+sourceContentHash: cd536c686ffae3b6
+title: "Where `this` really comes from"
+eyebrow: "Reference Records → property access → calls"
+dek: >-
+  A method does not permanently own its receiver. Follow the temporary Reference Record
+  created by a member expression and see how the call expression turns it into `this`.
+status: READY
+sourceSnapshot: ECMA-262-ES2026
+readingMinutes: 18
+learningObjectives:
+  - Distinguish a Reference Record from the value obtained through GetValue.
+  - Explain why method syntax preserves a receiver while a detached function call does not.
+  - Predict property-key, getter, argument, and call evaluation order.
+prerequisites:
+  - Expressions produce intermediate specification values.
+  - Strict functions receive undefined instead of a substituted global this value.
+sections:
+  - id: mental-model
+    title: "The missing link is a Reference"
+    mode: human
+    blocks:
+      - id: mental-model-prose
+        type: prose
+        body: >-
+          JavaScript evaluates `obj.method` to a temporary specification-only Reference Record.
+          It remembers both the base object and the property name. When parentheses immediately
+          call that reference, the base becomes the receiver. Assigning the function to another
+          variable first extracts only the function value, so the original base is gone.
+      - id: mental-model-claims
+        type: claims
+        claims:
+          - id: claim-reference-record
+            classification: NORMATIVE
+            text: "A property Reference Record carries a base value and a referenced name; it is not itself an ECMAScript language value."
+            citationIds: [reference-record]
+            sourceFingerprint: a4eddf680870da11
+            confidence: 1
+            reviewStatus: READY
+          - id: claim-member-reference
+            classification: DERIVED
+            text: "Evaluating a member expression keeps enough information to distinguish `obj.method()` from calling the same function after value extraction."
+            citationIds: [property-accessors, evaluate-call]
+            sourceFingerprint: f20b9c5fb2e6163c
+            confidence: 0.98
+            reviewStatus: READY
+      - id: operation-map
+        type: operations
+        operations:
+          - id: op-reference-record
+            name: Reference Record
+            kind: record
+            summary: "Carries the base, referenced name, strictness, and optional thisValue."
+            citationId: reference-record
+          - id: op-get-value
+            name: GetValue
+            kind: abstract-operation
+            summary: "Turns a Reference into the value needed by the call."
+            citationId: get-value
+          - id: op-evaluate-call
+            name: EvaluateCall
+            kind: runtime-semantics
+            summary: "Recovers the receiver before evaluating and invoking the argument list."
+            citationId: evaluate-call
+          - id: op-call
+            name: Call
+            kind: abstract-operation
+            summary: "Invokes the function's [[Call]] internal method with the chosen this value."
+            citationId: call
+  - id: normative-trace
+    title: "Normative trace of `obj.method()`"
+    mode: normative
+    blocks:
+      - id: normative-prose
+        type: prose
+        body: >-
+          The important hand-off happens before the function body starts. Property access creates
+          a Reference, EvaluateCall derives both the callable value and the receiver, and Call passes
+          that receiver into the function's internal call machinery.
+      - id: call-trace
+        type: trace
+        steps:
+          - id: trace-base
+            label: "1. Evaluate the base"
+            operation: MemberExpression
+            detail: "Evaluate `obj` and retain its object value as the base."
+            citationId: property-accessors
+          - id: trace-key
+            label: "2. Resolve the property key"
+            operation: ToPropertyKey
+            detail: "For bracket notation, convert the computed expression before creating the reference."
+            citationId: to-property-key
+          - id: trace-reference
+            label: "3. Create a Reference"
+            operation: Reference Record
+            detail: "The base is `obj`; the referenced name is `method`."
+            citationId: reference-record
+          - id: trace-value
+            label: "4. Read the function"
+            operation: GetValue
+            detail: "Property access invokes the base object's [[Get]] with the same receiver."
+            citationId: get-value
+          - id: trace-this
+            label: "5. Choose thisValue"
+            operation: EvaluateCall
+            detail: "Because the original result is a property Reference, its base becomes thisValue."
+            citationId: evaluate-call
+          - id: trace-arguments
+            label: "6. Evaluate arguments"
+            operation: ArgumentListEvaluation
+            detail: "Argument expressions run after the callable and receiver have been determined."
+            citationId: evaluate-call
+          - id: trace-call
+            label: "7. Invoke"
+            operation: Call
+            detail: "Call the function with the selected thisValue and argument list."
+            citationId: call
+      - id: normative-claims
+        type: claims
+        claims:
+          - id: claim-evaluatecall-this
+            classification: NORMATIVE
+            text: "EvaluateCall obtains thisValue from a property Reference before it evaluates the argument list."
+            citationIds: [evaluate-call, get-this-value]
+            sourceFingerprint: eef6eb3136422ebc
+            confidence: 1
+            reviewStatus: READY
+          - id: claim-getvalue-receiver
+            classification: NORMATIVE
+            text: "GetValue reads a property Reference by calling the base object's [[Get]] internal method with the Reference's receiver."
+            citationIds: [get-value, object-get]
+            sourceFingerprint: d833185a549caf49
+            confidence: 1
+            reviewStatus: READY
+  - id: observable-cases
+    title: "Seven observable pressure tests"
+    mode: observable
+    blocks:
+      - id: observable-prose
+        type: prose
+        body: >-
+          The examples below isolate one transition at a time. Run them in the browser sandbox,
+          then compare the recorded engine evidence. A browser result describes only the current
+          browser; it is never presented as the multi-engine matrix.
+      - id: observable-claims
+        type: claims
+        claims:
+          - id: claim-detach-loses-reference
+            classification: OBSERVABLE
+            text: "Assigning `obj.method` to a variable performs value extraction; calling that variable no longer supplies `obj` as the receiver."
+            citationIds: [get-value, evaluate-call]
+            sourceFingerprint: f98c12c16ad837bd
+            confidence: 0.99
+            reviewStatus: READY
+          - id: claim-evaluation-order
+            classification: OBSERVABLE
+            text: "Property lookup happens before argument evaluation, and both happen before the function body runs."
+            citationIds: [property-accessors, evaluate-call]
+            sourceFingerprint: 142a00c38ed74623
+            confidence: 0.99
+            reviewStatus: READY
+      - id: evaluation-order-note
+        type: note
+        tone: insight
+        title: "A getter may return the function without erasing the receiver"
+        body: >-
+          `obj.method()` calls the value returned by the getter with `obj` as this because the call
+          still receives the property Reference produced by the member expression.
+  - id: implementation-boundary
+    title: "What V8 is allowed to change"
+    mode: v8
+    blocks:
+      - id: v8-prose
+        type: prose
+        body: >-
+          V8 does not have to allocate a JavaScript-visible Reference Record. Ignition bytecode,
+          inline caches, and optimized tiers may encode or eliminate the intermediate state as long
+          as observable behavior follows the specification. Implementation artifacts are therefore
+          versioned evidence, never normative definitions.
+      - id: v8-claims
+        type: claims
+        claims:
+          - id: claim-v8-boundary
+            classification: V8_IMPLEMENTATION
+            text: "Ignition is V8's bytecode interpreter; its bytecode and optimization tiers are implementation details that may change between versions."
+            citationIds: [v8-ignition]
+            sourceFingerprint: 50f2ac0e841920ca
+            confidence: 0.95
+            reviewStatus: READY
+      - id: v8-warning
+        type: note
+        tone: implementation
+        title: "Implementation is not the standard"
+        body: "Use this layer to understand one pinned V8 build, not to infer requirements for every ECMAScript engine."
+citations:
+  - id: reference-record
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-reference-record-specification-type
+    label: "ECMA-262 §6.2.5 — Reference Record Specification Type"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-reference-record-specification-type
+    relevance: "Defines the fields and role of Reference Records."
+    evidenceHash: a4eddf680870da11
+  - id: get-value
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-getvalue
+    label: "ECMA-262 — GetValue"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-getvalue
+    relevance: "Defines value extraction and property [[Get]]."
+    evidenceHash: d833185a549caf49
+  - id: get-this-value
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-getthisvalue
+    label: "ECMA-262 — GetThisValue"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-getthisvalue
+    relevance: "Defines how a property Reference supplies a this value."
+    evidenceHash: eef6eb3136422ebc
+  - id: property-accessors
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-property-accessors-runtime-semantics-evaluation
+    label: "ECMA-262 — Property Accessors: Evaluation"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-property-accessors-runtime-semantics-evaluation
+    relevance: "Defines the Reference produced by dot and bracket property access."
+    evidenceHash: f20b9c5fb2e6163c
+  - id: evaluate-call
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-evaluatecall
+    label: "ECMA-262 — EvaluateCall"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-evaluatecall
+    relevance: "Defines receiver selection, arguments, and call ordering."
+    evidenceHash: 142a00c38ed74623
+  - id: to-property-key
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-topropertykey
+    label: "ECMA-262 — ToPropertyKey"
+    url: https://tc39.es/ecma262/2026/multipage/abstract-operations.html#sec-topropertykey
+    relevance: "Defines computed property-key conversion."
+    evidenceHash: 2f10ea080ccd04aa
+  - id: object-get
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-object-internal-methods-and-internal-slots-get-p-receiver
+    label: "ECMA-262 — [[Get]] (P, Receiver)"
+    url: https://tc39.es/ecma262/2026/multipage/ordinary-and-exotic-objects-behaviours.html#sec-object-internal-methods-and-internal-slots-get-p-receiver
+    relevance: "Defines the receiver-aware internal property read."
+    evidenceHash: 4856ab1818924d45
+  - id: call
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-call
+    label: "ECMA-262 — Call"
+    url: https://tc39.es/ecma262/2026/multipage/abstract-operations.html#sec-call
+    relevance: "Defines invocation through a callable object's [[Call]]."
+    evidenceHash: 3cac0f01c3730a0b
+  - id: v8-ignition
+    snapshot: V8-DOCUMENTATION-2026-08
+    nodeId: ignition
+    label: "V8 documentation — Ignition"
+    url: https://v8.dev/docs/ignition
+    relevance: "Identifies Ignition as V8's interpreter and bytecode pipeline."
+    evidenceHash: 50f2ac0e841920ca
+examples:
+  - id: method-call
+    title: "Method-call receiver"
+    goal: "Observe that a property Reference supplies the base object as this."
+    sourcePath: examples/method-call.js
+    timeoutMs: 1200
+    expectedOutput: ["true", "reference"]
+    claimIds: [claim-member-reference, claim-evaluatecall-this]
+    citationIds: [evaluate-call]
+  - id: detached-call
+    title: "Detached function"
+    goal: "Observe the loss of the original base after value extraction."
+    sourcePath: examples/detached-call.js
+    timeoutMs: 1200
+    expectedOutput: ["true"]
+    claimIds: [claim-detach-loses-reference]
+    citationIds: [get-value, evaluate-call]
+  - id: comma-call
+    title: "Comma operator extraction"
+    goal: "Observe another expression form that returns the function value rather than the property Reference."
+    sourcePath: examples/comma-call.js
+    timeoutMs: 1200
+    expectedOutput: ["true"]
+    claimIds: [claim-detach-loses-reference]
+    citationIds: [get-value, evaluate-call]
+  - id: getter-call
+    title: "Getter returns a function"
+    goal: "Show that the call still derives this from the surrounding property Reference."
+    sourcePath: examples/getter-call.js
+    timeoutMs: 1200
+    expectedOutput: ["true"]
+    claimIds: [claim-getvalue-receiver, claim-evaluatecall-this]
+    citationIds: [get-value, evaluate-call]
+  - id: computed-key
+    title: "Computed property key"
+    goal: "Expose ToPropertyKey before invocation."
+    sourcePath: examples/computed-key.js
+    timeoutMs: 1200
+    expectedOutput: ["key → call"]
+    claimIds: [claim-evaluation-order]
+    citationIds: [to-property-key, property-accessors]
+  - id: proxy-order
+    title: "Lookup, arguments, body"
+    goal: "Observe property lookup, argument evaluation, and function-body order."
+    sourcePath: examples/proxy-order.js
+    timeoutMs: 1200
+    expectedOutput: ["get:method → argument → call:7"]
+    claimIds: [claim-evaluation-order]
+    citationIds: [evaluate-call]
+  - id: non-callable
+    title: "Non-callable property"
+    goal: "Observe failure after the property value has been obtained."
+    sourcePath: examples/non-callable.js
+    timeoutMs: 1200
+    expectedOutput: ["TypeError"]
+    claimIds: [claim-evaluatecall-this]
+    citationIds: [evaluate-call, call]
+engineResults:
+  - exampleId: method-call
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["true", "reference"]
+    capturedAt: "2026-08-06"
+    note: "Verified locally in the pinned Linux Node.js runtime; standalone d8 capture remains a later artifact."
+  - exampleId: detached-call
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["true"]
+    capturedAt: "2026-08-06"
+  - exampleId: comma-call
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["true"]
+    capturedAt: "2026-08-06"
+  - exampleId: getter-call
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["true"]
+    capturedAt: "2026-08-06"
+  - exampleId: computed-key
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["key → call"]
+    capturedAt: "2026-08-06"
+  - exampleId: proxy-order
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["get:method → argument → call:7"]
+    capturedAt: "2026-08-06"
+  - exampleId: non-callable
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["TypeError"]
+    capturedAt: "2026-08-06"
+  - exampleId: method-call
+    engine: SpiderMonkey
+    version: not-installed
+    binaryHash: unavailable
+    status: pending
+    output: []
+    capturedAt: "2026-08-06"
+    note: "The adapter and exact shell are pending the JSVU capability milestone."
+  - exampleId: method-call
+    engine: JavaScriptCore
+    version: not-installed
+    binaryHash: unavailable
+    status: pending
+    output: []
+    capturedAt: "2026-08-06"
+    note: "The adapter and exact shell are pending the JSVU capability milestone."
+graph:
+  nodes:
+    - {
+        id: member-expression,
+        label: "MemberExpression",
+        kind: syntax,
+        citationId: property-accessors,
+      }
+    - {
+        id: reference-record,
+        label: "Reference Record",
+        kind: record,
+        citationId: reference-record,
+      }
+    - { id: get-value, label: "GetValue", kind: operation, citationId: get-value }
+    - { id: object-get, label: "[[Get]]", kind: internal-method, citationId: object-get }
+    - { id: evaluate-call, label: "EvaluateCall", kind: call, citationId: evaluate-call }
+    - { id: get-this-value, label: "GetThisValue", kind: operation, citationId: get-this-value }
+    - { id: call, label: "Call", kind: call, citationId: call }
+  edges:
+    - { id: e1, source: member-expression, target: reference-record, kind: produces, weight: 3 }
+    - { id: e2, source: evaluate-call, target: get-value, kind: calls, weight: 3 }
+    - { id: e3, source: get-value, target: object-get, kind: calls, weight: 2 }
+    - { id: e4, source: evaluate-call, target: get-this-value, kind: calls, weight: 3 }
+    - {
+        id: e5,
+        source: reference-record,
+        target: get-this-value,
+        kind: supplies-receiver,
+        weight: 3,
+      }
+    - { id: e6, source: evaluate-call, target: call, kind: calls, weight: 3 }

@@ -1,0 +1,31 @@
+schemaVersion: 1
+resolvedAt: "2026-08-06"
+sources:
+  - id: ecma262-es2026
+    role: normative
+    url: https://github.com/tc39/ecma262.git
+    ref: es2026
+    resolvedCommit: 0248456c758431e4bb8e5d26333ff1865123c9cd
+    archiveSha256: ca8eb6dde4a164d67c9a4827557454773a9dd33f6774b4e36786b197b8c87915
+    license: Ecma alternative copyright notice and software license
+    notice: https://github.com/tc39/ecma262/blob/main/LICENSE.md
+    redistribution: links-and-derived-structure
+  - id: ecmarkup
+    role: build-tool
+    url: https://github.com/tc39/ecmarkup.git
+    ref: v25.0.0
+    resolvedCommit: 64ae978159cf7b6a8f23b0e1d78960b3731536d0
+    archiveSha256: e23cb247c0a2aa75266e5bd8b62cd5e8fdc348cf94a24f76140cf730164e6c86
+    license: MIT
+    notice: https://github.com/tc39/ecmarkup/blob/main/LICENSE
+    redistribution: tool-only
+  - id: test262
+    role: observable-evidence
+    url: https://github.com/tc39/test262.git
+    ref: b363f29d3c43c626dc852744ad64a0b48a003693
+    resolvedCommit: b363f29d3c43c626dc852744ad64a0b48a003693
+    archiveSha256: 54637160b220473d926af23172a65b99de1dfcd5a69791acea158a1fcd52a9a9
+    compatibility: pinned-for-future-indexing
+    license: BSD-3-Clause
+    notice: https://github.com/tc39/test262/blob/main/LICENSE
+    redistribution: metadata-and-links

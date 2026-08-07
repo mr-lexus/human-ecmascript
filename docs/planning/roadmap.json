@@ -1,0 +1,5031 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-06",
+  "milestones": [
+    {
+      "id": "M0",
+      "title": "Research and decision freeze",
+      "userValue": "Retire risks that could force a rewrite of ingestion, execution, or hosting.",
+      "gate": "Every P0 spike has a fixture-backed result and a documented fallback."
+    },
+    {
+      "id": "M1",
+      "title": "WSL-first bootstrap and static shell",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "gate": "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+    },
+    {
+      "id": "M2",
+      "title": "Deterministic ES2026 ingestion",
+      "userValue": "The specification becomes navigable, provenance-rich structured data.",
+      "gate": "Two extractions are byte-identical and all graph integrity fixtures pass."
+    },
+    {
+      "id": "M3",
+      "title": "Knowledge graph and bounded context",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification.",
+      "gate": "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+    },
+    {
+      "id": "M4",
+      "title": "Content model and publication workflow",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose.",
+      "gate": "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+    },
+    {
+      "id": "M5",
+      "title": "English vertical slice",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics.",
+      "gate": "Every claim has evidence and readers can trace obj.method() to the this binding."
+    },
+    {
+      "id": "M6",
+      "title": "Examples Test262 and three engines",
+      "userValue": "Normative explanations are backed by reproducible observable evidence.",
+      "gate": "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+    },
+    {
+      "id": "M7",
+      "title": "Russian MVP and public release",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site.",
+      "gate": "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+    },
+    {
+      "id": "M8",
+      "title": "ESMeta enhancement",
+      "userValue": "Readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime.",
+      "gate": "Missing ESMeta artifacts degrade gracefully and present traces have provenance."
+    },
+    {
+      "id": "M9",
+      "title": "V8 implementation layer",
+      "userValue": "Advanced readers see one pinned implementation without confusing it with the standard.",
+      "gate": "Every V8 artifact is pinned and visibly implementation-specific."
+    },
+    {
+      "id": "M10",
+      "title": "Scale and v1",
+      "userValue": "The project becomes a maintainable learning system rather than a one-off demonstration.",
+      "gate": "Source updates produce a reviewed stale queue and new modules reuse the same pipeline."
+    }
+  ],
+  "items": [
+    {
+      "id": "R-001",
+      "title": "Confirm project and upstream license policy",
+      "goal": "Confirm project and upstream license policy so that retire risks that could force a rewrite of ingestion, execution, or hosting.",
+      "deliverable": "A reviewed and reproducible confirm project and upstream license policy artifact.",
+      "dependsOn": [],
+      "kind": "research",
+      "priority": "P0",
+      "size": "S",
+      "risk": "HIGH",
+      "done": [
+        "Confirm project and upstream license policy is implemented and documented.",
+        "M0 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every P0 spike has a fixture-backed result and a documented fallback."
+      ],
+      "subsystems": [
+        "research",
+        "architecture",
+        "provenance"
+      ],
+      "parallelGroup": "M0-01",
+      "milestone": "M0",
+      "userValue": "Retire risks that could force a rewrite of ingestion, execution, or hosting."
+    },
+    {
+      "id": "R-002",
+      "title": "Resolve the exact ES2026 source commit",
+      "goal": "Resolve the exact ES2026 source commit so that retire risks that could force a rewrite of ingestion, execution, or hosting.",
+      "deliverable": "A reviewed and reproducible resolve the exact es2026 source commit artifact.",
+      "dependsOn": [],
+      "kind": "research",
+      "priority": "P0",
+      "size": "S",
+      "risk": "MEDIUM",
+      "done": [
+        "Resolve the exact ES2026 source commit is implemented and documented.",
+        "M0 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every P0 spike has a fixture-backed result and a documented fallback."
+      ],
+      "subsystems": [
+        "research",
+        "architecture",
+        "provenance"
+      ],
+      "parallelGroup": "M0-01",
+      "milestone": "M0",
+      "userValue": "Retire risks that could force a rewrite of ingestion, execution, or hosting."
+    },
+    {
+      "id": "R-003",
+      "title": "Spike the Ecmarkup programmatic API",
+      "goal": "Spike the Ecmarkup programmatic API so that retire risks that could force a rewrite of ingestion, execution, or hosting.",
+      "deliverable": "A reviewed and reproducible spike the ecmarkup programmatic api artifact.",
+      "dependsOn": [],
+      "kind": "research",
+      "priority": "P0",
+      "size": "SPIKE",
+      "risk": "HIGH",
+      "done": [
+        "Spike the Ecmarkup programmatic API is implemented and documented.",
+        "M0 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every P0 spike has a fixture-backed result and a documented fallback."
+      ],
+      "subsystems": [
+        "research",
+        "architecture",
+        "provenance"
+      ],
+      "parallelGroup": "M0-01",
+      "milestone": "M0",
+      "userValue": "Retire risks that could force a rewrite of ingestion, execution, or hosting."
+    },
+    {
+      "id": "R-004",
+      "title": "Spike ESMeta ES2026 coverage and exports",
+      "goal": "Spike ESMeta ES2026 coverage and exports so that retire risks that could force a rewrite of ingestion, execution, or hosting.",
+      "deliverable": "A reviewed and reproducible spike esmeta es2026 coverage and exports artifact.",
+      "dependsOn": [],
+      "kind": "research",
+      "priority": "P1",
+      "size": "SPIKE",
+      "risk": "HIGH",
+      "done": [
+        "Spike ESMeta ES2026 coverage and exports is implemented and documented.",
+        "M0 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every P0 spike has a fixture-backed result and a documented fallback."
+      ],
+      "subsystems": [
+        "research",
+        "architecture",
+        "provenance"
+      ],
+      "parallelGroup": "M0-01",
+      "milestone": "M0",
+      "userValue": "Retire risks that could force a rewrite of ingestion, execution, or hosting."
+    },
+    {
+      "id": "R-005",
+      "title": "Audit Test262 clause mapping quality",
+      "goal": "Audit Test262 clause mapping quality so that retire risks that could force a rewrite of ingestion, execution, or hosting.",
+      "deliverable": "A reviewed and reproducible audit test262 clause mapping quality artifact.",
+      "dependsOn": [],
+      "kind": "research",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Audit Test262 clause mapping quality is implemented and documented.",
+        "M0 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every P0 spike has a fixture-backed result and a documented fallback."
+      ],
+      "subsystems": [
+        "research",
+        "architecture",
+        "provenance"
+      ],
+      "parallelGroup": "M0-01",
+      "milestone": "M0",
+      "userValue": "Retire risks that could force a rewrite of ingestion, execution, or hosting."
+    },
+    {
+      "id": "R-006",
+      "title": "Spike JSVU and JavaScriptCore on WSL2",
+      "goal": "Spike JSVU and JavaScriptCore on WSL2 so that retire risks that could force a rewrite of ingestion, execution, or hosting.",
+      "deliverable": "A reviewed and reproducible spike jsvu and javascriptcore on wsl2 artifact.",
+      "dependsOn": [],
+      "kind": "research",
+      "priority": "P0",
+      "size": "SPIKE",
+      "risk": "HIGH",
+      "done": [
+        "Spike JSVU and JavaScriptCore on WSL2 is implemented and documented.",
+        "M0 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every P0 spike has a fixture-backed result and a documented fallback."
+      ],
+      "subsystems": [
+        "research",
+        "architecture",
+        "provenance"
+      ],
+      "parallelGroup": "M0-01",
+      "milestone": "M0",
+      "userValue": "Retire risks that could force a rewrite of ingestion, execution, or hosting."
+    },
+    {
+      "id": "R-007",
+      "title": "Probe d8 runtime capabilities",
+      "goal": "Probe d8 runtime capabilities so that retire risks that could force a rewrite of ingestion, execution, or hosting.",
+      "deliverable": "A reviewed and reproducible probe d8 runtime capabilities artifact.",
+      "dependsOn": [
+        "R-001",
+        "R-002",
+        "R-003",
+        "R-004",
+        "R-005",
+        "R-006"
+      ],
+      "kind": "research",
+      "priority": "P1",
+      "size": "SPIKE",
+      "risk": "MEDIUM",
+      "done": [
+        "Probe d8 runtime capabilities is implemented and documented.",
+        "M0 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every P0 spike has a fixture-backed result and a documented fallback."
+      ],
+      "subsystems": [
+        "research",
+        "architecture",
+        "provenance"
+      ],
+      "parallelGroup": "M0-02",
+      "milestone": "M0",
+      "userValue": "Retire risks that could force a rewrite of ingestion, execution, or hosting."
+    },
+    {
+      "id": "R-008",
+      "title": "Complete browser sandbox threat model",
+      "goal": "Complete browser sandbox threat model so that retire risks that could force a rewrite of ingestion, execution, or hosting.",
+      "deliverable": "A reviewed and reproducible complete browser sandbox threat model artifact.",
+      "dependsOn": [
+        "R-001",
+        "R-002",
+        "R-003",
+        "R-004",
+        "R-005",
+        "R-006"
+      ],
+      "kind": "security",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Complete browser sandbox threat model is implemented and documented.",
+        "M0 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every P0 spike has a fixture-backed result and a documented fallback."
+      ],
+      "subsystems": [
+        "research",
+        "architecture",
+        "provenance"
+      ],
+      "parallelGroup": "M0-02",
+      "milestone": "M0",
+      "userValue": "Retire risks that could force a rewrite of ingestion, execution, or hosting."
+    },
+    {
+      "id": "R-009",
+      "title": "Benchmark JSON against derived SQLite",
+      "goal": "Benchmark JSON against derived SQLite so that retire risks that could force a rewrite of ingestion, execution, or hosting.",
+      "deliverable": "A reviewed and reproducible benchmark json against derived sqlite artifact.",
+      "dependsOn": [
+        "R-001",
+        "R-002",
+        "R-003",
+        "R-004",
+        "R-005",
+        "R-006"
+      ],
+      "kind": "research",
+      "priority": "P1",
+      "size": "SPIKE",
+      "risk": "MEDIUM",
+      "done": [
+        "Benchmark JSON against derived SQLite is implemented and documented.",
+        "M0 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every P0 spike has a fixture-backed result and a documented fallback."
+      ],
+      "subsystems": [
+        "research",
+        "architecture",
+        "provenance"
+      ],
+      "parallelGroup": "M0-02",
+      "milestone": "M0",
+      "userValue": "Retire risks that could force a rewrite of ingestion, execution, or hosting."
+    },
+    {
+      "id": "R-010",
+      "title": "Validate YAML authoring ergonomics",
+      "goal": "Validate YAML authoring ergonomics so that retire risks that could force a rewrite of ingestion, execution, or hosting.",
+      "deliverable": "A reviewed and reproducible validate yaml authoring ergonomics artifact.",
+      "dependsOn": [
+        "R-001",
+        "R-002",
+        "R-003",
+        "R-004",
+        "R-005",
+        "R-006"
+      ],
+      "kind": "research",
+      "priority": "P0",
+      "size": "S",
+      "risk": "MEDIUM",
+      "done": [
+        "Validate YAML authoring ergonomics is implemented and documented.",
+        "M0 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every P0 spike has a fixture-backed result and a documented fallback."
+      ],
+      "subsystems": [
+        "research",
+        "architecture",
+        "provenance"
+      ],
+      "parallelGroup": "M0-02",
+      "milestone": "M0",
+      "userValue": "Retire risks that could force a rewrite of ingestion, execution, or hosting."
+    },
+    {
+      "id": "R-011",
+      "title": "Validate static locale deployment",
+      "goal": "Validate static locale deployment so that retire risks that could force a rewrite of ingestion, execution, or hosting.",
+      "deliverable": "A reviewed and reproducible validate static locale deployment artifact.",
+      "dependsOn": [
+        "R-001",
+        "R-002",
+        "R-003",
+        "R-004",
+        "R-005",
+        "R-006"
+      ],
+      "kind": "research",
+      "priority": "P0",
+      "size": "S",
+      "risk": "MEDIUM",
+      "done": [
+        "Validate static locale deployment is implemented and documented.",
+        "M0 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every P0 spike has a fixture-backed result and a documented fallback."
+      ],
+      "subsystems": [
+        "research",
+        "architecture",
+        "provenance"
+      ],
+      "parallelGroup": "M0-02",
+      "milestone": "M0",
+      "userValue": "Retire risks that could force a rewrite of ingestion, execution, or hosting."
+    },
+    {
+      "id": "R-012",
+      "title": "Freeze baseline architecture decisions",
+      "goal": "Freeze baseline architecture decisions so that retire risks that could force a rewrite of ingestion, execution, or hosting.",
+      "deliverable": "A reviewed and reproducible freeze baseline architecture decisions artifact.",
+      "dependsOn": [
+        "R-001",
+        "R-002",
+        "R-003",
+        "R-004",
+        "R-005",
+        "R-006"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "S",
+      "risk": "LOW",
+      "done": [
+        "Freeze baseline architecture decisions is implemented and documented.",
+        "M0 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every P0 spike has a fixture-backed result and a documented fallback."
+      ],
+      "subsystems": [
+        "research",
+        "architecture",
+        "provenance"
+      ],
+      "parallelGroup": "M0-02",
+      "milestone": "M0",
+      "userValue": "Retire risks that could force a rewrite of ingestion, execution, or hosting."
+    },
+    {
+      "id": "B-001",
+      "title": "Create the WSL ext4 working checkout",
+      "goal": "Create the WSL ext4 working checkout so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible create the wsl ext4 working checkout artifact.",
+      "dependsOn": [
+        "R-007",
+        "R-008",
+        "R-009",
+        "R-010",
+        "R-011",
+        "R-012"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "S",
+      "risk": "MEDIUM",
+      "done": [
+        "Create the WSL ext4 working checkout is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-01",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "B-002",
+      "title": "Add project licenses and notices",
+      "goal": "Add project licenses and notices so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible add project licenses and notices artifact.",
+      "dependsOn": [
+        "R-007",
+        "R-008",
+        "R-009",
+        "R-010",
+        "R-011",
+        "R-012"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "S",
+      "risk": "MEDIUM",
+      "done": [
+        "Add project licenses and notices is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-01",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "B-003",
+      "title": "Pin Node and pnpm with checksums",
+      "goal": "Pin Node and pnpm with checksums so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible pin node and pnpm with checksums artifact.",
+      "dependsOn": [
+        "R-007",
+        "R-008",
+        "R-009",
+        "R-010",
+        "R-011",
+        "R-012"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "S",
+      "risk": "MEDIUM",
+      "done": [
+        "Pin Node and pnpm with checksums is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-01",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "B-004",
+      "title": "Create the pnpm workspace and root scripts",
+      "goal": "Create the pnpm workspace and root scripts so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible create the pnpm workspace and root scripts artifact.",
+      "dependsOn": [
+        "R-007",
+        "R-008",
+        "R-009",
+        "R-010",
+        "R-011",
+        "R-012"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "LOW",
+      "done": [
+        "Create the pnpm workspace and root scripts is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-01",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "B-005",
+      "title": "Create the Next.js static application",
+      "goal": "Create the Next.js static application so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible create the next.js static application artifact.",
+      "dependsOn": [
+        "B-001",
+        "B-002",
+        "B-003",
+        "B-004"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Create the Next.js static application is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-02",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "B-006",
+      "title": "Create the Mantine visual shell",
+      "goal": "Create the Mantine visual shell so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible create the mantine visual shell artifact.",
+      "dependsOn": [
+        "B-001",
+        "B-002",
+        "B-003",
+        "B-004"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Create the Mantine visual shell is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-02",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "B-007",
+      "title": "Generate explicit EN and RU routes",
+      "goal": "Generate explicit EN and RU routes so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible generate explicit en and ru routes artifact.",
+      "dependsOn": [
+        "B-001",
+        "B-002",
+        "B-003",
+        "B-004"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "S",
+      "risk": "MEDIUM",
+      "done": [
+        "Generate explicit EN and RU routes is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-02",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "B-008",
+      "title": "Create the shared model package",
+      "goal": "Create the shared model package so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible create the shared model package artifact.",
+      "dependsOn": [
+        "B-001",
+        "B-002",
+        "B-003",
+        "B-004"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "S",
+      "risk": "LOW",
+      "done": [
+        "Create the shared model package is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-02",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "B-009",
+      "title": "Configure formatting lint and types",
+      "goal": "Configure formatting lint and types so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible configure formatting lint and types artifact.",
+      "dependsOn": [
+        "B-005",
+        "B-006",
+        "B-007",
+        "B-008"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "S",
+      "risk": "LOW",
+      "done": [
+        "Configure formatting lint and types is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-03",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "B-010",
+      "title": "Configure Vitest",
+      "goal": "Configure Vitest so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible configure vitest artifact.",
+      "dependsOn": [
+        "B-005",
+        "B-006",
+        "B-007",
+        "B-008"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "S",
+      "risk": "LOW",
+      "done": [
+        "Configure Vitest is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-03",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "B-011",
+      "title": "Implement WSL doctor profiles",
+      "goal": "Implement WSL doctor profiles so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible implement wsl doctor profiles artifact.",
+      "dependsOn": [
+        "B-005",
+        "B-006",
+        "B-007",
+        "B-008"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Implement WSL doctor profiles is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-03",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "B-012",
+      "title": "Create Ubuntu CI",
+      "goal": "Create Ubuntu CI so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible create ubuntu ci artifact.",
+      "dependsOn": [
+        "B-005",
+        "B-006",
+        "B-007",
+        "B-008"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Create Ubuntu CI is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-03",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "B-013",
+      "title": "Create GitHub Pages deployment",
+      "goal": "Create GitHub Pages deployment so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible create github pages deployment artifact.",
+      "dependsOn": [
+        "B-005",
+        "B-006",
+        "B-007",
+        "B-008"
+      ],
+      "kind": "release",
+      "priority": "P1",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Create GitHub Pages deployment is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-03",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "B-014",
+      "title": "Document contribution security and decisions",
+      "goal": "Document contribution security and decisions so that a clean WSL checkout builds a bilingual static shell through one documented workflow.",
+      "deliverable": "A reviewed and reproducible document contribution security and decisions artifact.",
+      "dependsOn": [
+        "B-005",
+        "B-006",
+        "B-007",
+        "B-008"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "S",
+      "risk": "LOW",
+      "done": [
+        "Document contribution security and decisions is implemented and documented.",
+        "M1 quality evidence is recorded."
+      ],
+      "checks": [
+        "Doctor, checks, tests, and a static EN/RU build pass from a clean WSL checkout."
+      ],
+      "subsystems": [
+        "toolchain",
+        "web",
+        "ci"
+      ],
+      "parallelGroup": "M1-03",
+      "milestone": "M1",
+      "userValue": "A clean WSL checkout builds a bilingual static shell through one documented workflow."
+    },
+    {
+      "id": "I-001",
+      "title": "Create the source lock schema",
+      "goal": "Create the source lock schema so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible create the source lock schema artifact.",
+      "dependsOn": [
+        "B-009",
+        "B-010",
+        "B-011",
+        "B-012",
+        "B-013",
+        "B-014"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "S",
+      "risk": "MEDIUM",
+      "done": [
+        "Create the source lock schema is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-01",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-002",
+      "title": "Implement verified source fetching and caching",
+      "goal": "Implement verified source fetching and caching so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible implement verified source fetching and caching artifact.",
+      "dependsOn": [
+        "B-009",
+        "B-010",
+        "B-011",
+        "B-012",
+        "B-013",
+        "B-014"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Implement verified source fetching and caching is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-01",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-003",
+      "title": "Implement the Ecmarkup adapter boundary",
+      "goal": "Implement the Ecmarkup adapter boundary so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible implement the ecmarkup adapter boundary artifact.",
+      "dependsOn": [
+        "B-009",
+        "B-010",
+        "B-011",
+        "B-012",
+        "B-013",
+        "B-014"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Implement the Ecmarkup adapter boundary is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-01",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-004",
+      "title": "Extract clauses",
+      "goal": "Extract clauses so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible extract clauses artifact.",
+      "dependsOn": [
+        "I-001",
+        "I-002",
+        "I-003"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Extract clauses is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-02",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-005",
+      "title": "Extract AO SDO and internal method headers",
+      "goal": "Extract AO SDO and internal method headers so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible extract ao sdo and internal method headers artifact.",
+      "dependsOn": [
+        "I-001",
+        "I-002",
+        "I-003"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Extract AO SDO and internal method headers is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-02",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-006",
+      "title": "Extract algorithms and steps",
+      "goal": "Extract algorithms and steps so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible extract algorithms and steps artifact.",
+      "dependsOn": [
+        "I-001",
+        "I-002",
+        "I-003"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Extract algorithms and steps is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-02",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-007",
+      "title": "Extract grammar productions",
+      "goal": "Extract grammar productions so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible extract grammar productions artifact.",
+      "dependsOn": [
+        "I-001",
+        "I-002",
+        "I-003"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Extract grammar productions is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-02",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-008",
+      "title": "Extract cross references calls and effects",
+      "goal": "Extract cross references calls and effects so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible extract cross references calls and effects artifact.",
+      "dependsOn": [
+        "I-001",
+        "I-002",
+        "I-003"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Extract cross references calls and effects is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-02",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-009",
+      "title": "Capture source spans and fingerprints",
+      "goal": "Capture source spans and fingerprints so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible capture source spans and fingerprints artifact.",
+      "dependsOn": [
+        "I-004",
+        "I-005",
+        "I-006",
+        "I-007",
+        "I-008"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Capture source spans and fingerprints is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-03",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-010",
+      "title": "Finalize normalized spec schemas",
+      "goal": "Finalize normalized spec schemas so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible finalize normalized spec schemas artifact.",
+      "dependsOn": [
+        "I-004",
+        "I-005",
+        "I-006",
+        "I-007",
+        "I-008"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Finalize normalized spec schemas is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-03",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-011",
+      "title": "Implement sorted serializers",
+      "goal": "Implement sorted serializers so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible implement sorted serializers artifact.",
+      "dependsOn": [
+        "I-004",
+        "I-005",
+        "I-006",
+        "I-007",
+        "I-008"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "S",
+      "risk": "LOW",
+      "done": [
+        "Implement sorted serializers is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-03",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-012",
+      "title": "Create ingestion fixtures and goldens",
+      "goal": "Create ingestion fixtures and goldens so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible create ingestion fixtures and goldens artifact.",
+      "dependsOn": [
+        "I-004",
+        "I-005",
+        "I-006",
+        "I-007",
+        "I-008"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Create ingestion fixtures and goldens is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-03",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-013",
+      "title": "Implement ingestion integrity validation",
+      "goal": "Implement ingestion integrity validation so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible implement ingestion integrity validation artifact.",
+      "dependsOn": [
+        "I-004",
+        "I-005",
+        "I-006",
+        "I-007",
+        "I-008"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Implement ingestion integrity validation is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-03",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-014",
+      "title": "Publish the specification explorer",
+      "goal": "Publish the specification explorer so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible publish the specification explorer artifact.",
+      "dependsOn": [
+        "I-009",
+        "I-010",
+        "I-011",
+        "I-012",
+        "I-013"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "L",
+      "risk": "MEDIUM",
+      "done": [
+        "Publish the specification explorer is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-04",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-015",
+      "title": "Publish provenance panels",
+      "goal": "Publish provenance panels so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible publish provenance panels artifact.",
+      "dependsOn": [
+        "I-009",
+        "I-010",
+        "I-011",
+        "I-012",
+        "I-013"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "LOW",
+      "done": [
+        "Publish provenance panels is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-04",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "I-016",
+      "title": "Add deterministic ingestion CI",
+      "goal": "Add deterministic ingestion CI so that the specification becomes navigable, provenance-rich structured data.",
+      "deliverable": "A reviewed and reproducible add deterministic ingestion ci artifact.",
+      "dependsOn": [
+        "I-009",
+        "I-010",
+        "I-011",
+        "I-012",
+        "I-013"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Add deterministic ingestion CI is implemented and documented.",
+        "M2 quality evidence is recorded."
+      ],
+      "checks": [
+        "Two extractions are byte-identical and all graph integrity fixtures pass."
+      ],
+      "subsystems": [
+        "spec-ingest",
+        "model",
+        "web"
+      ],
+      "parallelGroup": "M2-04",
+      "milestone": "M2",
+      "userValue": "The specification becomes navigable, provenance-rich structured data."
+    },
+    {
+      "id": "G-001",
+      "title": "Finalize edge taxonomy",
+      "goal": "Finalize edge taxonomy so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible finalize edge taxonomy artifact.",
+      "dependsOn": [
+        "I-014",
+        "I-015",
+        "I-016"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Finalize edge taxonomy is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-01",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-002",
+      "title": "Implement the knowledge graph builder",
+      "goal": "Implement the knowledge graph builder so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible implement the knowledge graph builder artifact.",
+      "dependsOn": [
+        "I-014",
+        "I-015",
+        "I-016"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Implement the knowledge graph builder is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-01",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-003",
+      "title": "Build reverse indexes",
+      "goal": "Build reverse indexes so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible build reverse indexes artifact.",
+      "dependsOn": [
+        "I-014",
+        "I-015",
+        "I-016"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Build reverse indexes is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-01",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-004",
+      "title": "Implement SCC and cycle handling",
+      "goal": "Implement SCC and cycle handling so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible implement scc and cycle handling artifact.",
+      "dependsOn": [
+        "I-014",
+        "I-015",
+        "I-016"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Implement SCC and cycle handling is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-01",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-005",
+      "title": "Implement graph diffing",
+      "goal": "Implement graph diffing so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible implement graph diffing artifact.",
+      "dependsOn": [
+        "G-001",
+        "G-002",
+        "G-003",
+        "G-004"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Implement graph diffing is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-02",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-006",
+      "title": "Implement the staleness index",
+      "goal": "Implement the staleness index so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible implement the staleness index artifact.",
+      "dependsOn": [
+        "G-001",
+        "G-002",
+        "G-003",
+        "G-004"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Implement the staleness index is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-02",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-007",
+      "title": "Implement weighted context scoring",
+      "goal": "Implement weighted context scoring so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible implement weighted context scoring artifact.",
+      "dependsOn": [
+        "G-001",
+        "G-002",
+        "G-003",
+        "G-004"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Implement weighted context scoring is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-02",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-008",
+      "title": "Enforce context budgets and cutoffs",
+      "goal": "Enforce context budgets and cutoffs so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible enforce context budgets and cutoffs artifact.",
+      "dependsOn": [
+        "G-001",
+        "G-002",
+        "G-003",
+        "G-004"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Enforce context budgets and cutoffs is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-02",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-009",
+      "title": "Reuse fingerprint-matched verified content",
+      "goal": "Reuse fingerprint-matched verified content so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible reuse fingerprint-matched verified content artifact.",
+      "dependsOn": [
+        "G-001",
+        "G-002",
+        "G-003",
+        "G-004"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Reuse fingerprint-matched verified content is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-02",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-010",
+      "title": "Emit context package manifests",
+      "goal": "Emit context package manifests so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible emit context package manifests artifact.",
+      "dependsOn": [
+        "G-005",
+        "G-006",
+        "G-007",
+        "G-008",
+        "G-009"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Emit context package manifests is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-03",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-011",
+      "title": "Create the context builder CLI",
+      "goal": "Create the context builder CLI so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible create the context builder cli artifact.",
+      "dependsOn": [
+        "G-005",
+        "G-006",
+        "G-007",
+        "G-008",
+        "G-009"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Create the context builder CLI is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-03",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-012",
+      "title": "Create deterministic context fixtures",
+      "goal": "Create deterministic context fixtures so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible create deterministic context fixtures artifact.",
+      "dependsOn": [
+        "G-005",
+        "G-006",
+        "G-007",
+        "G-008",
+        "G-009"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Create deterministic context fixtures is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-03",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-013",
+      "title": "Publish a lazy Cytoscape subgraph",
+      "goal": "Publish a lazy Cytoscape subgraph so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible publish a lazy cytoscape subgraph artifact.",
+      "dependsOn": [
+        "G-005",
+        "G-006",
+        "G-007",
+        "G-008",
+        "G-009"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "L",
+      "risk": "MEDIUM",
+      "done": [
+        "Publish a lazy Cytoscape subgraph is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-03",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-014",
+      "title": "Publish AO drawer and breadcrumbs",
+      "goal": "Publish AO drawer and breadcrumbs so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible publish ao drawer and breadcrumbs artifact.",
+      "dependsOn": [
+        "G-005",
+        "G-006",
+        "G-007",
+        "G-008",
+        "G-009"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "L",
+      "risk": "MEDIUM",
+      "done": [
+        "Publish AO drawer and breadcrumbs is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-03",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "G-015",
+      "title": "Add the graph quality gate",
+      "goal": "Add the graph quality gate so that readers and agents can navigate real dependencies without loading the whole specification.",
+      "deliverable": "A reviewed and reproducible add the graph quality gate artifact.",
+      "dependsOn": [
+        "G-005",
+        "G-006",
+        "G-007",
+        "G-008",
+        "G-009"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Add the graph quality gate is implemented and documented.",
+        "M3 quality evidence is recorded."
+      ],
+      "checks": [
+        "Cyclic graphs terminate, context packages explain inclusion, and output is deterministic."
+      ],
+      "subsystems": [
+        "knowledge-graph",
+        "context-builder",
+        "web"
+      ],
+      "parallelGroup": "M3-03",
+      "milestone": "M3",
+      "userValue": "Readers and agents can navigate real dependencies without loading the whole specification."
+    },
+    {
+      "id": "C-001",
+      "title": "Define the article schema",
+      "goal": "Define the article schema so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible define the article schema artifact.",
+      "dependsOn": [
+        "G-010",
+        "G-011",
+        "G-012",
+        "G-013",
+        "G-014",
+        "G-015"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Define the article schema is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-01",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-002",
+      "title": "Define claim and citation schemas",
+      "goal": "Define claim and citation schemas so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible define claim and citation schemas artifact.",
+      "dependsOn": [
+        "G-010",
+        "G-011",
+        "G-012",
+        "G-013",
+        "G-014",
+        "G-015"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Define claim and citation schemas is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-01",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-003",
+      "title": "Define typed content blocks",
+      "goal": "Define typed content blocks so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible define typed content blocks artifact.",
+      "dependsOn": [
+        "G-010",
+        "G-011",
+        "G-012",
+        "G-013",
+        "G-014",
+        "G-015"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Define typed content blocks is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-01",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-004",
+      "title": "Define atomic knowledge",
+      "goal": "Define atomic knowledge so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible define atomic knowledge artifact.",
+      "dependsOn": [
+        "G-010",
+        "G-011",
+        "G-012",
+        "G-013",
+        "G-014",
+        "G-015"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Define atomic knowledge is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-01",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-005",
+      "title": "Define example test and engine references",
+      "goal": "Define example test and engine references so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible define example test and engine references artifact.",
+      "dependsOn": [
+        "G-010",
+        "G-011",
+        "G-012",
+        "G-013",
+        "G-014",
+        "G-015"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Define example test and engine references is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-01",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-006",
+      "title": "Define glossary entries",
+      "goal": "Define glossary entries so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible define glossary entries artifact.",
+      "dependsOn": [
+        "G-010",
+        "G-011",
+        "G-012",
+        "G-013",
+        "G-014",
+        "G-015"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "S",
+      "risk": "LOW",
+      "done": [
+        "Define glossary entries is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-01",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-007",
+      "title": "Define translation and parity schemas",
+      "goal": "Define translation and parity schemas so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible define translation and parity schemas artifact.",
+      "dependsOn": [
+        "C-001",
+        "C-002",
+        "C-003",
+        "C-004",
+        "C-005",
+        "C-006"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Define translation and parity schemas is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-02",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-008",
+      "title": "Define learning path and coverage schemas",
+      "goal": "Define learning path and coverage schemas so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible define learning path and coverage schemas artifact.",
+      "dependsOn": [
+        "C-001",
+        "C-002",
+        "C-003",
+        "C-004",
+        "C-005",
+        "C-006"
+      ],
+      "kind": "architecture",
+      "priority": "P1",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Define learning path and coverage schemas is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-02",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-009",
+      "title": "Generate JSON Schema from Zod",
+      "goal": "Generate JSON Schema from Zod so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible generate json schema from zod artifact.",
+      "dependsOn": [
+        "C-001",
+        "C-002",
+        "C-003",
+        "C-004",
+        "C-005",
+        "C-006"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "S",
+      "risk": "LOW",
+      "done": [
+        "Generate JSON Schema from Zod is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-02",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-010",
+      "title": "Implement the content compiler",
+      "goal": "Implement the content compiler so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible implement the content compiler artifact.",
+      "dependsOn": [
+        "C-001",
+        "C-002",
+        "C-003",
+        "C-004",
+        "C-005",
+        "C-006"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Implement the content compiler is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-02",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-011",
+      "title": "Integrate build-time Shiki",
+      "goal": "Integrate build-time Shiki so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible integrate build-time shiki artifact.",
+      "dependsOn": [
+        "C-001",
+        "C-002",
+        "C-003",
+        "C-004",
+        "C-005",
+        "C-006"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "S",
+      "risk": "LOW",
+      "done": [
+        "Integrate build-time Shiki is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-02",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-012",
+      "title": "Implement the publication state machine",
+      "goal": "Implement the publication state machine so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible implement the publication state machine artifact.",
+      "dependsOn": [
+        "C-007",
+        "C-008",
+        "C-009",
+        "C-010",
+        "C-011"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Implement the publication state machine is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-03",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-013",
+      "title": "Validate claims and citations",
+      "goal": "Validate claims and citations so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible validate claims and citations artifact.",
+      "dependsOn": [
+        "C-007",
+        "C-008",
+        "C-009",
+        "C-010",
+        "C-011"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Validate claims and citations is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-03",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-014",
+      "title": "Lint bilingual terminology",
+      "goal": "Lint bilingual terminology so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible lint bilingual terminology artifact.",
+      "dependsOn": [
+        "C-007",
+        "C-008",
+        "C-009",
+        "C-010",
+        "C-011"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Lint bilingual terminology is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-03",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-015",
+      "title": "Validate locale semantic parity",
+      "goal": "Validate locale semantic parity so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible validate locale semantic parity artifact.",
+      "dependsOn": [
+        "C-007",
+        "C-008",
+        "C-009",
+        "C-010",
+        "C-011"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Validate locale semantic parity is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-03",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-016",
+      "title": "Record editorial review artifacts",
+      "goal": "Record editorial review artifacts so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible record editorial review artifacts artifact.",
+      "dependsOn": [
+        "C-007",
+        "C-008",
+        "C-009",
+        "C-010",
+        "C-011"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Record editorial review artifacts is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-03",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-017",
+      "title": "Publish how to read algorithms atom",
+      "goal": "Publish how to read algorithms atom so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible publish how to read algorithms atom artifact.",
+      "dependsOn": [
+        "C-007",
+        "C-008",
+        "C-009",
+        "C-010",
+        "C-011"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Publish how to read algorithms atom is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-03",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "C-018",
+      "title": "Add the content CI gate",
+      "goal": "Add the content CI gate so that articles become reviewable evidence objects instead of unstructured prose.",
+      "deliverable": "A reviewed and reproducible add the content ci gate artifact.",
+      "dependsOn": [
+        "C-007",
+        "C-008",
+        "C-009",
+        "C-010",
+        "C-011"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Add the content CI gate is implemented and documented.",
+        "M4 quality evidence is recorded."
+      ],
+      "checks": [
+        "Broken citations locale drift stale hashes and uncertain ready claims stop publication."
+      ],
+      "subsystems": [
+        "model",
+        "content-compiler",
+        "validation"
+      ],
+      "parallelGroup": "M4-03",
+      "milestone": "M4",
+      "userValue": "Articles become reviewable evidence objects instead of unstructured prose."
+    },
+    {
+      "id": "V-001",
+      "title": "Map vertical-slice dependencies",
+      "goal": "Map vertical-slice dependencies so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible map vertical-slice dependencies artifact.",
+      "dependsOn": [
+        "C-012",
+        "C-013",
+        "C-014",
+        "C-015",
+        "C-016",
+        "C-017",
+        "C-018"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Map vertical-slice dependencies is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-01",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "V-002",
+      "title": "Build the bounded slice context",
+      "goal": "Build the bounded slice context so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible build the bounded slice context artifact.",
+      "dependsOn": [
+        "C-012",
+        "C-013",
+        "C-014",
+        "C-015",
+        "C-016",
+        "C-017",
+        "C-018"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Build the bounded slice context is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-01",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "V-003",
+      "title": "Define outcomes and prerequisites",
+      "goal": "Define outcomes and prerequisites so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible define outcomes and prerequisites artifact.",
+      "dependsOn": [
+        "C-012",
+        "C-013",
+        "C-014",
+        "C-015",
+        "C-016",
+        "C-017",
+        "C-018"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "S",
+      "risk": "LOW",
+      "done": [
+        "Define outcomes and prerequisites is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-01",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "V-004",
+      "title": "Author the Reference Record atom",
+      "goal": "Author the Reference Record atom so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible author the reference record atom artifact.",
+      "dependsOn": [
+        "V-001",
+        "V-002",
+        "V-003"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Author the Reference Record atom is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-02",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "V-005",
+      "title": "Author Completion and GetValue atoms",
+      "goal": "Author Completion and GetValue atoms so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible author completion and getvalue atoms artifact.",
+      "dependsOn": [
+        "V-001",
+        "V-002",
+        "V-003"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Author Completion and GetValue atoms is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-02",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "V-006",
+      "title": "Author the property access explanation",
+      "goal": "Author the property access explanation so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible author the property access explanation artifact.",
+      "dependsOn": [
+        "V-001",
+        "V-002",
+        "V-003"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Author the property access explanation is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-02",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "V-007",
+      "title": "Author EvaluateCall and this",
+      "goal": "Author EvaluateCall and this so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible author evaluatecall and this artifact.",
+      "dependsOn": [
+        "V-001",
+        "V-002",
+        "V-003"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Author EvaluateCall and this is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-02",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "V-008",
+      "title": "Author observable pressure tests",
+      "goal": "Author observable pressure tests so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible author observable pressure tests artifact.",
+      "dependsOn": [
+        "V-004",
+        "V-005",
+        "V-006",
+        "V-007"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Author observable pressure tests is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-03",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "V-009",
+      "title": "Author side-effect and abrupt traces",
+      "goal": "Author side-effect and abrupt traces so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible author side-effect and abrupt traces artifact.",
+      "dependsOn": [
+        "V-004",
+        "V-005",
+        "V-006",
+        "V-007"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Author side-effect and abrupt traces is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-03",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "V-010",
+      "title": "Document common misconceptions",
+      "goal": "Document common misconceptions so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible document common misconceptions artifact.",
+      "dependsOn": [
+        "V-004",
+        "V-005",
+        "V-006",
+        "V-007"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "S",
+      "risk": "MEDIUM",
+      "done": [
+        "Document common misconceptions is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-03",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "V-011",
+      "title": "Audit all slice citations",
+      "goal": "Audit all slice citations so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible audit all slice citations artifact.",
+      "dependsOn": [
+        "V-004",
+        "V-005",
+        "V-006",
+        "V-007"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Audit all slice citations is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-03",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "V-012",
+      "title": "Publish the interactive topic UI",
+      "goal": "Publish the interactive topic UI so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible publish the interactive topic ui artifact.",
+      "dependsOn": [
+        "V-004",
+        "V-005",
+        "V-006",
+        "V-007"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "XL",
+      "risk": "HIGH",
+      "done": [
+        "Publish the interactive topic UI is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-03",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "V-013",
+      "title": "Complete independent English review",
+      "goal": "Complete independent English review so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible complete independent english review artifact.",
+      "dependsOn": [
+        "V-008",
+        "V-009",
+        "V-010",
+        "V-011",
+        "V-012"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Complete independent English review is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-04",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "V-014",
+      "title": "Create the English release candidate",
+      "goal": "Create the English release candidate so that the first complete topic explains this from syntax through runtime semantics.",
+      "deliverable": "A reviewed and reproducible create the english release candidate artifact.",
+      "dependsOn": [
+        "V-008",
+        "V-009",
+        "V-010",
+        "V-011",
+        "V-012"
+      ],
+      "kind": "release",
+      "priority": "P0",
+      "size": "S",
+      "risk": "MEDIUM",
+      "done": [
+        "Create the English release candidate is implemented and documented.",
+        "M5 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every claim has evidence and readers can trace obj.method() to the this binding."
+      ],
+      "subsystems": [
+        "content",
+        "web",
+        "provenance"
+      ],
+      "parallelGroup": "M5-04",
+      "milestone": "M5",
+      "userValue": "The first complete topic explains this from syntax through runtime semantics."
+    },
+    {
+      "id": "E-001",
+      "title": "Finalize runner threat model and contract",
+      "goal": "Finalize runner threat model and contract so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible finalize runner threat model and contract artifact.",
+      "dependsOn": [
+        "V-013",
+        "V-014"
+      ],
+      "kind": "security",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Finalize runner threat model and contract is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-01",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-002",
+      "title": "Define the example manifest",
+      "goal": "Define the example manifest so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible define the example manifest artifact.",
+      "dependsOn": [
+        "V-013",
+        "V-014"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Define the example manifest is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-01",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-003",
+      "title": "Implement disposable container execution",
+      "goal": "Implement disposable container execution so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible implement disposable container execution artifact.",
+      "dependsOn": [
+        "V-013",
+        "V-014"
+      ],
+      "kind": "security",
+      "priority": "P0",
+      "size": "XL",
+      "risk": "HIGH",
+      "done": [
+        "Implement disposable container execution is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-01",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-004",
+      "title": "Define the engine adapter protocol",
+      "goal": "Define the engine adapter protocol so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible define the engine adapter protocol artifact.",
+      "dependsOn": [
+        "V-013",
+        "V-014"
+      ],
+      "kind": "architecture",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Define the engine adapter protocol is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-01",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-005",
+      "title": "Pin JSVU and engine distributions",
+      "goal": "Pin JSVU and engine distributions so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible pin jsvu and engine distributions artifact.",
+      "dependsOn": [
+        "E-001",
+        "E-002",
+        "E-003",
+        "E-004"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Pin JSVU and engine distributions is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-02",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-006",
+      "title": "Implement the V8 adapter",
+      "goal": "Implement the V8 adapter so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible implement the v8 adapter artifact.",
+      "dependsOn": [
+        "E-001",
+        "E-002",
+        "E-003",
+        "E-004"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Implement the V8 adapter is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-02",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-007",
+      "title": "Implement the SpiderMonkey adapter",
+      "goal": "Implement the SpiderMonkey adapter so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible implement the spidermonkey adapter artifact.",
+      "dependsOn": [
+        "E-001",
+        "E-002",
+        "E-003",
+        "E-004"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Implement the SpiderMonkey adapter is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-02",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-008",
+      "title": "Implement the JavaScriptCore adapter",
+      "goal": "Implement the JavaScriptCore adapter so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible implement the javascriptcore adapter artifact.",
+      "dependsOn": [
+        "E-001",
+        "E-002",
+        "E-003",
+        "E-004"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Implement the JavaScriptCore adapter is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-02",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-009",
+      "title": "Implement optional QuickJS adapter",
+      "goal": "Implement optional QuickJS adapter so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible implement optional quickjs adapter artifact.",
+      "dependsOn": [
+        "E-001",
+        "E-002",
+        "E-003",
+        "E-004"
+      ],
+      "kind": "build",
+      "priority": "P2",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Implement optional QuickJS adapter is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-02",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-010",
+      "title": "Index Test262 metadata",
+      "goal": "Index Test262 metadata so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible index test262 metadata artifact.",
+      "dependsOn": [
+        "E-005",
+        "E-006",
+        "E-007",
+        "E-008",
+        "E-009"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Index Test262 metadata is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-03",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-011",
+      "title": "Review Test262 relevance mappings",
+      "goal": "Review Test262 relevance mappings so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible review test262 relevance mappings artifact.",
+      "dependsOn": [
+        "E-005",
+        "E-006",
+        "E-007",
+        "E-008",
+        "E-009"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Review Test262 relevance mappings is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-03",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-012",
+      "title": "Finalize curated slice examples",
+      "goal": "Finalize curated slice examples so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible finalize curated slice examples artifact.",
+      "dependsOn": [
+        "E-005",
+        "E-006",
+        "E-007",
+        "E-008",
+        "E-009"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "L",
+      "risk": "MEDIUM",
+      "done": [
+        "Finalize curated slice examples is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-03",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-013",
+      "title": "Generate the differential engine matrix",
+      "goal": "Generate the differential engine matrix so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible generate the differential engine matrix artifact.",
+      "dependsOn": [
+        "E-005",
+        "E-006",
+        "E-007",
+        "E-008",
+        "E-009"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Generate the differential engine matrix is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-03",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-014",
+      "title": "Record run provenance and hashes",
+      "goal": "Record run provenance and hashes so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible record run provenance and hashes artifact.",
+      "dependsOn": [
+        "E-005",
+        "E-006",
+        "E-007",
+        "E-008",
+        "E-009"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Record run provenance and hashes is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-03",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-015",
+      "title": "Implement the opaque browser sandbox",
+      "goal": "Implement the opaque browser sandbox so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible implement the opaque browser sandbox artifact.",
+      "dependsOn": [
+        "E-010",
+        "E-011",
+        "E-012",
+        "E-013",
+        "E-014"
+      ],
+      "kind": "security",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Implement the opaque browser sandbox is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-04",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-016",
+      "title": "Integrate CodeMirror",
+      "goal": "Integrate CodeMirror so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible integrate codemirror artifact.",
+      "dependsOn": [
+        "E-010",
+        "E-011",
+        "E-012",
+        "E-013",
+        "E-014"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Integrate CodeMirror is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-04",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-017",
+      "title": "Publish the engine result matrix",
+      "goal": "Publish the engine result matrix so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible publish the engine result matrix artifact.",
+      "dependsOn": [
+        "E-010",
+        "E-011",
+        "E-012",
+        "E-013",
+        "E-014"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "L",
+      "risk": "MEDIUM",
+      "done": [
+        "Publish the engine result matrix is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-04",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-018",
+      "title": "Add the engine CI job",
+      "goal": "Add the engine CI job so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible add the engine ci job artifact.",
+      "dependsOn": [
+        "E-010",
+        "E-011",
+        "E-012",
+        "E-013",
+        "E-014"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Add the engine CI job is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-04",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "E-019",
+      "title": "Add sandbox negative tests",
+      "goal": "Add sandbox negative tests so that normative explanations are backed by reproducible observable evidence.",
+      "deliverable": "A reviewed and reproducible add sandbox negative tests artifact.",
+      "dependsOn": [
+        "E-010",
+        "E-011",
+        "E-012",
+        "E-013",
+        "E-014"
+      ],
+      "kind": "security",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Add sandbox negative tests is implemented and documented.",
+        "M6 quality evidence is recorded."
+      ],
+      "checks": [
+        "V8 SpiderMonkey and JSC run slice fixtures with provenance and sandbox tests pass."
+      ],
+      "subsystems": [
+        "example-runner",
+        "engine-runner",
+        "web",
+        "security"
+      ],
+      "parallelGroup": "M6-04",
+      "milestone": "M6",
+      "userValue": "Normative explanations are backed by reproducible observable evidence."
+    },
+    {
+      "id": "L-001",
+      "title": "Seed the bilingual glossary",
+      "goal": "Seed the bilingual glossary so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible seed the bilingual glossary artifact.",
+      "dependsOn": [
+        "E-015",
+        "E-016",
+        "E-017",
+        "E-018",
+        "E-019"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Seed the bilingual glossary is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-01",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "L-002",
+      "title": "Translate the vertical slice",
+      "goal": "Translate the vertical slice so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible translate the vertical slice artifact.",
+      "dependsOn": [
+        "E-015",
+        "E-016",
+        "E-017",
+        "E-018",
+        "E-019"
+      ],
+      "kind": "content",
+      "priority": "P0",
+      "size": "XL",
+      "risk": "HIGH",
+      "done": [
+        "Translate the vertical slice is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-01",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "L-003",
+      "title": "Validate Russian terminology",
+      "goal": "Validate Russian terminology so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible validate russian terminology artifact.",
+      "dependsOn": [
+        "E-015",
+        "E-016",
+        "E-017",
+        "E-018",
+        "E-019"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Validate Russian terminology is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-01",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "L-004",
+      "title": "Validate semantic translation parity",
+      "goal": "Validate semantic translation parity so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible validate semantic translation parity artifact.",
+      "dependsOn": [
+        "E-015",
+        "E-016",
+        "E-017",
+        "E-018",
+        "E-019"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Validate semantic translation parity is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-01",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "L-005",
+      "title": "Complete Russian technical and editorial review",
+      "goal": "Complete Russian technical and editorial review so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible complete russian technical and editorial review artifact.",
+      "dependsOn": [
+        "E-015",
+        "E-016",
+        "E-017",
+        "E-018",
+        "E-019"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Complete Russian technical and editorial review is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-01",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "L-006",
+      "title": "Publish locale comparison UI",
+      "goal": "Publish locale comparison UI so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible publish locale comparison ui artifact.",
+      "dependsOn": [
+        "L-001",
+        "L-002",
+        "L-003",
+        "L-004",
+        "L-005"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Publish locale comparison UI is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-02",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "L-007",
+      "title": "Generate static locale search indexes",
+      "goal": "Generate static locale search indexes so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible generate static locale search indexes artifact.",
+      "dependsOn": [
+        "L-001",
+        "L-002",
+        "L-003",
+        "L-004",
+        "L-005"
+      ],
+      "kind": "build",
+      "priority": "P0",
+      "size": "L",
+      "risk": "MEDIUM",
+      "done": [
+        "Generate static locale search indexes is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-02",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "L-008",
+      "title": "Publish coverage and learning map",
+      "goal": "Publish coverage and learning map so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible publish coverage and learning map artifact.",
+      "dependsOn": [
+        "L-001",
+        "L-002",
+        "L-003",
+        "L-004",
+        "L-005"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "L",
+      "risk": "MEDIUM",
+      "done": [
+        "Publish coverage and learning map is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-02",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "L-009",
+      "title": "Complete WCAG audit",
+      "goal": "Complete WCAG audit so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible complete wcag audit artifact.",
+      "dependsOn": [
+        "L-001",
+        "L-002",
+        "L-003",
+        "L-004",
+        "L-005"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Complete WCAG audit is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-02",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "L-010",
+      "title": "Enforce performance and bundle budgets",
+      "goal": "Enforce performance and bundle budgets so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible enforce performance and bundle budgets artifact.",
+      "dependsOn": [
+        "L-001",
+        "L-002",
+        "L-003",
+        "L-004",
+        "L-005"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Enforce performance and bundle budgets is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-02",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "L-011",
+      "title": "Generate hreflang sitemap and metadata",
+      "goal": "Generate hreflang sitemap and metadata so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible generate hreflang sitemap and metadata artifact.",
+      "dependsOn": [
+        "L-006",
+        "L-007",
+        "L-008",
+        "L-009",
+        "L-010"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "M",
+      "risk": "LOW",
+      "done": [
+        "Generate hreflang sitemap and metadata is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-03",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "L-012",
+      "title": "Complete license and attribution gate",
+      "goal": "Complete license and attribution gate so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible complete license and attribution gate artifact.",
+      "dependsOn": [
+        "L-006",
+        "L-007",
+        "L-008",
+        "L-009",
+        "L-010"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Complete license and attribution gate is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-03",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "L-013",
+      "title": "Deploy to GitHub Pages",
+      "goal": "Deploy to GitHub Pages so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible deploy to github pages artifact.",
+      "dependsOn": [
+        "L-006",
+        "L-007",
+        "L-008",
+        "L-009",
+        "L-010"
+      ],
+      "kind": "release",
+      "priority": "P0",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Deploy to GitHub Pages is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-03",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "L-014",
+      "title": "Publish the MVP release manifest",
+      "goal": "Publish the MVP release manifest so that a reviewed bilingual module is publicly accessible as a static site.",
+      "deliverable": "A reviewed and reproducible publish the mvp release manifest artifact.",
+      "dependsOn": [
+        "L-006",
+        "L-007",
+        "L-008",
+        "L-009",
+        "L-010"
+      ],
+      "kind": "release",
+      "priority": "P0",
+      "size": "S",
+      "risk": "MEDIUM",
+      "done": [
+        "Publish the MVP release manifest is implemented and documented.",
+        "M7 quality evidence is recorded."
+      ],
+      "checks": [
+        "EN and RU parity accessibility licenses provenance and Pages deployment are green."
+      ],
+      "subsystems": [
+        "content",
+        "localization",
+        "web",
+        "release"
+      ],
+      "parallelGroup": "M7-03",
+      "milestone": "M7",
+      "userValue": "A reviewed bilingual module is publicly accessible as a static site."
+    },
+    {
+      "id": "M-001",
+      "title": "Pin ESMeta JDK and sbt",
+      "goal": "Pin ESMeta JDK and sbt so that readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime.",
+      "deliverable": "A reviewed and reproducible pin esmeta jdk and sbt artifact.",
+      "dependsOn": [
+        "L-011",
+        "L-012",
+        "L-013",
+        "L-014"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Pin ESMeta JDK and sbt is implemented and documented.",
+        "M8 quality evidence is recorded."
+      ],
+      "checks": [
+        "Missing ESMeta artifacts degrade gracefully and present traces have provenance."
+      ],
+      "subsystems": [
+        "esmeta-adapter",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M8-01",
+      "milestone": "M8",
+      "userValue": "Readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime."
+    },
+    {
+      "id": "M-002",
+      "title": "Implement the ESMeta process adapter",
+      "goal": "Implement the ESMeta process adapter so that readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime.",
+      "deliverable": "A reviewed and reproducible implement the esmeta process adapter artifact.",
+      "dependsOn": [
+        "L-011",
+        "L-012",
+        "L-013",
+        "L-014"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Implement the ESMeta process adapter is implemented and documented.",
+        "M8 quality evidence is recorded."
+      ],
+      "checks": [
+        "Missing ESMeta artifacts degrade gracefully and present traces have provenance."
+      ],
+      "subsystems": [
+        "esmeta-adapter",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M8-01",
+      "milestone": "M8",
+      "userValue": "Readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime."
+    },
+    {
+      "id": "M-003",
+      "title": "Map ESMeta outputs to stable IDs",
+      "goal": "Map ESMeta outputs to stable IDs so that readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime.",
+      "deliverable": "A reviewed and reproducible map esmeta outputs to stable ids artifact.",
+      "dependsOn": [
+        "L-011",
+        "L-012",
+        "L-013",
+        "L-014"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Map ESMeta outputs to stable IDs is implemented and documented.",
+        "M8 quality evidence is recorded."
+      ],
+      "checks": [
+        "Missing ESMeta artifacts degrade gracefully and present traces have provenance."
+      ],
+      "subsystems": [
+        "esmeta-adapter",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M8-01",
+      "milestone": "M8",
+      "userValue": "Readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime."
+    },
+    {
+      "id": "M-004",
+      "title": "Normalize CFG and trace artifacts",
+      "goal": "Normalize CFG and trace artifacts so that readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime.",
+      "deliverable": "A reviewed and reproducible normalize cfg and trace artifacts artifact.",
+      "dependsOn": [
+        "L-011",
+        "L-012",
+        "L-013",
+        "L-014"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "XL",
+      "risk": "HIGH",
+      "done": [
+        "Normalize CFG and trace artifacts is implemented and documented.",
+        "M8 quality evidence is recorded."
+      ],
+      "checks": [
+        "Missing ESMeta artifacts degrade gracefully and present traces have provenance."
+      ],
+      "subsystems": [
+        "esmeta-adapter",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M8-01",
+      "milestone": "M8",
+      "userValue": "Readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime."
+    },
+    {
+      "id": "M-005",
+      "title": "Record formal trace provenance",
+      "goal": "Record formal trace provenance so that readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime.",
+      "deliverable": "A reviewed and reproducible record formal trace provenance artifact.",
+      "dependsOn": [
+        "L-011",
+        "L-012",
+        "L-013",
+        "L-014"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Record formal trace provenance is implemented and documented.",
+        "M8 quality evidence is recorded."
+      ],
+      "checks": [
+        "Missing ESMeta artifacts degrade gracefully and present traces have provenance."
+      ],
+      "subsystems": [
+        "esmeta-adapter",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M8-01",
+      "milestone": "M8",
+      "userValue": "Readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime."
+    },
+    {
+      "id": "M-006",
+      "title": "Publish synchronized trace UI",
+      "goal": "Publish synchronized trace UI so that readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime.",
+      "deliverable": "A reviewed and reproducible publish synchronized trace ui artifact.",
+      "dependsOn": [
+        "L-011",
+        "L-012",
+        "L-013",
+        "L-014"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "XL",
+      "risk": "HIGH",
+      "done": [
+        "Publish synchronized trace UI is implemented and documented.",
+        "M8 quality evidence is recorded."
+      ],
+      "checks": [
+        "Missing ESMeta artifacts degrade gracefully and present traces have provenance."
+      ],
+      "subsystems": [
+        "esmeta-adapter",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M8-01",
+      "milestone": "M8",
+      "userValue": "Readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime."
+    },
+    {
+      "id": "M-007",
+      "title": "Validate ESMeta against the first slice",
+      "goal": "Validate ESMeta against the first slice so that readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime.",
+      "deliverable": "A reviewed and reproducible validate esmeta against the first slice artifact.",
+      "dependsOn": [
+        "L-011",
+        "L-012",
+        "L-013",
+        "L-014"
+      ],
+      "kind": "validation",
+      "priority": "P1",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Validate ESMeta against the first slice is implemented and documented.",
+        "M8 quality evidence is recorded."
+      ],
+      "checks": [
+        "Missing ESMeta artifacts degrade gracefully and present traces have provenance."
+      ],
+      "subsystems": [
+        "esmeta-adapter",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M8-01",
+      "milestone": "M8",
+      "userValue": "Readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime."
+    },
+    {
+      "id": "M-008",
+      "title": "Implement graceful ESMeta degradation",
+      "goal": "Implement graceful ESMeta degradation so that readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime.",
+      "deliverable": "A reviewed and reproducible implement graceful esmeta degradation artifact.",
+      "dependsOn": [
+        "L-011",
+        "L-012",
+        "L-013",
+        "L-014"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Implement graceful ESMeta degradation is implemented and documented.",
+        "M8 quality evidence is recorded."
+      ],
+      "checks": [
+        "Missing ESMeta artifacts degrade gracefully and present traces have provenance."
+      ],
+      "subsystems": [
+        "esmeta-adapter",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M8-01",
+      "milestone": "M8",
+      "userValue": "Readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime."
+    },
+    {
+      "id": "M-009",
+      "title": "Add optional ESMeta CI",
+      "goal": "Add optional ESMeta CI so that readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime.",
+      "deliverable": "A reviewed and reproducible add optional esmeta ci artifact.",
+      "dependsOn": [
+        "L-011",
+        "L-012",
+        "L-013",
+        "L-014"
+      ],
+      "kind": "validation",
+      "priority": "P2",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Add optional ESMeta CI is implemented and documented.",
+        "M8 quality evidence is recorded."
+      ],
+      "checks": [
+        "Missing ESMeta artifacts degrade gracefully and present traces have provenance."
+      ],
+      "subsystems": [
+        "esmeta-adapter",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M8-01",
+      "milestone": "M8",
+      "userValue": "Readers can correlate JavaScript execution with formal traces without depending on ESMeta at runtime."
+    },
+    {
+      "id": "D-001",
+      "title": "Map V8 binary to source commit",
+      "goal": "Map V8 binary to source commit so that advanced readers see one pinned implementation without confusing it with the standard.",
+      "deliverable": "A reviewed and reproducible map v8 binary to source commit artifact.",
+      "dependsOn": [
+        "M-001",
+        "M-002",
+        "M-003",
+        "M-004",
+        "M-005",
+        "M-006",
+        "M-007",
+        "M-008",
+        "M-009"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Map V8 binary to source commit is implemented and documented.",
+        "M9 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every V8 artifact is pinned and visibly implementation-specific."
+      ],
+      "subsystems": [
+        "v8-analyzer",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M9-01",
+      "milestone": "M9",
+      "userValue": "Advanced readers see one pinned implementation without confusing it with the standard."
+    },
+    {
+      "id": "D-002",
+      "title": "Probe V8 flags at runtime",
+      "goal": "Probe V8 flags at runtime so that advanced readers see one pinned implementation without confusing it with the standard.",
+      "deliverable": "A reviewed and reproducible probe v8 flags at runtime artifact.",
+      "dependsOn": [
+        "M-001",
+        "M-002",
+        "M-003",
+        "M-004",
+        "M-005",
+        "M-006",
+        "M-007",
+        "M-008",
+        "M-009"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Probe V8 flags at runtime is implemented and documented.",
+        "M9 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every V8 artifact is pinned and visibly implementation-specific."
+      ],
+      "subsystems": [
+        "v8-analyzer",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M9-01",
+      "milestone": "M9",
+      "userValue": "Advanced readers see one pinned implementation without confusing it with the standard."
+    },
+    {
+      "id": "D-003",
+      "title": "Capture and parse Ignition bytecode",
+      "goal": "Capture and parse Ignition bytecode so that advanced readers see one pinned implementation without confusing it with the standard.",
+      "deliverable": "A reviewed and reproducible capture and parse ignition bytecode artifact.",
+      "dependsOn": [
+        "M-001",
+        "M-002",
+        "M-003",
+        "M-004",
+        "M-005",
+        "M-006",
+        "M-007",
+        "M-008",
+        "M-009"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Capture and parse Ignition bytecode is implemented and documented.",
+        "M9 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every V8 artifact is pinned and visibly implementation-specific."
+      ],
+      "subsystems": [
+        "v8-analyzer",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M9-01",
+      "milestone": "M9",
+      "userValue": "Advanced readers see one pinned implementation without confusing it with the standard."
+    },
+    {
+      "id": "D-004",
+      "title": "Version the bytecode instruction catalog",
+      "goal": "Version the bytecode instruction catalog so that advanced readers see one pinned implementation without confusing it with the standard.",
+      "deliverable": "A reviewed and reproducible version the bytecode instruction catalog artifact.",
+      "dependsOn": [
+        "M-001",
+        "M-002",
+        "M-003",
+        "M-004",
+        "M-005",
+        "M-006",
+        "M-007",
+        "M-008",
+        "M-009"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Version the bytecode instruction catalog is implemented and documented.",
+        "M9 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every V8 artifact is pinned and visibly implementation-specific."
+      ],
+      "subsystems": [
+        "v8-analyzer",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M9-01",
+      "milestone": "M9",
+      "userValue": "Advanced readers see one pinned implementation without confusing it with the standard."
+    },
+    {
+      "id": "D-005",
+      "title": "Capture cold and feedback fixtures",
+      "goal": "Capture cold and feedback fixtures so that advanced readers see one pinned implementation without confusing it with the standard.",
+      "deliverable": "A reviewed and reproducible capture cold and feedback fixtures artifact.",
+      "dependsOn": [
+        "M-001",
+        "M-002",
+        "M-003",
+        "M-004",
+        "M-005",
+        "M-006",
+        "M-007",
+        "M-008",
+        "M-009"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Capture cold and feedback fixtures is implemented and documented.",
+        "M9 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every V8 artifact is pinned and visibly implementation-specific."
+      ],
+      "subsystems": [
+        "v8-analyzer",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M9-01",
+      "milestone": "M9",
+      "userValue": "Advanced readers see one pinned implementation without confusing it with the standard."
+    },
+    {
+      "id": "D-006",
+      "title": "Capture optimization and deopt fixtures",
+      "goal": "Capture optimization and deopt fixtures so that advanced readers see one pinned implementation without confusing it with the standard.",
+      "deliverable": "A reviewed and reproducible capture optimization and deopt fixtures artifact.",
+      "dependsOn": [
+        "M-001",
+        "M-002",
+        "M-003",
+        "M-004",
+        "M-005",
+        "M-006",
+        "M-007",
+        "M-008",
+        "M-009"
+      ],
+      "kind": "build",
+      "priority": "P2",
+      "size": "XL",
+      "risk": "HIGH",
+      "done": [
+        "Capture optimization and deopt fixtures is implemented and documented.",
+        "M9 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every V8 artifact is pinned and visibly implementation-specific."
+      ],
+      "subsystems": [
+        "v8-analyzer",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M9-01",
+      "milestone": "M9",
+      "userValue": "Advanced readers see one pinned implementation without confusing it with the standard."
+    },
+    {
+      "id": "D-007",
+      "title": "Cite relevant V8 source",
+      "goal": "Cite relevant V8 source so that advanced readers see one pinned implementation without confusing it with the standard.",
+      "deliverable": "A reviewed and reproducible cite relevant v8 source artifact.",
+      "dependsOn": [
+        "D-001",
+        "D-002",
+        "D-003",
+        "D-004",
+        "D-005",
+        "D-006"
+      ],
+      "kind": "content",
+      "priority": "P1",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Cite relevant V8 source is implemented and documented.",
+        "M9 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every V8 artifact is pinned and visibly implementation-specific."
+      ],
+      "subsystems": [
+        "v8-analyzer",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M9-02",
+      "milestone": "M9",
+      "userValue": "Advanced readers see one pinned implementation without confusing it with the standard."
+    },
+    {
+      "id": "D-008",
+      "title": "Finalize V8 artifact provenance schema",
+      "goal": "Finalize V8 artifact provenance schema so that advanced readers see one pinned implementation without confusing it with the standard.",
+      "deliverable": "A reviewed and reproducible finalize v8 artifact provenance schema artifact.",
+      "dependsOn": [
+        "D-001",
+        "D-002",
+        "D-003",
+        "D-004",
+        "D-005",
+        "D-006"
+      ],
+      "kind": "architecture",
+      "priority": "P1",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Finalize V8 artifact provenance schema is implemented and documented.",
+        "M9 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every V8 artifact is pinned and visibly implementation-specific."
+      ],
+      "subsystems": [
+        "v8-analyzer",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M9-02",
+      "milestone": "M9",
+      "userValue": "Advanced readers see one pinned implementation without confusing it with the standard."
+    },
+    {
+      "id": "D-009",
+      "title": "Publish the V8 explanation mode",
+      "goal": "Publish the V8 explanation mode so that advanced readers see one pinned implementation without confusing it with the standard.",
+      "deliverable": "A reviewed and reproducible publish the v8 explanation mode artifact.",
+      "dependsOn": [
+        "D-001",
+        "D-002",
+        "D-003",
+        "D-004",
+        "D-005",
+        "D-006"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "XL",
+      "risk": "HIGH",
+      "done": [
+        "Publish the V8 explanation mode is implemented and documented.",
+        "M9 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every V8 artifact is pinned and visibly implementation-specific."
+      ],
+      "subsystems": [
+        "v8-analyzer",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M9-02",
+      "milestone": "M9",
+      "userValue": "Advanced readers see one pinned implementation without confusing it with the standard."
+    },
+    {
+      "id": "D-010",
+      "title": "Enforce implementation labels",
+      "goal": "Enforce implementation labels so that advanced readers see one pinned implementation without confusing it with the standard.",
+      "deliverable": "A reviewed and reproducible enforce implementation labels artifact.",
+      "dependsOn": [
+        "D-001",
+        "D-002",
+        "D-003",
+        "D-004",
+        "D-005",
+        "D-006"
+      ],
+      "kind": "validation",
+      "priority": "P0",
+      "size": "S",
+      "risk": "HIGH",
+      "done": [
+        "Enforce implementation labels is implemented and documented.",
+        "M9 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every V8 artifact is pinned and visibly implementation-specific."
+      ],
+      "subsystems": [
+        "v8-analyzer",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M9-02",
+      "milestone": "M9",
+      "userValue": "Advanced readers see one pinned implementation without confusing it with the standard."
+    },
+    {
+      "id": "D-011",
+      "title": "Add V8 artifact golden tests",
+      "goal": "Add V8 artifact golden tests so that advanced readers see one pinned implementation without confusing it with the standard.",
+      "deliverable": "A reviewed and reproducible add v8 artifact golden tests artifact.",
+      "dependsOn": [
+        "D-001",
+        "D-002",
+        "D-003",
+        "D-004",
+        "D-005",
+        "D-006"
+      ],
+      "kind": "validation",
+      "priority": "P1",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Add V8 artifact golden tests is implemented and documented.",
+        "M9 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every V8 artifact is pinned and visibly implementation-specific."
+      ],
+      "subsystems": [
+        "v8-analyzer",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M9-02",
+      "milestone": "M9",
+      "userValue": "Advanced readers see one pinned implementation without confusing it with the standard."
+    },
+    {
+      "id": "D-012",
+      "title": "Support an optional debug d8 build",
+      "goal": "Support an optional debug d8 build so that advanced readers see one pinned implementation without confusing it with the standard.",
+      "deliverable": "A reviewed and reproducible support an optional debug d8 build artifact.",
+      "dependsOn": [
+        "D-001",
+        "D-002",
+        "D-003",
+        "D-004",
+        "D-005",
+        "D-006"
+      ],
+      "kind": "build",
+      "priority": "P2",
+      "size": "XL",
+      "risk": "HIGH",
+      "done": [
+        "Support an optional debug d8 build is implemented and documented.",
+        "M9 quality evidence is recorded."
+      ],
+      "checks": [
+        "Every V8 artifact is pinned and visibly implementation-specific."
+      ],
+      "subsystems": [
+        "v8-analyzer",
+        "artifacts",
+        "web"
+      ],
+      "parallelGroup": "M9-02",
+      "milestone": "M9",
+      "userValue": "Advanced readers see one pinned implementation without confusing it with the standard."
+    },
+    {
+      "id": "S-001",
+      "title": "Sequence core learning paths",
+      "goal": "Sequence core learning paths so that the project becomes a maintainable learning system rather than a one-off demonstration.",
+      "deliverable": "A reviewed and reproducible sequence core learning paths artifact.",
+      "dependsOn": [
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012"
+      ],
+      "kind": "content",
+      "priority": "P1",
+      "size": "L",
+      "risk": "MEDIUM",
+      "done": [
+        "Sequence core learning paths is implemented and documented.",
+        "M10 quality evidence is recorded."
+      ],
+      "checks": [
+        "Source updates produce a reviewed stale queue and new modules reuse the same pipeline."
+      ],
+      "subsystems": [
+        "content",
+        "maintenance",
+        "release"
+      ],
+      "parallelGroup": "M10-01",
+      "milestone": "M10",
+      "userValue": "The project becomes a maintainable learning system rather than a one-off demonstration."
+    },
+    {
+      "id": "S-002",
+      "title": "Author the next content slices",
+      "goal": "Author the next content slices so that the project becomes a maintainable learning system rather than a one-off demonstration.",
+      "deliverable": "A reviewed and reproducible author the next content slices artifact.",
+      "dependsOn": [
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012"
+      ],
+      "kind": "content",
+      "priority": "P1",
+      "size": "XL",
+      "risk": "HIGH",
+      "done": [
+        "Author the next content slices is implemented and documented.",
+        "M10 quality evidence is recorded."
+      ],
+      "checks": [
+        "Source updates produce a reviewed stale queue and new modules reuse the same pipeline."
+      ],
+      "subsystems": [
+        "content",
+        "maintenance",
+        "release"
+      ],
+      "parallelGroup": "M10-01",
+      "milestone": "M10",
+      "userValue": "The project becomes a maintainable learning system rather than a one-off demonstration."
+    },
+    {
+      "id": "S-003",
+      "title": "Publish the coverage dashboard",
+      "goal": "Publish the coverage dashboard so that the project becomes a maintainable learning system rather than a one-off demonstration.",
+      "deliverable": "A reviewed and reproducible publish the coverage dashboard artifact.",
+      "dependsOn": [
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "L",
+      "risk": "MEDIUM",
+      "done": [
+        "Publish the coverage dashboard is implemented and documented.",
+        "M10 quality evidence is recorded."
+      ],
+      "checks": [
+        "Source updates produce a reviewed stale queue and new modules reuse the same pipeline."
+      ],
+      "subsystems": [
+        "content",
+        "maintenance",
+        "release"
+      ],
+      "parallelGroup": "M10-01",
+      "milestone": "M10",
+      "userValue": "The project becomes a maintainable learning system rather than a one-off demonstration."
+    },
+    {
+      "id": "S-004",
+      "title": "Watch the living specification",
+      "goal": "Watch the living specification so that the project becomes a maintainable learning system rather than a one-off demonstration.",
+      "deliverable": "A reviewed and reproducible watch the living specification artifact.",
+      "dependsOn": [
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Watch the living specification is implemented and documented.",
+        "M10 quality evidence is recorded."
+      ],
+      "checks": [
+        "Source updates produce a reviewed stale queue and new modules reuse the same pipeline."
+      ],
+      "subsystems": [
+        "content",
+        "maintenance",
+        "release"
+      ],
+      "parallelGroup": "M10-01",
+      "milestone": "M10",
+      "userValue": "The project becomes a maintainable learning system rather than a one-off demonstration."
+    },
+    {
+      "id": "S-005",
+      "title": "Generate change triage reports",
+      "goal": "Generate change triage reports so that the project becomes a maintainable learning system rather than a one-off demonstration.",
+      "deliverable": "A reviewed and reproducible generate change triage reports artifact.",
+      "dependsOn": [
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Generate change triage reports is implemented and documented.",
+        "M10 quality evidence is recorded."
+      ],
+      "checks": [
+        "Source updates produce a reviewed stale queue and new modules reuse the same pipeline."
+      ],
+      "subsystems": [
+        "content",
+        "maintenance",
+        "release"
+      ],
+      "parallelGroup": "M10-01",
+      "milestone": "M10",
+      "userValue": "The project becomes a maintainable learning system rather than a one-off demonstration."
+    },
+    {
+      "id": "S-006",
+      "title": "Operate the stale content queue",
+      "goal": "Operate the stale content queue so that the project becomes a maintainable learning system rather than a one-off demonstration.",
+      "deliverable": "A reviewed and reproducible operate the stale content queue artifact.",
+      "dependsOn": [
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Operate the stale content queue is implemented and documented.",
+        "M10 quality evidence is recorded."
+      ],
+      "checks": [
+        "Source updates produce a reviewed stale queue and new modules reuse the same pipeline."
+      ],
+      "subsystems": [
+        "content",
+        "maintenance",
+        "release"
+      ],
+      "parallelGroup": "M10-01",
+      "milestone": "M10",
+      "userValue": "The project becomes a maintainable learning system rather than a one-off demonstration."
+    },
+    {
+      "id": "S-007",
+      "title": "Finalize contributor workflow",
+      "goal": "Finalize contributor workflow so that the project becomes a maintainable learning system rather than a one-off demonstration.",
+      "deliverable": "A reviewed and reproducible finalize contributor workflow artifact.",
+      "dependsOn": [
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012"
+      ],
+      "kind": "build",
+      "priority": "P1",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Finalize contributor workflow is implemented and documented.",
+        "M10 quality evidence is recorded."
+      ],
+      "checks": [
+        "Source updates produce a reviewed stale queue and new modules reuse the same pipeline."
+      ],
+      "subsystems": [
+        "content",
+        "maintenance",
+        "release"
+      ],
+      "parallelGroup": "M10-01",
+      "milestone": "M10",
+      "userValue": "The project becomes a maintainable learning system rather than a one-off demonstration."
+    },
+    {
+      "id": "S-008",
+      "title": "Create release bundle and SBOM",
+      "goal": "Create release bundle and SBOM so that the project becomes a maintainable learning system rather than a one-off demonstration.",
+      "deliverable": "A reviewed and reproducible create release bundle and sbom artifact.",
+      "dependsOn": [
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012"
+      ],
+      "kind": "release",
+      "priority": "P1",
+      "size": "M",
+      "risk": "MEDIUM",
+      "done": [
+        "Create release bundle and SBOM is implemented and documented.",
+        "M10 quality evidence is recorded."
+      ],
+      "checks": [
+        "Source updates produce a reviewed stale queue and new modules reuse the same pipeline."
+      ],
+      "subsystems": [
+        "content",
+        "maintenance",
+        "release"
+      ],
+      "parallelGroup": "M10-01",
+      "milestone": "M10",
+      "userValue": "The project becomes a maintainable learning system rather than a one-off demonstration."
+    },
+    {
+      "id": "S-009",
+      "title": "Add accessibility and performance regression checks",
+      "goal": "Add accessibility and performance regression checks so that the project becomes a maintainable learning system rather than a one-off demonstration.",
+      "deliverable": "A reviewed and reproducible add accessibility and performance regression checks artifact.",
+      "dependsOn": [
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012"
+      ],
+      "kind": "validation",
+      "priority": "P1",
+      "size": "L",
+      "risk": "MEDIUM",
+      "done": [
+        "Add accessibility and performance regression checks is implemented and documented.",
+        "M10 quality evidence is recorded."
+      ],
+      "checks": [
+        "Source updates produce a reviewed stale queue and new modules reuse the same pipeline."
+      ],
+      "subsystems": [
+        "content",
+        "maintenance",
+        "release"
+      ],
+      "parallelGroup": "M10-01",
+      "milestone": "M10",
+      "userValue": "The project becomes a maintainable learning system rather than a one-off demonstration."
+    },
+    {
+      "id": "S-010",
+      "title": "Complete v1 security review",
+      "goal": "Complete v1 security review so that the project becomes a maintainable learning system rather than a one-off demonstration.",
+      "deliverable": "A reviewed and reproducible complete v1 security review artifact.",
+      "dependsOn": [
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012"
+      ],
+      "kind": "security",
+      "priority": "P0",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Complete v1 security review is implemented and documented.",
+        "M10 quality evidence is recorded."
+      ],
+      "checks": [
+        "Source updates produce a reviewed stale queue and new modules reuse the same pipeline."
+      ],
+      "subsystems": [
+        "content",
+        "maintenance",
+        "release"
+      ],
+      "parallelGroup": "M10-01",
+      "milestone": "M10",
+      "userValue": "The project becomes a maintainable learning system rather than a one-off demonstration."
+    },
+    {
+      "id": "S-011",
+      "title": "Establish editorial governance",
+      "goal": "Establish editorial governance so that the project becomes a maintainable learning system rather than a one-off demonstration.",
+      "deliverable": "A reviewed and reproducible establish editorial governance artifact.",
+      "dependsOn": [
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012"
+      ],
+      "kind": "validation",
+      "priority": "P1",
+      "size": "M",
+      "risk": "HIGH",
+      "done": [
+        "Establish editorial governance is implemented and documented.",
+        "M10 quality evidence is recorded."
+      ],
+      "checks": [
+        "Source updates produce a reviewed stale queue and new modules reuse the same pipeline."
+      ],
+      "subsystems": [
+        "content",
+        "maintenance",
+        "release"
+      ],
+      "parallelGroup": "M10-01",
+      "milestone": "M10",
+      "userValue": "The project becomes a maintainable learning system rather than a one-off demonstration."
+    },
+    {
+      "id": "S-012",
+      "title": "Publish v1 acceptance and release",
+      "goal": "Publish v1 acceptance and release so that the project becomes a maintainable learning system rather than a one-off demonstration.",
+      "deliverable": "A reviewed and reproducible publish v1 acceptance and release artifact.",
+      "dependsOn": [
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012"
+      ],
+      "kind": "release",
+      "priority": "P1",
+      "size": "L",
+      "risk": "HIGH",
+      "done": [
+        "Publish v1 acceptance and release is implemented and documented.",
+        "M10 quality evidence is recorded."
+      ],
+      "checks": [
+        "Source updates produce a reviewed stale queue and new modules reuse the same pipeline."
+      ],
+      "subsystems": [
+        "content",
+        "maintenance",
+        "release"
+      ],
+      "parallelGroup": "M10-01",
+      "milestone": "M10",
+      "userValue": "The project becomes a maintainable learning system rather than a one-off demonstration."
+    }
+  ]
+}

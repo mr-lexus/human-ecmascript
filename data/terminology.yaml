@@ -1,0 +1,17 @@
+version: 1
+terms:
+  - term: Reference Record
+    ru: Reference Record
+    policy: Keep the specification name in English; explain it in Russian on first use.
+  - term: base value
+    ru: значение-основание
+    policy: The field name Base remains in code and normative traces.
+  - term: receiver
+    ru: получатель
+    policy: Use receiver in API signatures and получатель in explanatory prose.
+  - term: abstract operation
+    ru: абстрактная операция
+    policy: Operation names such as GetValue are never translated.
+  - term: internal method
+    ru: внутренний метод
+    policy: Preserve double-bracket spellings such as [[Get]].

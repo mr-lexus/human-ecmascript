@@ -1,0 +1,40 @@
+{
+  "name": "human-ecmascript",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A bilingual, evidence-backed guide to ECMAScript",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@11.4.0",
+  "engines": {
+    "node": "24.18.1",
+    "pnpm": "11.4.0"
+  },
+  "scripts": {
+    "build": "pnpm validate:content && pnpm --filter @human-ecmascript/web build",
+    "check": "pnpm format:check && pnpm lint && pnpm check:types && pnpm test && pnpm validate:content && pnpm roadmap:check",
+    "check:types": "tsc --noEmit -p tsconfig.check.json",
+    "dev": "pnpm --filter @human-ecmascript/web dev",
+    "doctor": "bash scripts/doctor.sh",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "roadmap:generate": "node scripts/generate-roadmap.mjs",
+    "roadmap:check": "node scripts/generate-roadmap.mjs --check",
+    "test": "vitest run",
+    "validate:content": "tsx packages/validation/src/cli.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "26.1.2",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "eslint": "10.8.0",
+    "globals": "17.9.0",
+    "prettier": "3.9.6",
+    "tsx": "4.23.8",
+    "typescript": "6.0.2",
+    "typescript-eslint": "8.66.0",
+    "vitest": "4.1.10"
+  }
+}
