@@ -1,0 +1,562 @@
+id: values-types-memory
+slug: values-types-memory
+locale: en
+sourceContentHash: ae2e9596b25684cb
+title: "Values, objects, and the myth of reference types"
+eyebrow: "Language types → value semantics → V8 representations"
+dek: >-
+  JavaScript has primitive values, but it does not have an ECMAScript language type called
+  “reference”. Learn why object aliasing is not pass-by-reference, why integer is not a JavaScript
+  type, and why stack-versus-heap diagrams cannot explain the language.
+status: TECH_REVIEW
+sourceSnapshot: ECMA-262-ES2026
+readingMinutes: 28
+learningObjectives:
+  - Name the eight ECMAScript language types and distinguish language types from specification types.
+  - Explain assignment and argument passing without inventing a “reference type”.
+  - Predict primitive copying, object aliasing, String immutability, and Symbol identity.
+  - Separate ECMA-262 semantics from V8's Smi, heap-object, and optimized representations.
+prerequisites:
+  - A binding stores a value; the binding and the value are different concepts.
+  - Reference Records are specification-only records used while evaluating expressions.
+sections:
+  - id: values-mental-model
+    title: "Start with values, not memory boxes"
+    mode: human
+    blocks:
+      - id: values-mental-model-prose
+        type: prose
+        body: >-
+          ECMA-262 divides values that JavaScript code can manipulate into eight language types:
+          Undefined, Null, Boolean, String, Symbol, Number, BigInt, and Object. Values in the first
+          seven types are primitive values. Object is the remaining language type. That taxonomy
+          describes program behavior; it does not say “stack”, “heap”, “inline”, or “pointer”.
+      - id: values-core-claims
+        type: claims
+        claims:
+          - id: claim-language-types
+            classification: NORMATIVE
+            text: "The ECMAScript language types are Undefined, Null, Boolean, String, Symbol, Number, BigInt, and Object; values in every language type except Object are primitive values."
+            citationIds: [language-types, primitive-value-definition]
+            sourceFingerprint: 7cad09a970ce4a31
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-no-reference-language-type
+            classification: DERIVED
+            text: "There is no ECMAScript language type named `reference`. A Reference Record belongs to the separate family of specification types and cannot be obtained as a JavaScript value."
+            citationIds: [language-types, reference-record]
+            sourceFingerprint: 67cb5bfa268d443a
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-integer-is-number
+            classification: NORMATIVE
+            text: "`42` is a Number value. “Integer” describes a mathematical subset and several specification operations, but it is not another ECMAScript language type; `42n` is a BigInt value."
+            citationIds: [language-types, number-type, bigint-type]
+            sourceFingerprint: 875220aebf6d36a9
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+      - id: values-terminology-note
+        type: note
+        tone: insight
+        title: "“Primitive” is shorthand; “primitive value” is the precise term"
+        body: >-
+          Saying “a primitive” is harmless when it clearly means “a primitive value”. The mistake
+          begins when that word is turned into a memory-layout promise such as “stored on the stack”
+          or paired with a made-up opposite called a “reference type”.
+  - id: values-normative-model
+    title: "The specification passes and stores values"
+    mode: normative
+    blocks:
+      - id: values-normative-prose
+        type: prose
+        body: >-
+          Evaluation may temporarily produce a Reference Record for a name or property. `GetValue`
+          resolves that record to an ECMAScript language value. Assignment then writes the value to
+          another binding or property. When the value is an Object, both places can designate the same
+          Object; ECMA-262 does not need a second language type to express that identity.
+      - id: values-operation-map
+        type: operations
+        operations:
+          - id: op-language-value
+            name: ECMAScript language value
+            kind: record
+            summary: "A value characterized by one of the eight language types."
+            citationId: language-types
+          - id: op-reference-record-value-topic
+            name: Reference Record
+            kind: record
+            summary: "A specification-only record for a resolved name or property binding."
+            citationId: reference-record
+          - id: op-get-value-value-topic
+            name: GetValue
+            kind: abstract-operation
+            summary: "Turns a Reference Record into the language value currently stored there."
+            citationId: reference-record
+          - id: op-function-instantiation-value-topic
+            name: FunctionDeclarationInstantiation
+            kind: runtime-semantics
+            summary: "Creates parameter bindings and initializes them with argument values."
+            citationId: function-instantiation
+      - id: values-assignment-trace
+        type: trace
+        steps:
+          - id: trace-evaluate-source
+            label: "1. Evaluate the source expression"
+            operation: Evaluation
+            detail: "An expression such as `source` first produces a Reference Record for that binding."
+            citationId: reference-record
+          - id: trace-get-source-value
+            label: "2. Read its value"
+            operation: GetValue
+            detail: "GetValue obtains the Number, String, Symbol, BigInt, Object, or other language value held by the source binding."
+            citationId: reference-record
+          - id: trace-evaluate-target
+            label: "3. Resolve the destination"
+            operation: Assignment evaluation
+            detail: "The left side produces the Reference Record that identifies the destination binding or property."
+            citationId: assignment-operators
+          - id: trace-put-value
+            label: "4. Store that value"
+            operation: PutValue
+            detail: "Assignment stores the obtained language value. It does not switch between a copy operation and a pass-by-reference operation based on its type."
+            citationId: assignment-operators
+          - id: trace-observe-identity
+            label: "5. Object identity may now be shared"
+            operation: Object value
+            detail: "If the stored value designates an Object already stored elsewhere, both access paths reach that same Object. Reassigning either binding still changes only that binding."
+            citationId: object-type
+      - id: values-normative-claims
+        type: claims
+        claims:
+          - id: claim-assignment-copies-value
+            classification: DERIVED
+            text: "Assignment obtains an ECMAScript language value from the right-hand expression and stores that value at the left-hand reference. The algorithms do not define separate “copy by value” and “copy by reference” modes."
+            citationIds: [assignment-operators, reference-record]
+            sourceFingerprint: 07a6eab892028701
+            confidence: 0.99
+            reviewStatus: TECH_REVIEW
+          - id: claim-parameters-receive-values
+            classification: DERIVED
+            text: "A parameter binding is initialized from the corresponding argument value. Assigning a different value to that parameter does not assign to the caller's binding."
+            citationIds: [function-instantiation]
+            sourceFingerprint: 36bedc4b87df13ea
+            confidence: 0.99
+            reviewStatus: TECH_REVIEW
+          - id: claim-strings-immutable
+            classification: NORMATIVE
+            text: "A String value is an immutable ordered sequence of UTF-16 code units. An engine may share or intern its storage, but JavaScript still observes an immutable String value."
+            citationIds: [string-type]
+            sourceFingerprint: 271250dc77ab3f67
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+  - id: values-observable-behavior
+    title: "Aliasing is observable; pointers are not"
+    mode: observable
+    blocks:
+      - id: values-observable-prose
+        type: prose
+        body: >-
+          You can observe whether two expressions produce the same Object, and you can mutate that
+          Object through either access path. You cannot observe an address, ask whether a value is on
+          a stack, or detect whether two equal strings share storage. Phrase the rule in terms of
+          values and identity, because those are the guarantees your program actually receives.
+      - id: values-observable-claims
+        type: claims
+        claims:
+          - id: claim-primitive-reassignment-independent
+            classification: OBSERVABLE
+            text: "After `let b = a`, assigning a new primitive value to `b` does not change `a`. Primitive values themselves have no mutable properties that could reveal shared identity."
+            citationIds: [language-types, assignment-operators]
+            sourceFingerprint: edc13cd582940a08
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-object-aliasing
+            classification: OBSERVABLE
+            text: "If two bindings contain the same Object value, mutation through one path is visible through the other. Reassigning one binding to a different Object does not redirect the other binding."
+            citationIds: [object-type, assignment-operators]
+            sourceFingerprint: fbcf042113f58e56
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-not-pass-by-reference
+            classification: OBSERVABLE
+            text: "A function cannot replace the caller's variable by assigning to its parameter. It can mutate an Object received as an argument because the parameter and caller initially hold the same Object value."
+            citationIds: [function-instantiation, object-type]
+            sourceFingerprint: 5fd8c31be7f6c4c0
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-symbol-identity
+            classification: NORMATIVE
+            text: "Each call to `Symbol(description)` returns a unique Symbol value. The description is not its identity, and Symbol remains a primitive language type."
+            citationIds: [symbol-type, symbol-constructor]
+            sourceFingerprint: 241183623c85395f
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+      - id: values-observable-note
+        type: note
+        tone: warning
+        title: "Do not teach “objects are copied by reference”"
+        body: >-
+          That phrase predicts the common mutation example, but it predicts parameter replacement
+          badly and suggests that a reference is a user-visible value. Say “the same Object value is
+          stored in both bindings” and the mutation/reassignment distinction becomes straightforward.
+  - id: values-v8-representation
+    title: "One primitive is immediate; another is a heap object"
+    mode: v8
+    blocks:
+      - id: values-v8-prose
+        type: prose
+        body: >-
+          V8 represents general JavaScript values with several internal forms. In the pinned x64
+          build, `42` fits V8's Smi representation and its integer payload lives directly in a tagged
+          slot. The captured decimal Number, String, Symbol, and BigInt are represented by tagged
+          pointers to heap objects. These choices can change across builds and optimization tiers
+          without changing the program's ECMAScript type.
+      - id: values-v8-claims
+        type: claims
+        claims:
+          - id: claim-v8-smi
+            classification: V8_IMPLEMENTATION
+            text: "In the pinned V8 13.6 x64 build, `42` is a Smi: the small integer payload is encoded directly in the tagged value rather than stored in a separate HeapNumber."
+            citationIds: [v8-pointer-compression, v8-smi-source]
+            sourceFingerprint: bbf2378a03431130
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-v8-symbol-heap
+            classification: V8_IMPLEMENTATION
+            text: 'The same capture reports `Symbol("guide")` as a heap object with `SYMBOL_TYPE`. V8''s source declares Symbol as a Name, and Name extends PrimitiveHeapObject.'
+            citationIds: [v8-symbol-source]
+            sourceFingerprint: b10627869679eaf3
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-layout-not-language-type
+            classification: DERIVED
+            text: "Therefore “primitive = inline or stack” and “Object = heap reference” cannot be the ECMAScript type model: two primitive values already use different V8 representations."
+            citationIds: [language-types, v8-pointer-compression, v8-symbol-source]
+            sourceFingerprint: ae193b5b1c8c74c4
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-v8-optimized-representations
+            classification: V8_IMPLEMENTATION
+            text: "Optimizing V8 tiers may operate on unboxed numeric representations and rebox only when necessary. Source-level declarations do not uniquely determine a permanent stack or heap layout."
+            citationIds: [v8-maglev]
+            sourceFingerprint: f09b508effec5328
+            confidence: 0.99
+            reviewStatus: TECH_REVIEW
+      - id: values-v8-artifact
+        type: representation
+        artifactId: value-representations
+        title: "The same spec category, different V8 storage"
+        body: "Each tab is reproduced with `%IsSmi` and `%DebugPrint` from the pinned Linux binary. Addresses and unstable object hashes are deliberately removed."
+        cases:
+          - id: representation-smi
+            caseId: smi
+            title: "Small integer Number"
+            explanation: "`42` is a Number primitive value in ECMA-262 and a tagged-immediate `Smi` in this V8 build. Smi is an implementation representation, not a ninth JavaScript type."
+          - id: representation-heap-number
+            caseId: heap-number
+            title: "Decimal Number"
+            explanation: "`3.141592653589793` is also a Number primitive value, but this capture uses a `HeapNumber` and a tagged pointer. One language type can have multiple engine representations."
+          - id: representation-string
+            caseId: string
+            title: "String value"
+            explanation: "The literal is an immutable String value by the standard. Here V8 has internalized it as a heap object; storage sharing does not make the String mutable or reference-typed."
+          - id: representation-symbol
+            caseId: symbol
+            title: "Unique Symbol value"
+            explanation: "Symbol is a primitive language type, while V8 represents this Symbol as a `SYMBOL_TYPE` heap object. This is the cleanest counterexample to the stack/heap folklore."
+          - id: representation-bigint
+            caseId: bigint
+            title: "BigInt value"
+            explanation: "The BigInt primitive value is represented as a `BIG_INT_BASE_TYPE` heap object in this capture. Its arbitrary-size payload cannot fit in a Smi slot."
+      - id: values-performance-note
+        type: note
+        tone: implementation
+        title: "Performance rule: stabilize hot data, then measure"
+        body: >-
+          Do not choose APIs based on “primitive versus reference” folklore. In genuinely hot numeric
+          code, stable representations and dense TypedArrays can matter; V8 can also unbox values or
+          eliminate allocations. Use representative benchmarks and profiling, because the optimizer,
+          surrounding operations, and engine version decide more than the source-level type label.
+citations:
+  - id: language-types
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-ecmascript-language-types
+    label: "ECMA-262 §6.1 — ECMAScript Language Types"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-ecmascript-language-types
+    relevance: "Lists the eight language types and separates them from specification types."
+    evidenceHash: c8a916d9d9cf4a2e
+  - id: primitive-value-definition
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-terms-and-definitions-primitive-value
+    label: "ECMA-262 §4.4.5 — primitive value"
+    url: https://tc39.es/ecma262/2026/multipage/overview.html#sec-terms-and-definitions-primitive-value
+    relevance: "Defines primitive value as a member of a non-Object language type."
+    evidenceHash: ccf45a86557c9d66
+  - id: object-type
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-object-type
+    label: "ECMA-262 §6.1.7 — The Object Type"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-object-type
+    relevance: "Defines Object values, properties, and identity-bearing object behavior."
+    evidenceHash: 34f7c7f94ac2051c
+  - id: reference-record
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-reference-record-specification-type
+    label: "ECMA-262 §6.2.5 — Reference Record Specification Type"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-reference-record-specification-type
+    relevance: "Places Reference Records among specification types and defines GetValue and PutValue."
+    evidenceHash: 38d79e0ad4f58a73
+  - id: assignment-operators
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-assignment-operators-runtime-semantics-evaluation
+    label: "ECMA-262 — Assignment operator evaluation"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-assignment-operators-runtime-semantics-evaluation
+    relevance: "Shows GetValue of the right-hand expression followed by PutValue at the destination."
+    evidenceHash: 9d5d9b7b8181b612
+  - id: function-instantiation
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-functiondeclarationinstantiation
+    label: "ECMA-262 — FunctionDeclarationInstantiation"
+    url: https://tc39.es/ecma262/2026/multipage/ordinary-and-exotic-objects-behaviours.html#sec-functiondeclarationinstantiation
+    relevance: "Initializes parameter bindings from the corresponding argument values."
+    evidenceHash: 199ab6489775597f
+  - id: string-type
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-ecmascript-language-types-string-type
+    label: "ECMA-262 §6.1.4 — The String Type"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-ecmascript-language-types-string-type
+    relevance: "Defines String values as immutable ordered sequences of UTF-16 code units."
+    evidenceHash: adef5c0600ee0b07
+  - id: number-type
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-ecmascript-language-types-number-type
+    label: "ECMA-262 §6.1.6.1 — The Number Type"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-ecmascript-language-types-number-type
+    relevance: "Defines the Number language type; integer-valued Numbers remain Number values."
+    evidenceHash: 88302b189945cd4b
+  - id: bigint-type
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-ecmascript-language-types-bigint-type
+    label: "ECMA-262 §6.1.6.2 — The BigInt Type"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-ecmascript-language-types-bigint-type
+    relevance: "Defines BigInt as a distinct numeric language type."
+    evidenceHash: 8b716fd6116decef
+  - id: symbol-type
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-ecmascript-language-types-symbol-type
+    label: "ECMA-262 §6.1.5 — The Symbol Type"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-ecmascript-language-types-symbol-type
+    relevance: "Defines Symbol as a primitive language type whose values are unique and immutable."
+    evidenceHash: b0644897d57c8fe6
+  - id: symbol-constructor
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-symbol-description
+    label: "ECMA-262 — Symbol ( description )"
+    url: https://tc39.es/ecma262/2026/multipage/fundamental-objects.html#sec-symbol-description
+    relevance: "Specifies that Symbol returns a new unique Symbol value."
+    evidenceHash: bf381133b9812aad
+  - id: v8-pointer-compression
+    snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
+    nodeId: v8-tagged-values
+    label: "V8 — Pointer Compression and value tagging"
+    url: https://v8.dev/blog/pointer-compression
+    relevance: "Explains tagged values, heap pointers, and small integers stored directly in a tagged value."
+    evidenceHash: 087f0d56e79b1034
+  - id: v8-smi-source
+    snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
+    nodeId: src-objects-smi-h
+    label: "Pinned V8 source — Smi"
+    url: https://chromium.googlesource.com/v8/v8/+/241f63a62a3518ad4110e78e4f61815623c6e95d/src/objects/smi.h
+    relevance: "Defines V8's internal Smi small-integer representation."
+    evidenceHash: 2f7ef3b1b435f380
+  - id: v8-symbol-source
+    snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
+    nodeId: src-objects-name-tq
+    label: "Pinned V8 source — Symbol extends PrimitiveHeapObject"
+    url: https://chromium.googlesource.com/v8/v8/+/241f63a62a3518ad4110e78e4f61815623c6e95d/src/objects/name.tq
+    relevance: "Declares Name as a PrimitiveHeapObject and Symbol as a Name."
+    evidenceHash: 5f3143bbb485d840
+  - id: v8-maglev
+    snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
+    nodeId: v8-maglev-representation-selection
+    label: "V8 — Maglev representation selection"
+    url: https://v8.dev/blog/maglev#representation-selection
+    relevance: "Explains Smi encoding and unboxed numeric representations in optimizing code."
+    evidenceHash: d6f22747e76d2a0c
+examples:
+  - id: primitive-value-copy
+    title: "Independent primitive bindings"
+    goal: "Observe that rebinding a copied Number or String does not change the first binding."
+    sourcePath: examples/primitive-value-copy.js
+    timeoutMs: 1200
+    expectedOutput: ["7 7", "7 9", "hello hello", "hello goodbye"]
+    claimIds: [claim-primitive-reassignment-independent, claim-assignment-copies-value]
+    citationIds: [language-types, assignment-operators]
+  - id: object-value-alias
+    title: "Mutation versus rebinding"
+    goal: "Separate mutation of one shared Object from assigning a different Object to one binding."
+    sourcePath: examples/object-value-alias.js
+    timeoutMs: 1200
+    expectedOutput: ["2", "2 3"]
+    claimIds: [claim-object-aliasing, claim-assignment-copies-value]
+    citationIds: [object-type, assignment-operators]
+  - id: argument-passing-values
+    title: "An argument does not pass a variable by reference"
+    goal: "Compare parameter reassignment with mutation through a shared Object value."
+    sourcePath: examples/argument-passing-values.js
+    timeoutMs: 1200
+    expectedOutput: ["1", "2"]
+    claimIds: [claim-parameters-receive-values, claim-not-pass-by-reference]
+    citationIds: [function-instantiation, object-type]
+  - id: integer-is-number
+    title: "Integer is not a language type"
+    goal: "Compare an integer-valued Number with a BigInt value."
+    sourcePath: examples/integer-is-number.js
+    timeoutMs: 1200
+    expectedOutput: ["number", "true", "bigint"]
+    claimIds: [claim-integer-is-number]
+    citationIds: [number-type, bigint-type]
+  - id: symbol-identity
+    title: "A description is not Symbol identity"
+    goal: "Create two distinct Symbol values with equal descriptions and use both as property keys."
+    sourcePath: examples/symbol-identity.js
+    timeoutMs: 1200
+    expectedOutput: ["false", "2"]
+    claimIds: [claim-symbol-identity, claim-v8-symbol-heap]
+    citationIds: [symbol-type, symbol-constructor, v8-symbol-source]
+  - id: string-immutability
+    title: "String storage is not mutable identity"
+    goal: "Observe that an indexed write cannot change a String value."
+    sourcePath: examples/string-immutability.js
+    timeoutMs: 1200
+    expectedOutput: ["TypeError", "cat"]
+    claimIds: [claim-strings-immutable]
+    citationIds: [string-type]
+engineResults:
+  - {
+      exampleId: primitive-value-copy,
+      engine: V8,
+      version: "Node.js 24.18.1 / V8 13.6.233.17-node.50",
+      binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a,
+      status: verified,
+      output: ["7 7", "7 9", "hello hello", "hello goodbye"],
+      capturedAt: "2026-08-20",
+    }
+  - {
+      exampleId: object-value-alias,
+      engine: V8,
+      version: "Node.js 24.18.1 / V8 13.6.233.17-node.50",
+      binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a,
+      status: verified,
+      output: ["2", "2 3"],
+      capturedAt: "2026-08-20",
+    }
+  - {
+      exampleId: argument-passing-values,
+      engine: V8,
+      version: "Node.js 24.18.1 / V8 13.6.233.17-node.50",
+      binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a,
+      status: verified,
+      output: ["1", "2"],
+      capturedAt: "2026-08-20",
+    }
+  - {
+      exampleId: integer-is-number,
+      engine: V8,
+      version: "Node.js 24.18.1 / V8 13.6.233.17-node.50",
+      binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a,
+      status: verified,
+      output: ["number", "true", "bigint"],
+      capturedAt: "2026-08-20",
+    }
+  - {
+      exampleId: symbol-identity,
+      engine: V8,
+      version: "Node.js 24.18.1 / V8 13.6.233.17-node.50",
+      binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a,
+      status: verified,
+      output: ["false", "2"],
+      capturedAt: "2026-08-20",
+    }
+  - {
+      exampleId: string-immutability,
+      engine: V8,
+      version: "Node.js 24.18.1 / V8 13.6.233.17-node.50",
+      binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a,
+      status: verified,
+      output: ["TypeError", "cat"],
+      capturedAt: "2026-08-20",
+    }
+graph:
+  nodes:
+    - {
+        id: language-value,
+        label: "ECMAScript language value",
+        kind: type,
+        citationId: language-types,
+      }
+    - {
+        id: primitive-value,
+        label: "Primitive value",
+        kind: type,
+        citationId: primitive-value-definition,
+      }
+    - { id: object-value, label: "Object value", kind: type, citationId: object-type }
+    - {
+        id: reference-record-value-map,
+        label: "Reference Record",
+        kind: record,
+        citationId: reference-record,
+      }
+    - { id: get-value-map, label: "GetValue", kind: operation, citationId: reference-record }
+    - {
+        id: v8-tagged-value,
+        label: "V8 tagged value",
+        kind: representation,
+        citationId: v8-pointer-compression,
+      }
+    - { id: v8-smi, label: "Smi", kind: representation, citationId: v8-smi-source }
+    - {
+        id: v8-heap-object,
+        label: "Heap object",
+        kind: representation,
+        citationId: v8-symbol-source,
+      }
+  edges:
+    - {
+        id: value-edge-1,
+        source: language-value,
+        target: primitive-value,
+        kind: classifies,
+        weight: 3,
+      }
+    - {
+        id: value-edge-2,
+        source: language-value,
+        target: object-value,
+        kind: classifies,
+        weight: 3,
+      }
+    - {
+        id: value-edge-3,
+        source: reference-record-value-map,
+        target: get-value-map,
+        kind: uses,
+        weight: 2,
+      }
+    - { id: value-edge-4, source: get-value-map, target: language-value, kind: produces, weight: 3 }
+    - { id: value-edge-5, source: v8-tagged-value, target: v8-smi, kind: implements, weight: 2 }
+    - {
+        id: value-edge-6,
+        source: v8-tagged-value,
+        target: v8-heap-object,
+        kind: implements,
+        weight: 2,
+      }
+    - {
+        id: value-edge-7,
+        source: primitive-value,
+        target: v8-tagged-value,
+        kind: not-equivalent,
+        weight: 1,
+      }

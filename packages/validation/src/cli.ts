@@ -72,6 +72,18 @@ for (const slug of slugs) {
       throw new Error(`${artifact.id} binary provenance differs from its V8 engine result`);
     }
   }
+  for (const artifact of Object.values(en.representationArtifacts)) {
+    const captureHash = createHash("sha256").update(JSON.stringify(artifact.cases)).digest("hex");
+    if (captureHash !== artifact.captureSha256) {
+      throw new Error(`${artifact.id} normalized capture fingerprint is stale`);
+    }
+    const v8Results = en.engineResults.filter(
+      ({ engine, status }) => engine === "V8" && status === "verified",
+    );
+    if (!v8Results.some(({ binaryHash }) => binaryHash === artifact.runtime.binarySha256)) {
+      throw new Error(`${artifact.id} binary provenance has no matching verified V8 result`);
+    }
+  }
 }
 
 const sourceLock = readFileSync(join(process.cwd(), "data", "sources.lock.yaml"), "utf8");

@@ -18,6 +18,12 @@ const entries = {
       href: "/en/guide/const-let-var/",
     },
     {
+      title: "Values, objects, and reference-type myths",
+      detail: "Types and V8 representations · 28 min",
+      terms: "primitive value reference type object identity heap stack smi symbol bigint number",
+      href: "/en/guide/values-types-memory/",
+    },
+    {
       title: "GetValue",
       detail: "Abstract operation",
       terms: "getvalue reference value property",
@@ -49,6 +55,13 @@ const entries = {
       terms:
         "const let var tdz область видимости переменная всплытие производительность цикл замыкание",
       href: "/ru/guide/const-let-var/",
+    },
+    {
+      title: "Значения, объекты и миф о ссылочных типах",
+      detail: "Типы и представления V8 · 30 минут",
+      terms:
+        "примитив primitive value ссылочный тип объект идентичность куча heap стек smi symbol bigint number",
+      href: "/ru/guide/values-types-memory/",
     },
     {
       title: "GetValue",

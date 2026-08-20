@@ -6,9 +6,11 @@ import type {
   Citation,
   ClaimClassification,
   V8BytecodeArtifact,
+  V8ValueRepresentationArtifact,
 } from "@human-ecmascript/model";
 import { Fragment, useMemo, useState } from "react";
 import { V8BytecodeBlock } from "./V8BytecodeBlock";
+import { V8ValueRepresentationBlock } from "./V8ValueRepresentationBlock";
 
 const modeLabels = {
   en: {
@@ -87,11 +89,13 @@ export function ArticleModes({
   sections,
   citations,
   bytecodeArtifacts,
+  representationArtifacts,
   locale,
 }: Readonly<{
   sections: ArticleSection[];
   citations: Citation[];
   bytecodeArtifacts: Record<string, V8BytecodeArtifact>;
+  representationArtifacts: Record<string, V8ValueRepresentationArtifact>;
   locale: "en" | "ru";
 }>) {
   const [activeMode, setActiveMode] = useState<ArticleSection["mode"]>("human");
@@ -210,6 +214,17 @@ export function ArticleModes({
             const artifact = bytecodeArtifacts[block.artifactId];
             return artifact ? (
               <V8BytecodeBlock key={block.id} block={block} artifact={artifact} locale={locale} />
+            ) : null;
+          }
+          if (block.type === "representation") {
+            const artifact = representationArtifacts[block.artifactId];
+            return artifact ? (
+              <V8ValueRepresentationBlock
+                key={block.id}
+                block={block}
+                artifact={artifact}
+                locale={locale}
+              />
             ) : null;
           }
           return (

@@ -6,6 +6,7 @@ import {
   type CompiledArticle,
   type Locale,
   v8BytecodeArtifactSchema,
+  v8ValueRepresentationArtifactSchema,
 } from "@human-ecmascript/model";
 import { parse } from "yaml";
 
@@ -56,7 +57,32 @@ export function loadArticle(
       }
     }
   }
-  return { ...article, exampleSources, bytecodeArtifacts };
+  const representationBlocks = article.sections
+    .flatMap(({ blocks }) => blocks)
+    .filter((block) => block.type === "representation");
+  const representationArtifacts = Object.fromEntries(
+    [...new Set(representationBlocks.map(({ artifactId }) => artifactId))].map((artifactId) => {
+      const artifact = v8ValueRepresentationArtifactSchema.parse(
+        JSON.parse(readFileSync(join(root, "artifacts", "v8", `${artifactId}.json`), "utf8")),
+      );
+      if (artifact.id !== artifactId) {
+        throw new Error(
+          `Representation artifact id mismatch: expected ${artifactId}, received ${artifact.id}`,
+        );
+      }
+      return [artifactId, artifact];
+    }),
+  );
+  for (const block of representationBlocks) {
+    const artifact = representationArtifacts[block.artifactId]!;
+    const artifactCaseIds = new Set(artifact.cases.map(({ id }) => id));
+    for (const item of block.cases) {
+      if (!artifactCaseIds.has(item.caseId)) {
+        throw new Error(`Representation block ${block.id} references missing case ${item.caseId}`);
+      }
+    }
+  }
+  return { ...article, exampleSources, bytecodeArtifacts, representationArtifacts };
 }
 
 export function listArticleSlugs(locale: Locale, root = findWorkspaceRoot()): string[] {
@@ -76,6 +102,9 @@ function semanticShape(article: Article): string[] {
       ...(block.type === "operations" ? block.operations.map(({ id }) => `operation:${id}`) : []),
       ...(block.type === "bytecode"
         ? block.cases.map(({ id, caseId }) => `bytecode:${id}:${caseId}`)
+        : []),
+      ...(block.type === "representation"
+        ? block.cases.map(({ id, caseId }) => `representation:${id}:${caseId}`)
         : []),
     ]),
   ]);

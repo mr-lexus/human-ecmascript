@@ -87,6 +87,14 @@ export function KnowledgeMap({
           style: { "background-color": "#eef0ff", "border-color": "#7a80d8" },
         },
         {
+          selector: 'node[kind = "type"]',
+          style: { "background-color": "#eef8f3", "border-color": "#3f8c74" },
+        },
+        {
+          selector: 'node[kind = "representation"]',
+          style: { "background-color": "#fff0e5", "border-color": "#e67839" },
+        },
+        {
           selector: "edge",
           style: {
             width: "1.5px",

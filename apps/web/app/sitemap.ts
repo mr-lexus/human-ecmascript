@@ -16,6 +16,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.85,
     },
+    {
+      url: `${base}/${locale}/guide/values-types-memory/`,
+      changeFrequency: "monthly" as const,
+      priority: 0.85,
+    },
     { url: `${base}/${locale}/spec/`, changeFrequency: "monthly" as const, priority: 0.6 },
     { url: `${base}/${locale}/glossary/`, changeFrequency: "monthly" as const, priority: 0.5 },
   ]);

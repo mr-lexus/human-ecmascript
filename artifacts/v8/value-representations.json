@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "id": "value-representations",
+  "provider": "V8 tagged values",
+  "runtime": {
+    "name": "Node.js",
+    "version": "24.18.1",
+    "v8Version": "13.6.233.17-node.50",
+    "platform": "linux-x64",
+    "binarySha256": "f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a"
+  },
+  "commandTemplate": "node --allow-natives-syntax -e \"const value = <expression>; %IsSmi(value); %DebugPrint(value)\"",
+  "capturedAt": "2026-08-20",
+  "cases": [
+    {
+      "id": "smi",
+      "expression": "42",
+      "specType": "Number",
+      "isSmi": true,
+      "storage": "tagged-immediate",
+      "debugType": "Smi",
+      "debugSummary": ["DebugPrint: Smi (42)", "%IsSmi: true"]
+    },
+    {
+      "id": "heap-number",
+      "expression": "3.141592653589793",
+      "specType": "Number",
+      "isSmi": false,
+      "storage": "heap-object",
+      "debugType": "HeapNumber",
+      "debugSummary": ["DebugPrint: [HeapNumber]", "map type: HEAP_NUMBER_TYPE", "%IsSmi: false"]
+    },
+    {
+      "id": "string",
+      "expression": "\"hello\"",
+      "specType": "String",
+      "isSmi": false,
+      "storage": "heap-object",
+      "debugType": "String",
+      "debugSummary": [
+        "DebugPrint: [String]",
+        "map type: INTERNALIZED_ONE_BYTE_STRING_TYPE",
+        "%IsSmi: false"
+      ]
+    },
+    {
+      "id": "symbol",
+      "expression": "Symbol(\"guide\")",
+      "specType": "Symbol",
+      "isSmi": false,
+      "storage": "heap-object",
+      "debugType": "Symbol",
+      "debugSummary": ["DebugPrint: [Symbol]", "map type: SYMBOL_TYPE", "%IsSmi: false"]
+    },
+    {
+      "id": "bigint",
+      "expression": "12345678901234567890n",
+      "specType": "BigInt",
+      "isSmi": false,
+      "storage": "heap-object",
+      "debugType": "BigInt",
+      "debugSummary": ["DebugPrint: [BigInt]", "map type: BIG_INT_BASE_TYPE", "%IsSmi: false"]
+    }
+  ],
+  "captureSha256": "8fe4e4f945ce664891df9ec480d5eb84704d049f167b9bc12f6f8fc454c6aa8a"
+}

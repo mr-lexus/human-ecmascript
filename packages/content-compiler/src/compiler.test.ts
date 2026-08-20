@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { listArticleSlugs, loadArticle, validateContentPair } from "./index";
 
 describe("content compiler", () => {
-  it.each(["const-let-var", "reference-call-this"])(
+  it.each(["const-let-var", "reference-call-this", "values-types-memory"])(
     "loads the bilingual %s slice with matching semantic structure",
     (slug) => {
       const en = loadArticle("en", slug);
@@ -12,7 +12,11 @@ describe("content compiler", () => {
   );
 
   it("discovers every article deterministically", () => {
-    expect(listArticleSlugs("en")).toEqual(["const-let-var", "reference-call-this"]);
+    expect(listArticleSlugs("en")).toEqual([
+      "const-let-var",
+      "reference-call-this",
+      "values-types-memory",
+    ]);
     expect(listArticleSlugs("ru")).toEqual(listArticleSlugs("en"));
   });
 
@@ -37,6 +41,21 @@ describe("content compiler", () => {
         .find(({ id }) => id === "initialized-let")
         ?.instructions.map(({ opcode }) => opcode),
     ).not.toContain("ThrowReferenceErrorIfHole");
+  });
+
+  it("loads the pinned V8 value representations without confusing spec types and storage", () => {
+    const values = loadArticle("en", "values-types-memory");
+    const artifact = values.representationArtifacts["value-representations"];
+    expect(artifact?.cases.find(({ id }) => id === "smi")).toMatchObject({
+      specType: "Number",
+      storage: "tagged-immediate",
+      isSmi: true,
+    });
+    expect(artifact?.cases.find(({ id }) => id === "symbol")).toMatchObject({
+      specType: "Symbol",
+      storage: "heap-object",
+      debugType: "Symbol",
+    });
   });
 
   it("rejects a translation whose English source fingerprint is stale", () => {

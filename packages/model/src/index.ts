@@ -100,6 +100,23 @@ export const contentBlockSchema = z.discriminatedUnion("type", [
       )
       .min(1),
   }),
+  z.object({
+    id: z.string(),
+    type: z.literal("representation"),
+    artifactId: z.string().regex(/^[a-z0-9-]+$/),
+    title: z.string().min(1),
+    body: z.string().min(1),
+    cases: z
+      .array(
+        z.object({
+          id: z.string().min(1),
+          caseId: z.string().min(1),
+          title: z.string().min(1),
+          explanation: z.string().min(1),
+        }),
+      )
+      .min(1),
+  }),
 ]);
 export type ContentBlock = z.infer<typeof contentBlockSchema>;
 
@@ -173,17 +190,62 @@ export const v8BytecodeArtifactSchema = z.object({
 });
 export type V8BytecodeArtifact = z.infer<typeof v8BytecodeArtifactSchema>;
 
+export const v8ValueRepresentationCaseSchema = z.object({
+  id: z.string().min(1),
+  expression: z.string().min(1),
+  specType: z.enum(["Number", "String", "Symbol", "BigInt"]),
+  isSmi: z.boolean(),
+  storage: z.enum(["tagged-immediate", "heap-object"]),
+  debugType: z.string().min(1),
+  debugSummary: z.array(z.string().min(1)).min(1),
+});
+
+export const v8ValueRepresentationArtifactSchema = z.object({
+  schemaVersion: z.literal(1),
+  id: z.string().regex(/^[a-z0-9-]+$/),
+  provider: z.literal("V8 tagged values"),
+  runtime: z.object({
+    name: z.literal("Node.js"),
+    version: z.string().min(1),
+    v8Version: z.string().min(1),
+    platform: z.string().min(1),
+    binarySha256: z.string().regex(/^[0-9a-f]{64}$/),
+  }),
+  commandTemplate: z.string().min(1),
+  capturedAt: z.string().date(),
+  cases: z.array(v8ValueRepresentationCaseSchema).min(1),
+  captureSha256: z.string().regex(/^[0-9a-f]{64}$/),
+});
+export type V8ValueRepresentationArtifact = z.infer<typeof v8ValueRepresentationArtifactSchema>;
+
 export const graphNodeSchema = z.object({
   id: z.string(),
   label: z.string(),
-  kind: z.enum(["syntax", "record", "operation", "internal-method", "call"]),
+  kind: z.enum([
+    "syntax",
+    "record",
+    "operation",
+    "internal-method",
+    "call",
+    "type",
+    "representation",
+  ]),
   citationId: z.string().optional(),
 });
 export const graphEdgeSchema = z.object({
   id: z.string(),
   source: z.string(),
   target: z.string(),
-  kind: z.enum(["produces", "calls", "uses", "supplies-receiver", "binds"]),
+  kind: z.enum([
+    "produces",
+    "calls",
+    "uses",
+    "supplies-receiver",
+    "binds",
+    "classifies",
+    "implements",
+    "not-equivalent",
+  ]),
   weight: z.number().positive().default(1),
 });
 export type GraphNode = z.infer<typeof graphNodeSchema>;
@@ -260,6 +322,7 @@ export type Article = z.infer<typeof articleSchema>;
 export type CompiledArticle = Article & {
   exampleSources: Record<string, string>;
   bytecodeArtifacts: Record<string, V8BytecodeArtifact>;
+  representationArtifacts: Record<string, V8ValueRepresentationArtifact>;
 };
 
 export const specNodeSchema = z.object({

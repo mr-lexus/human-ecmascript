@@ -17,6 +17,9 @@ const copy = {
     declarationTitle: "const, let, and var without folklore",
     declarationBody:
       "Trace initialization, TDZ, scopes, loop bindings, and the real performance boundary behind each declaration.",
+    valuesTitle: "Values, objects, and the myth of reference types",
+    valuesBody:
+      "Replace stack-versus-heap folklore with the ECMA-262 value model, observable identity, and a pinned V8 Smi/Symbol comparison.",
     evidence: "Evidence layers",
     evidenceBody:
       "Every statement tells you whether it is normative, derived, observable, host-defined, or implementation-specific.",
@@ -36,6 +39,9 @@ const copy = {
     declarationTitle: "const, let и var — без мифов",
     declarationBody:
       "Разберём инициализацию, TDZ, области видимости, циклы и честные правила выбора без мифов о скорости.",
+    valuesTitle: "Значения, объекты и миф о ссылочных типах",
+    valuesBody:
+      "Отделим типы ECMA-262 от устройства памяти и сравним, как V8 представляет небольшое число и Symbol.",
     evidence: "Откуда мы это знаем",
     evidenceBody:
       "У каждого технического утверждения есть метка и источник: стандарт, логический вывод, запускаемый пример или данные конкретного движка.",
@@ -111,9 +117,9 @@ export default async function HomePage({ params }: { params: Promise<{ lang: "en
             <h2>{t.pathTitle}</h2>
           </div>
           <div className="coverage-ring">
-            <strong>2</strong>
+            <strong>3</strong>
             <span>
-              / 2<br />
+              / 3<br />
               NOW
             </span>
           </div>
@@ -139,6 +145,18 @@ export default async function HomePage({ params }: { params: Promise<{ lang: "en
             </div>
             <div className="path-meta">
               <span>22–24 min</span>
+              <span>6 examples</span>
+              <span aria-hidden="true">→</span>
+            </div>
+          </Link>
+          <Link className="path-card" href={`/${lang}/guide/values-types-memory/`}>
+            <div className="path-number">03</div>
+            <div>
+              <h3>{t.valuesTitle}</h3>
+              <p>{t.valuesBody}</p>
+            </div>
+            <div className="path-meta">
+              <span>28–30 min</span>
               <span>6 examples</span>
               <span aria-hidden="true">→</span>
             </div>

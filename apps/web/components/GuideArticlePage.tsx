@@ -14,12 +14,17 @@ export function GuideArticlePage({
   sequence: number;
 }>) {
   const isDeclarationTopic = article.slug === "const-let-var";
+  const isValueTopic = article.slug === "values-types-memory";
   const labels =
     locale === "ru"
       ? {
           path: "Тема",
           objectives: "После этой темы вы сможете",
-          map: isDeclarationTopic ? "Карта переменных" : "Схема вызова",
+          map: isDeclarationTopic
+            ? "Карта переменных"
+            : isValueTopic
+              ? "Карта значений"
+              : "Схема вызова",
           lab: "Примеры, которые можно запустить",
           sources: "На что мы опираемся",
           status:
@@ -30,7 +35,7 @@ export function GuideArticlePage({
       : {
           path: "Learning path",
           objectives: "After this topic, you can",
-          map: isDeclarationTopic ? "Binding map" : "Evaluation map",
+          map: isDeclarationTopic ? "Binding map" : isValueTopic ? "Value map" : "Evaluation map",
           lab: "Example laboratory",
           sources: "Sources and provenance",
           status:
@@ -84,6 +89,7 @@ export function GuideArticlePage({
           sections={article.sections}
           citations={article.citations}
           bytecodeArtifacts={article.bytecodeArtifacts}
+          representationArtifacts={article.representationArtifacts}
           locale={locale}
         />
       </section>
