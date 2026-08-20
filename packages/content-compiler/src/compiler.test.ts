@@ -53,6 +53,21 @@ describe("content compiler", () => {
     ).not.toContain("ThrowReferenceErrorIfHole");
   });
 
+  it("separates syntactic nesting from captured and per-iteration context costs", () => {
+    const declarations = loadArticle("en", "const-let-var");
+    const artifact = declarations.bytecodeArtifacts["const-let-var-nesting"];
+    const opcodes = (id: string) =>
+      artifact?.cases.find((item) => item.id === id)?.instructions.map(({ opcode }) => opcode);
+
+    expect(opcodes("nested-let-read")).toEqual(opcodes("nested-var-read"));
+    expect(opcodes("make-captured-let")).toContain("CreateFunctionContext");
+    expect(opcodes("make-captured-var")).toContain("CreateFunctionContext");
+    expect(opcodes("read-captured-let")).toContain("LdaImmutableCurrentContextSlot");
+    expect(opcodes("read-captured-var")).toContain("LdaImmutableCurrentContextSlot");
+    expect(opcodes("captured-loop-let")).toContain("CreateBlockContext");
+    expect(opcodes("captured-loop-var")).not.toContain("CreateBlockContext");
+  });
+
   it("loads the pinned V8 value representations without confusing spec types and storage", () => {
     const values = loadArticle("en", "values-types-memory");
     const artifact = values.representationArtifacts["value-representations"];

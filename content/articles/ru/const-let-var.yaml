@@ -2,7 +2,7 @@ id: const-let-var-ru
 slug: const-let-var
 locale: ru
 translationOf: const-let-var
-sourceContentHash: d5210b55851af115
+sourceContentHash: 82387690804e0e9a
 title: "const, let и var: без мифов и запретов"
 eyebrow: "Переменная → инициализация → область видимости → производительность"
 dek: >-
@@ -11,10 +11,10 @@ dek: >-
   `var` остаётся уместным и намеренным выбором.
 status: LOCALE_REVIEW
 sourceSnapshot: ECMA-262-ES2026
-readingMinutes: 32
+readingMinutes: 40
 learningObjectives:
   - Различать создание переменной, первое присваивание значения, чтение и последующее переназначение.
-  - Предсказывать блочную и функциональную область видимости, TDZ и поведение замыканий в цикле.
+  - Предсказывать блочную и функциональную область видимости, TDZ и захват переменных в цикле.
   - Выбирать `const`, `let` или `var`, не опираясь на мифы о производительности.
   - Читать закреплённый байткод Ignition и находить в нём проверку TDZ.
 prerequisites:
@@ -172,7 +172,8 @@ sections:
         type: prose
         body: >-
           Область видимости и момент инициализации меняют поведение программы. Примеры сравнивают
-          раннее чтение, видимость после блока, изменение объекта через `const` и замыкания в цикле.
+          раннее чтение, видимость после блока, изменение объекта через `const` и функции, которые
+          продолжают обращаться к переменным цикла.
           В конце показаны обычная связка `const` с `let`, намеренный функциональный `var` и тот же
           пример с веткой, по которому снят байткод. Это разбор инструмента, а не совет переписать
           весь новый код на `var`.
@@ -188,7 +189,7 @@ sections:
             reviewStatus: TECH_REVIEW
           - id: claim-loop-bindings
             classification: OBSERVABLE
-            text: "Замыкание получает отдельную переменную `let` для каждой итерации цикла; замыкания над `var` делят одну переменную функции."
+            text: "Функция, созданная внутри `for (let ...)`, видит отдельную переменную своей итерации; функции из цикла `for (var ...)` обращаются к одной общей переменной функции."
             citationIds: [create-per-iteration-environment, variable-statement]
             sourceFingerprint: 8f8f696aa7961cef
             confidence: 1
@@ -201,7 +202,8 @@ sections:
           Сохраняйте `var`, если старый код наблюдаемо зависит от области всей функции, повторных
           объявлений или интеграции обычного скрипта с глобальным объектом. В новом коде делайте это
           намерение заметным: лучше объявить `var` ближе к началу функции, чем прятать его внутри
-          блока. Не меняйте `let` на `var`, если замыканиям нужно своё значение на каждой итерации.
+          блока. Не меняйте `let` на `var`, если вложенным функциям нужно своё значение на каждой
+          итерации.
   - id: declaration-performance
     title: "Производительность: сначала сохранить смысл, потом измерять"
     mode: v8
@@ -237,6 +239,41 @@ sections:
             citationIds: [v8-hole-checks]
             sourceFingerprint: 8af584f5e91414c8
             confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-nesting-no-runtime-scan
+            classification: V8_IMPLEMENTATION
+            text: "В закреплённом capture V8 13.6 примеры с локальными `let` и `var` внутри одной функции имеют одинаковую последовательность байткода. Вложенные `if` и цикл не заставляют V8 при каждом чтении заново обходить цепочку блочных областей."
+            citationIds: [v8-sparkplug]
+            sourceFingerprint: 9737b5e27328fcb3
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-function-environment
+            classification: NORMATIVE
+            text: "Объект ECMAScript-функции хранит Environment Record во внутреннем слоте `[[Environment]]`. При вызове новая Function Environment Record использует сохранённую запись как `[[OuterEnv]]` — так спецификация описывает доступ функции к внешним переменным."
+            citationIds: [function-objects, new-function-environment]
+            sourceFingerprint: 529cc80af215a6c0
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-closure-terminology
+            classification: DERIVED
+            text: "В разговорной речи «замыканием» называют Function Object, который сохраняет доступ к своему лексическому окружению. Это не то же самое, что спецификационный тип `Abstract Closure`, а запуск callback по правилам HTML не заменяет `[[Environment]]` функции."
+            citationIds: [function-objects, abstract-closure, html-job-callback]
+            sourceFingerprint: 85f0cde66da089d9
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-v8-captured-context
+            classification: V8_IMPLEMENTATION
+            text: "Если внутренняя функция использует локальную переменную внешней функции, V8 может поместить эту переменную в Context в куче. Это происходит и с захваченным `let`, и с захваченным `var`: путь хранения меняет сам захват, а не одно только ключевое слово."
+            citationIds: [v8-preparser]
+            sourceFingerprint: fa3faedd8027fe59
+            confidence: 0.99
+            reviewStatus: TECH_REVIEW
+          - id: claim-v8-context-optimization
+            classification: V8_IMPLEMENTATION
+            text: "Инструкции работы с Context в Ignition ещё не дают окончательного ответа о скорости: оптимизирующий pipeline V8 умеет сворачивать загрузки из Context и упрощать записи, когда необходимые предположения подтверждены."
+            citationIds: [v8-context-specialization]
+            sourceFingerprint: a7424eae641393b4
+            confidence: 0.98
             reviewStatus: TECH_REVIEW
           - id: claim-performance-no-guarantee
             classification: INFORMATIVE
@@ -302,13 +339,66 @@ sections:
             caseId: initialized-shadowed-let
             title: "Сначала инициализируем затеняющий `let`"
             explanation: "Если поставить `let p2;` перед `p2 = 7`, внутренний binding сначала получит `undefined`. Функция вернёт `12`, а hole-check в этом capture исчезнет."
+      - id: declaration-nesting-bytecode-artifact
+        type: bytecode
+        artifactId: const-let-var-nesting
+        title: "Вложенные блоки, захваченные переменные и окружение цикла"
+        body: "Здесь отдельно показаны три ситуации, которые часто смешивают: обычное чтение локальной переменной, доступ из вложенной функции и переменная цикла, которую читают после завершения итерации. Длина байткода описывает только закреплённый baseline Ignition — это не замер времени."
+        cases:
+          - id: bytecode-nested-let-read
+            caseId: nested-let-read
+            title: "Чтение локального `let` во вложенных блоках"
+            explanation: "Переменная остаётся в виртуальном регистре интерпретатора. Цикл и вложенные `if` добавляют переходы, но не поиск по лексическим областям при каждом чтении."
+          - id: bytecode-nested-var-read
+            caseId: nested-var-read
+            title: "Чтение локального `var` во вложенных блоках"
+            explanation: "Здесь получается та же 39-байтная последовательность инструкций, что и у `let`. Преимущества только от замены ключевого слова в этом случае нет."
+          - id: bytecode-make-captured-let
+            caseId: make-captured-let
+            title: "Создаём функцию, которая читает внешний `let`"
+            explanation: "V8 создаёт Function Context и хранит лексическую переменную в нём. Начальное значение hole относится к правилам инициализации `let`."
+          - id: bytecode-make-captured-var
+            caseId: make-captured-var
+            title: "Создаём функцию, которая читает внешний `var`"
+            explanation: "Для захваченного `var` V8 тоже создаёт Function Context, но лексическая инициализация через hole здесь не нужна."
+          - id: bytecode-read-captured-let
+            caseId: read-captured-let
+            title: "Читаем захваченный `let`"
+            explanation: "Вложенная функция загружает слот Context; в этом baseline-байткоде остаётся проверка TDZ."
+          - id: bytecode-read-captured-var
+            caseId: read-captured-var
+            title: "Читаем захваченный `var`"
+            explanation: "Вложенная функция загружает слот Context без проверки TDZ, потому что var-переменная получила `undefined` ещё при создании окружения функции."
+          - id: bytecode-captured-loop-let
+            caseId: captured-loop-let
+            title: "Захваченная переменная `for (let ...)`"
+            explanation: "`CreateBlockContext` обеспечивает отдельную переменную для каждой итерации: позднее функции возвращают `0,1,2`. Это настоящая дополнительная baseline-работа ради другой семантики."
+          - id: bytecode-captured-loop-var
+            caseId: captured-loop-var
+            title: "Захваченная переменная `for (var ...)`"
+            explanation: "Одна общая переменная хранится в Function Context, поэтому позднее все функции видят `3`. Это не равноценная ускоренная версия программы с `let`."
+      - id: declaration-closure-terminology-note
+        type: note
+        tone: insight
+        title: "Что здесь значит «замыкание»"
+        body: >-
+          В ECMA-262 нет JavaScript-типа `Closure`. Спецификация говорит, что объект
+          ECMAScript-функции содержит код, замкнутый на лексическое окружение, и хранит
+          соответствующую Environment Record в `[[Environment]]`. Отдельный тип `Abstract Closure`
+          — это служебное мета-значение для алгоритмов самой спецификации, а не результат выполнения
+          function expression. HTML при запуске таймера, события или job не создаёт лексическое
+          окружение заново: host-алгоритмы восстанавливают браузерное состояние callback, а затем
+          вызывают сохранённую функцию через операцию `Call` из ECMA-262.
       - id: declaration-performance-note
         type: note
         tone: implementation
         title: "Что на самом деле доказывает пример `theSum`"
         body: >-
-          Исходная функция показывает ошибочный путь через TDZ, а не общий проигрыш `let` по скорости.
-          Поставьте внутреннее `let p2;` перед `p2 = 7`: функция вернёт `12`, и в этом capture исчезнет
+          V8 не путается в двух объявлениях `p2`. Ещё до выполнения scope analysis связывает
+          присваивание с внутренней переменной, а hole означает лишь то, что эта уже найденная
+          переменная пока не инициализирована. Поэтому исходная функция показывает ошибочный путь
+          через TDZ, а не поиск одинаковых имён и не общий проигрыш `let` по скорости. Поставьте
+          внутреннее `let p2;` перед `p2 = 7`: функция вернёт `12`, и в этом capture исчезнет
           hole-check. Замена на `var` тоже уберёт блочное затенение, но превратит код в один binding на
           всю функцию — это уже другая семантика, и выбирать её нужно намеренно. Число инструкций
           Ignition описывает холодный baseline-путь этой версии V8, а не производительность
@@ -370,6 +460,55 @@ citations:
     url: https://chromium.googlesource.com/v8/v8/+/241f63a62a3518ad4110e78e4f61815623c6e95d/src/interpreter/bytecode-generator.cc
     relevance: "Показывает реализацию проверок инициализации и удаления лишних проверок в V8."
     evidenceHash: c5e65ad43b90fb47
+  - id: function-objects
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-ecmascript-function-objects
+    label: "ECMA-262 §10.2 — ECMAScript Function Objects"
+    url: https://tc39.es/ecma262/2026/multipage/ordinary-and-exotic-objects-behaviours.html#sec-ecmascript-function-objects
+    relevance: "Описывает Function Object как код, замкнутый на лексическое окружение, и задаёт внутренний слот `[[Environment]]`."
+    evidenceHash: 529cc80af215a6c0
+  - id: new-function-environment
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-newfunctionenvironment
+    label: "ECMA-262 §9.1.2.4 — NewFunctionEnvironment"
+    url: https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-newfunctionenvironment
+    relevance: "Делает сохранённый `[[Environment]]` функции внешним окружением нового вызова."
+    evidenceHash: 2864f24641523062
+  - id: abstract-closure
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-abstract-closure
+    label: "ECMA-262 §6.2.8 — The Abstract Closure Specification Type"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-abstract-closure
+    relevance: "Отделяет мета-значения Abstract Closure, используемые в алгоритмах спецификации, от объектов ECMAScript-функций."
+    evidenceHash: 85f0cde66da089d9
+  - id: html-job-callback
+    snapshot: HTML-58eecd01b9a2e8fa1cbaffc888305ba4f7dcfb2e
+    nodeId: hostcalljobcallback
+    label: "HTML Standard — HostCallJobCallback"
+    url: https://html.spec.whatwg.org/multipage/webappapis.html#hostcalljobcallback
+    relevance: "Показывает, как HTML восстанавливает host-состояние callback, а затем вызывает сохранённую JavaScript-функцию через Call из ECMA-262."
+    evidenceHash: 06251a72c005e868
+  - id: v8-preparser
+    snapshot: V8-INTERNALS-2019-04-15
+    nodeId: preparser-variable-allocation
+    label: "V8 — Lazy parsing: variable allocation"
+    url: https://v8.dev/blog/preparser#variable-allocation
+    relevance: "Объясняет локальные переменные на stack, захваченные переменные в heap-allocated Context и связь function closure с кодом и Context."
+    evidenceHash: fa3faedd8027fe59
+  - id: v8-sparkplug
+    snapshot: V8-INTERNALS-2021-05-27
+    nodeId: sparkplug-interpreter-compatible-frames
+    label: "V8 — Sparkplug: interpreter-compatible frames"
+    url: https://v8.dev/blog/sparkplug#interpreter-compatible-frames
+    relevance: "Объясняет, что виртуальные регистры Ignition хранят обычные локальные переменные JavaScript в interpreter stack frame."
+    evidenceHash: 9737b5e27328fcb3
+  - id: v8-context-specialization
+    snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
+    nodeId: js-context-specialization
+    label: "Исходный код V8 — JS context specialization"
+    url: https://chromium.googlesource.com/v8/v8/+/241f63a62a3518ad4110e78e4f61815623c6e95d/src/compiler/js-context-specialization.h
+    relevance: "Описывает оптимизирующие преобразования загрузок и записей Context."
+    evidenceHash: a7424eae641393b4
 examples:
   - id: declaration-tdz
     title: "TDZ и ранняя инициализация `var`"
@@ -439,6 +578,20 @@ examples:
         claim-v8-bytecode-capture,
       ]
     citationIds: [lexical-declarations, variable-statement, declarative-environment, v8-hole-checks]
+  - id: declaration-nesting-bytecode
+    title: "Вложенные блоки, захваченные переменные и переменные итераций"
+    goal: "Отделить обычное чтение локальной переменной от доступа из вложенной функции и от отдельных переменных итераций `for (let ...)`."
+    sourcePath: examples/declaration-nesting-bytecode.js
+    timeoutMs: 1200
+    expectedOutput: ["7 7", "7 7", "0,1,2", "3,3,3"]
+    claimIds:
+      [
+        claim-nesting-no-runtime-scan,
+        claim-function-environment,
+        claim-v8-captured-context,
+        claim-v8-context-optimization,
+      ]
+    citationIds: [function-objects, new-function-environment, v8-preparser, v8-sparkplug]
 engineResults:
   - exampleId: declaration-tdz
     engine: V8
@@ -493,6 +646,14 @@ engineResults:
     binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output: ["undefined", "ReferenceError", "ReferenceError", "7", "7", "ReferenceError", "12"]
+    capturedAt: "2026-08-20"
+    note: "Из этого же файла воспроизводимо снимается байткод Ignition."
+  - exampleId: declaration-nesting-bytecode
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
+    status: verified
+    output: ["7 7", "7 7", "0,1,2", "3,3,3"]
     capturedAt: "2026-08-20"
     note: "Из этого же файла воспроизводимо снимается байткод Ignition."
 graph:

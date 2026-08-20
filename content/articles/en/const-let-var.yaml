@@ -1,7 +1,7 @@
 id: const-let-var
 slug: const-let-var
 locale: en
-sourceContentHash: d5210b55851af115
+sourceContentHash: 82387690804e0e9a
 title: "const, let, and var without folklore"
 eyebrow: "Bindings → initialization → scope → performance"
 dek: >-
@@ -10,10 +10,10 @@ dek: >-
   the narrow cases where `var` is still an intentional tool.
 status: TECH_REVIEW
 sourceSnapshot: ECMA-262-ES2026
-readingMinutes: 30
+readingMinutes: 38
 learningObjectives:
   - Explain the difference between creating, initializing, reading, and assigning a binding.
-  - Predict block scope, function scope, the temporal dead zone, and loop closure behavior.
+  - Predict block scope, function scope, the temporal dead zone, and captured-binding behavior in loops.
   - Choose `const`, `let`, or `var` without relying on performance folklore.
   - Read a pinned Ignition bytecode listing and identify a TDZ guard.
 prerequisites:
@@ -171,7 +171,8 @@ sections:
         type: prose
         body: >-
           Scope and initialization change program behavior. The examples contrast an early read,
-          block visibility, object mutation through `const`, and loop closures. The final examples
+          block visibility, object mutation through `const`, and functions that retain access to
+          loop bindings. The final examples
           show a normal `const`/`let` combination, an intentional function-scoped `var`, and the
           exact branch fixture used for the bytecode capture—not a blanket recommendation to write
           new code with `var`.
@@ -187,7 +188,7 @@ sections:
             reviewStatus: TECH_REVIEW
           - id: claim-loop-bindings
             classification: OBSERVABLE
-            text: "A captured `let` loop variable has a distinct binding for each iteration; closures over a `var` loop variable share the function-scoped binding."
+            text: "A function created in a `for (let ...)` iteration observes that iteration's distinct binding; functions created by a `for (var ...)` loop share one function-scoped binding."
             citationIds: [create-per-iteration-environment, variable-statement]
             sourceFingerprint: 8f8f696aa7961cef
             confidence: 1
@@ -200,7 +201,8 @@ sections:
           Keep `var` when maintaining code whose observable behavior depends on function scope,
           repeated declarations, or classic-script global integration. In new code, make that intent
           conspicuous—prefer declaring the `var` near the top of the function instead of hiding it
-          inside a block. Never replace `let` with `var` when closures require a value per iteration.
+          inside a block. Never replace `let` with `var` when nested functions require a distinct
+          value for each iteration.
   - id: declaration-performance
     title: "Performance: preserve semantics, then measure"
     mode: v8
@@ -236,6 +238,41 @@ sections:
             citationIds: [v8-hole-checks]
             sourceFingerprint: 8af584f5e91414c8
             confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-nesting-no-runtime-scan
+            classification: V8_IMPLEMENTATION
+            text: "In the pinned V8 13.6 capture, the same-function `let` and `var` fixtures have byte-identical opcode sequences. Nested `if` statements and a loop do not make V8 search a chain of block scopes on every local read."
+            citationIds: [v8-sparkplug]
+            sourceFingerprint: 9737b5e27328fcb3
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-function-environment
+            classification: NORMATIVE
+            text: "An ECMAScript function object stores an Environment Record in `[[Environment]]`. On a call, the new Function Environment Record uses that stored record as its `[[OuterEnv]]`; this is the specification mechanism behind a function retaining access to outer bindings."
+            citationIds: [function-objects, new-function-environment]
+            sourceFingerprint: 529cc80af215a6c0
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-closure-terminology
+            classification: DERIVED
+            text: "The common term ‘JavaScript closure’ refers to a Function Object retaining its lexical environment. It is not the same thing as ECMA-262's `Abstract Closure` specification type, and HTML callback scheduling does not replace the function's `[[Environment]]`."
+            citationIds: [function-objects, abstract-closure, html-job-callback]
+            sourceFingerprint: 85f0cde66da089d9
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-v8-captured-context
+            classification: V8_IMPLEMENTATION
+            text: "When an inner function uses an outer local, V8 may place that local in a heap-allocated Context. This applies to captured `let` and captured `var`; it is capture, not the declaration keyword alone, that changes the storage path."
+            citationIds: [v8-preparser]
+            sourceFingerprint: fa3faedd8027fe59
+            confidence: 0.99
+            reviewStatus: TECH_REVIEW
+          - id: claim-v8-context-optimization
+            classification: V8_IMPLEMENTATION
+            text: "Ignition context bytecodes are not a final performance verdict: V8's optimizing pipeline includes context specialization that can fold context loads and simplify context stores when its assumptions hold."
+            citationIds: [v8-context-specialization]
+            sourceFingerprint: a7424eae641393b4
+            confidence: 0.98
             reviewStatus: TECH_REVIEW
           - id: claim-performance-no-guarantee
             classification: INFORMATIVE
@@ -301,13 +338,66 @@ sections:
             caseId: initialized-shadowed-let
             title: "Shadowing `let` initialized first"
             explanation: "Moving `let p2;` before `p2 = 7` initializes the inner binding with `undefined`. The function returns `12`, and this capture contains no hole guard."
+      - id: declaration-nesting-bytecode-artifact
+        type: bytecode
+        artifactId: const-let-var-nesting
+        title: "Nested blocks, captured bindings, and loop environments"
+        body: "This capture separates three cases that are often conflated: ordinary local reads, an outer binding used by an inner function, and a loop binding observed after its iteration. Bytecode length describes this pinned Ignition baseline only; it is not a timing benchmark."
+        cases:
+          - id: bytecode-nested-let-read
+            caseId: nested-let-read
+            title: "Nested local read with `let`"
+            explanation: "The local stays in an interpreter virtual register. The nested loop and `if` statements add control flow, not a runtime lexical-environment search."
+          - id: bytecode-nested-var-read
+            caseId: nested-var-read
+            title: "Nested local read with `var`"
+            explanation: "This fixture has the same 39-byte opcode sequence as the `let` version. There is no keyword-only advantage in this case."
+          - id: bytecode-make-captured-let
+            caseId: make-captured-let
+            title: "Create a function that uses outer `let`"
+            explanation: "V8 creates a Function Context and stores the lexical binding there. The hole initialization belongs to `let` initialization semantics."
+          - id: bytecode-make-captured-var
+            caseId: make-captured-var
+            title: "Create a function that uses outer `var`"
+            explanation: "V8 also creates a Function Context for captured `var`. It does not need the lexical hole initialization."
+          - id: bytecode-read-captured-let
+            caseId: read-captured-let
+            title: "Read captured `let`"
+            explanation: "The inner function loads a Context slot and retains a TDZ guard in this baseline bytecode."
+          - id: bytecode-read-captured-var
+            caseId: read-captured-var
+            title: "Read captured `var`"
+            explanation: "The inner function loads its Context slot without a TDZ guard because the var binding was initialized to `undefined` during instantiation."
+          - id: bytecode-captured-loop-let
+            caseId: captured-loop-let
+            title: "Captured `for (let ...)` binding"
+            explanation: "`CreateBlockContext` implements the observable per-iteration binding: the readers later return `0,1,2`. This is real extra baseline work required by different semantics."
+          - id: bytecode-captured-loop-var
+            caseId: captured-loop-var
+            title: "Captured `for (var ...)` binding"
+            explanation: "One Function Context holds the shared binding, so every reader later observes `3`. This is not an equivalent faster rewrite of the `let` program."
+      - id: declaration-closure-terminology-note
+        type: note
+        tone: insight
+        title: "What “closure” means here"
+        body: >-
+          ECMA-262 does not define a JavaScript language type named `Closure`. It describes an
+          ECMAScript Function Object as code closed over a lexical environment and stores that
+          Environment Record in `[[Environment]]`. The separate `Abstract Closure` specification
+          type is a meta-value used inside specification algorithms, not a value created by a
+          JavaScript function expression. HTML does not rebuild the lexical environment when a
+          timer, event, or job runs: its host algorithms restore browser-specific callback state
+          and then invoke the stored function through ECMA-262's `Call` operation.
       - id: declaration-performance-note
         type: note
         tone: implementation
         title: "What the `theSum` example actually proves"
         body: >-
-          The original function is an erroneous TDZ path, not a benchmark showing that `let` is
-          generally slow. Put the inner `let p2;` before `p2 = 7` and the function returns `12`
+          V8 is not confused by the two `p2` declarations. Scope analysis resolves the assignment
+          to the inner binding before execution; the hole records that this already-resolved binding
+          is still uninitialized. The original function is therefore an erroneous TDZ path, not a
+          duplicate-name search and not a benchmark showing that `let` is generally slow. Put the
+          inner `let p2;` before `p2 = 7` and the function returns `12`
           without a hole guard in this V8 capture. Replacing it with `var` also removes block
           shadowing, but changes the program to one function-wide binding; use that only when those
           semantics are intentional. Instruction count in Ignition is evidence about this cold
@@ -369,6 +459,55 @@ citations:
     url: https://chromium.googlesource.com/v8/v8/+/241f63a62a3518ad4110e78e4f61815623c6e95d/src/interpreter/bytecode-generator.cc
     relevance: "Shows V8's implementation of lexical initialization guards and redundant-check elimination."
     evidenceHash: c5e65ad43b90fb47
+  - id: function-objects
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-ecmascript-function-objects
+    label: "ECMA-262 §10.2 — ECMAScript Function Objects"
+    url: https://tc39.es/ecma262/2026/multipage/ordinary-and-exotic-objects-behaviours.html#sec-ecmascript-function-objects
+    relevance: "Defines Function Objects as code closed over a lexical environment and the `[[Environment]]` internal slot."
+    evidenceHash: 529cc80af215a6c0
+  - id: new-function-environment
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-newfunctionenvironment
+    label: "ECMA-262 §9.1.2.4 — NewFunctionEnvironment"
+    url: https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-newfunctionenvironment
+    relevance: "Makes the function object's stored `[[Environment]]` the outer environment of a new call."
+    evidenceHash: 2864f24641523062
+  - id: abstract-closure
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-abstract-closure
+    label: "ECMA-262 §6.2.8 — The Abstract Closure Specification Type"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-abstract-closure
+    relevance: "Separates the specification's Abstract Closure meta-values from ECMAScript Function Objects."
+    evidenceHash: 85f0cde66da089d9
+  - id: html-job-callback
+    snapshot: HTML-58eecd01b9a2e8fa1cbaffc888305ba4f7dcfb2e
+    nodeId: hostcalljobcallback
+    label: "HTML Standard — HostCallJobCallback"
+    url: https://html.spec.whatwg.org/multipage/webappapis.html#hostcalljobcallback
+    relevance: "Shows HTML restoring host callback state and then invoking the stored JavaScript callback through ECMA-262 Call."
+    evidenceHash: 06251a72c005e868
+  - id: v8-preparser
+    snapshot: V8-INTERNALS-2019-04-15
+    nodeId: preparser-variable-allocation
+    label: "V8 — Lazy parsing: variable allocation"
+    url: https://v8.dev/blog/preparser#variable-allocation
+    relevance: "Explains V8 stack locals, captured variables in heap-allocated Contexts, and function closures pointing to code and context."
+    evidenceHash: fa3faedd8027fe59
+  - id: v8-sparkplug
+    snapshot: V8-INTERNALS-2021-05-27
+    nodeId: sparkplug-interpreter-compatible-frames
+    label: "V8 — Sparkplug: interpreter-compatible frames"
+    url: https://v8.dev/blog/sparkplug#interpreter-compatible-frames
+    relevance: "Explains that Ignition virtual registers hold ordinary JavaScript locals in the interpreter stack frame."
+    evidenceHash: 9737b5e27328fcb3
+  - id: v8-context-specialization
+    snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
+    nodeId: js-context-specialization
+    label: "V8 source — JS context specialization"
+    url: https://chromium.googlesource.com/v8/v8/+/241f63a62a3518ad4110e78e4f61815623c6e95d/src/compiler/js-context-specialization.h
+    relevance: "Documents optimizer reductions for context loads and stores."
+    evidenceHash: a7424eae641393b4
 examples:
   - id: declaration-tdz
     title: "TDZ versus `var` initialization"
@@ -438,6 +577,20 @@ examples:
         claim-v8-bytecode-capture,
       ]
     citationIds: [lexical-declarations, variable-statement, declarative-environment, v8-hole-checks]
+  - id: declaration-nesting-bytecode
+    title: "Nested locals, captured bindings, and per-iteration bindings"
+    goal: "Separate ordinary local access from a binding retained by an inner function and from `for (let ...)` per-iteration semantics."
+    sourcePath: examples/declaration-nesting-bytecode.js
+    timeoutMs: 1200
+    expectedOutput: ["7 7", "7 7", "0,1,2", "3,3,3"]
+    claimIds:
+      [
+        claim-nesting-no-runtime-scan,
+        claim-function-environment,
+        claim-v8-captured-context,
+        claim-v8-context-optimization,
+      ]
+    citationIds: [function-objects, new-function-environment, v8-preparser, v8-sparkplug]
 engineResults:
   - exampleId: declaration-tdz
     engine: V8
@@ -492,6 +645,14 @@ engineResults:
     binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output: ["undefined", "ReferenceError", "ReferenceError", "7", "7", "ReferenceError", "12"]
+    capturedAt: "2026-08-20"
+    note: "The same source file is used by the reproducible Ignition bytecode capture."
+  - exampleId: declaration-nesting-bytecode
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
+    status: verified
+    output: ["7 7", "7 7", "0,1,2", "3,3,3"]
     capturedAt: "2026-08-20"
     note: "The same source file is used by the reproducible Ignition bytecode capture."
 graph:

@@ -1,0 +1,1037 @@
+{
+  "schemaVersion": 1,
+  "id": "const-let-var-nesting",
+  "provider": "V8 Ignition",
+  "sourcePath": "examples/declaration-nesting-bytecode.js",
+  "sourceSha256": "57d36157289c04b8c2b119c5d7634d0cfc84d6053817c1d30ab13031ac7f1de3",
+  "runtime": {
+    "name": "Node.js",
+    "version": "24.18.1",
+    "v8Version": "13.6.233.17-node.50",
+    "platform": "linux-x64",
+    "binarySha256": "f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a"
+  },
+  "commandTemplate": "node --print-bytecode --print-bytecode-filter=<function> examples/declaration-nesting-bytecode.js",
+  "capturedAt": "2026-08-20",
+  "cases": [
+    {
+      "id": "nested-let-read",
+      "functionName": "nestedLetRead",
+      "source": "function nestedLetRead(flag) {\n  let value = 7;\n  for (let index = 0; index < 3; index += 1) {\n    if (flag) {\n      if (index === 2) return value;\n    }\n  }\n  return value;\n}",
+      "bytecodeLength": 39,
+      "parameterCount": 2,
+      "registerCount": 2,
+      "frameSize": 16,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 2,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 3,
+          "bytes": "0c",
+          "opcode": "LdaZero",
+          "operands": ""
+        },
+        {
+          "offset": 4,
+          "bytes": "cd",
+          "opcode": "Star1",
+          "operands": ""
+        },
+        {
+          "offset": 5,
+          "bytes": "0d 03",
+          "opcode": "LdaSmi",
+          "operands": "[3]"
+        },
+        {
+          "offset": 7,
+          "bytes": "75 f8 00",
+          "opcode": "TestLessThan",
+          "operands": "r1, [0]"
+        },
+        {
+          "offset": 10,
+          "bytes": "a3 1a",
+          "opcode": "JumpIfFalse",
+          "operands": "[26]"
+        },
+        {
+          "offset": 12,
+          "bytes": "0b 03",
+          "opcode": "Ldar",
+          "operands": "a0"
+        },
+        {
+          "offset": 14,
+          "bytes": "a1 0c",
+          "opcode": "JumpIfToBooleanFalse",
+          "operands": "[12]"
+        },
+        {
+          "offset": 16,
+          "bytes": "0d 02",
+          "opcode": "LdaSmi",
+          "operands": "[2]"
+        },
+        {
+          "offset": 18,
+          "bytes": "74 f8 01",
+          "opcode": "TestEqualStrict",
+          "operands": "r1, [1]"
+        },
+        {
+          "offset": 21,
+          "bytes": "a3 05",
+          "opcode": "JumpIfFalse",
+          "operands": "[5]"
+        },
+        {
+          "offset": 23,
+          "bytes": "0b f9",
+          "opcode": "Ldar",
+          "operands": "r0"
+        },
+        {
+          "offset": 25,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        },
+        {
+          "offset": 26,
+          "bytes": "0b f8",
+          "opcode": "Ldar",
+          "operands": "r1"
+        },
+        {
+          "offset": 28,
+          "bytes": "4b 01 02",
+          "opcode": "AddSmi",
+          "operands": "[1], [2]"
+        },
+        {
+          "offset": 31,
+          "bytes": "cd",
+          "opcode": "Star1",
+          "operands": ""
+        },
+        {
+          "offset": 32,
+          "bytes": "92 1b 00 03",
+          "opcode": "JumpLoop",
+          "operands": "[27], [0], [3]"
+        },
+        {
+          "offset": 36,
+          "bytes": "0b f9",
+          "opcode": "Ldar",
+          "operands": "r0"
+        },
+        {
+          "offset": 38,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "nested-var-read",
+      "functionName": "nestedVarRead",
+      "source": "function nestedVarRead(flag) {\n  var value = 7;\n  for (let index = 0; index < 3; index += 1) {\n    if (flag) {\n      if (index === 2) return value;\n    }\n  }\n  return value;\n}",
+      "bytecodeLength": 39,
+      "parameterCount": 2,
+      "registerCount": 2,
+      "frameSize": 16,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 2,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 3,
+          "bytes": "0c",
+          "opcode": "LdaZero",
+          "operands": ""
+        },
+        {
+          "offset": 4,
+          "bytes": "cd",
+          "opcode": "Star1",
+          "operands": ""
+        },
+        {
+          "offset": 5,
+          "bytes": "0d 03",
+          "opcode": "LdaSmi",
+          "operands": "[3]"
+        },
+        {
+          "offset": 7,
+          "bytes": "75 f8 00",
+          "opcode": "TestLessThan",
+          "operands": "r1, [0]"
+        },
+        {
+          "offset": 10,
+          "bytes": "a3 1a",
+          "opcode": "JumpIfFalse",
+          "operands": "[26]"
+        },
+        {
+          "offset": 12,
+          "bytes": "0b 03",
+          "opcode": "Ldar",
+          "operands": "a0"
+        },
+        {
+          "offset": 14,
+          "bytes": "a1 0c",
+          "opcode": "JumpIfToBooleanFalse",
+          "operands": "[12]"
+        },
+        {
+          "offset": 16,
+          "bytes": "0d 02",
+          "opcode": "LdaSmi",
+          "operands": "[2]"
+        },
+        {
+          "offset": 18,
+          "bytes": "74 f8 01",
+          "opcode": "TestEqualStrict",
+          "operands": "r1, [1]"
+        },
+        {
+          "offset": 21,
+          "bytes": "a3 05",
+          "opcode": "JumpIfFalse",
+          "operands": "[5]"
+        },
+        {
+          "offset": 23,
+          "bytes": "0b f9",
+          "opcode": "Ldar",
+          "operands": "r0"
+        },
+        {
+          "offset": 25,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        },
+        {
+          "offset": 26,
+          "bytes": "0b f8",
+          "opcode": "Ldar",
+          "operands": "r1"
+        },
+        {
+          "offset": 28,
+          "bytes": "4b 01 02",
+          "opcode": "AddSmi",
+          "operands": "[1], [2]"
+        },
+        {
+          "offset": 31,
+          "bytes": "cd",
+          "opcode": "Star1",
+          "operands": ""
+        },
+        {
+          "offset": 32,
+          "bytes": "92 1b 00 03",
+          "opcode": "JumpLoop",
+          "operands": "[27], [0], [3]"
+        },
+        {
+          "offset": 36,
+          "bytes": "0b f9",
+          "opcode": "Ldar",
+          "operands": "r0"
+        },
+        {
+          "offset": 38,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "make-captured-let",
+      "functionName": "makeCapturedLet",
+      "source": "function makeCapturedLet() {\n  let value = 7;\n  return function readCapturedLet() {\n    return value;\n  };\n}",
+      "bytecodeLength": 17,
+      "parameterCount": 1,
+      "registerCount": 1,
+      "frameSize": 8,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "8c 00 01",
+          "opcode": "CreateFunctionContext",
+          "operands": "[0], [1]"
+        },
+        {
+          "offset": 3,
+          "bytes": "1c f9",
+          "opcode": "PushContext",
+          "operands": "r0"
+        },
+        {
+          "offset": 5,
+          "bytes": "10",
+          "opcode": "LdaTheHole",
+          "operands": ""
+        },
+        {
+          "offset": 6,
+          "bytes": "27 02",
+          "opcode": "StaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 8,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 10,
+          "bytes": "27 02",
+          "opcode": "StaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 12,
+          "bytes": "89 01 00 02",
+          "opcode": "CreateClosure",
+          "operands": "[1], [0], #2"
+        },
+        {
+          "offset": 16,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "make-captured-var",
+      "functionName": "makeCapturedVar",
+      "source": "function makeCapturedVar() {\n  var value = 7;\n  return function readCapturedVar() {\n    return value;\n  };\n}",
+      "bytecodeLength": 14,
+      "parameterCount": 1,
+      "registerCount": 1,
+      "frameSize": 8,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "8c 00 01",
+          "opcode": "CreateFunctionContext",
+          "operands": "[0], [1]"
+        },
+        {
+          "offset": 3,
+          "bytes": "1c f9",
+          "opcode": "PushContext",
+          "operands": "r0"
+        },
+        {
+          "offset": 5,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 7,
+          "bytes": "27 02",
+          "opcode": "StaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 9,
+          "bytes": "89 01 00 02",
+          "opcode": "CreateClosure",
+          "operands": "[1], [0], #2"
+        },
+        {
+          "offset": 13,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "read-captured-let",
+      "functionName": "readCapturedLet",
+      "source": "function readCapturedLet() {\n    return value;\n  }",
+      "bytecodeLength": 5,
+      "parameterCount": 1,
+      "registerCount": 0,
+      "frameSize": 0,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "19 02",
+          "opcode": "LdaImmutableCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 2,
+          "bytes": "b4 00",
+          "opcode": "ThrowReferenceErrorIfHole",
+          "operands": "[0]"
+        },
+        {
+          "offset": 4,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "read-captured-var",
+      "functionName": "readCapturedVar",
+      "source": "function readCapturedVar() {\n    return value;\n  }",
+      "bytecodeLength": 3,
+      "parameterCount": 1,
+      "registerCount": 0,
+      "frameSize": 0,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "19 02",
+          "opcode": "LdaImmutableCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 2,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "captured-loop-let",
+      "functionName": "capturedLoopLet",
+      "source": "function capturedLoopLet() {\n  const readers = [];\n  for (let index = 0; index < 3; index += 1) {\n    readers.push(function readLoopLet() {\n      return index;\n    });\n  }\n  return readers.map((read) => read()).join(\",\");\n}",
+      "bytecodeLength": 135,
+      "parameterCount": 1,
+      "registerCount": 9,
+      "frameSize": 72,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "84 00",
+          "opcode": "CreateEmptyArrayLiteral",
+          "operands": "[0]"
+        },
+        {
+          "offset": 2,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 3,
+          "bytes": "0c",
+          "opcode": "LdaZero",
+          "operands": ""
+        },
+        {
+          "offset": 4,
+          "bytes": "ca",
+          "opcode": "Star4",
+          "operands": ""
+        },
+        {
+          "offset": 5,
+          "bytes": "cd",
+          "opcode": "Star1",
+          "operands": ""
+        },
+        {
+          "offset": 6,
+          "bytes": "0d 01",
+          "opcode": "LdaSmi",
+          "operands": "[1]"
+        },
+        {
+          "offset": 8,
+          "bytes": "cc",
+          "opcode": "Star2",
+          "operands": ""
+        },
+        {
+          "offset": 9,
+          "bytes": "8a 00",
+          "opcode": "CreateBlockContext",
+          "operands": "[0]"
+        },
+        {
+          "offset": 11,
+          "bytes": "1c f4",
+          "opcode": "PushContext",
+          "operands": "r5"
+        },
+        {
+          "offset": 13,
+          "bytes": "10",
+          "opcode": "LdaTheHole",
+          "operands": ""
+        },
+        {
+          "offset": 14,
+          "bytes": "27 02",
+          "opcode": "StaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 16,
+          "bytes": "0b f8",
+          "opcode": "Ldar",
+          "operands": "r1"
+        },
+        {
+          "offset": 18,
+          "bytes": "27 02",
+          "opcode": "StaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 20,
+          "bytes": "0d 01",
+          "opcode": "LdaSmi",
+          "operands": "[1]"
+        },
+        {
+          "offset": 22,
+          "bytes": "73 f7 01",
+          "opcode": "TestEqual",
+          "operands": "r2, [1]"
+        },
+        {
+          "offset": 25,
+          "bytes": "a3 06",
+          "opcode": "JumpIfFalse",
+          "operands": "[6]"
+        },
+        {
+          "offset": 27,
+          "bytes": "0c",
+          "opcode": "LdaZero",
+          "operands": ""
+        },
+        {
+          "offset": 28,
+          "bytes": "cc",
+          "opcode": "Star2",
+          "operands": ""
+        },
+        {
+          "offset": 29,
+          "bytes": "93 09",
+          "opcode": "Jump",
+          "operands": "[9]"
+        },
+        {
+          "offset": 31,
+          "bytes": "17 02",
+          "opcode": "LdaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 33,
+          "bytes": "4b 01 02",
+          "opcode": "AddSmi",
+          "operands": "[1], [2]"
+        },
+        {
+          "offset": 36,
+          "bytes": "27 02",
+          "opcode": "StaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 38,
+          "bytes": "0d 01",
+          "opcode": "LdaSmi",
+          "operands": "[1]"
+        },
+        {
+          "offset": 40,
+          "bytes": "cb",
+          "opcode": "Star3",
+          "operands": ""
+        },
+        {
+          "offset": 41,
+          "bytes": "17 02",
+          "opcode": "LdaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 43,
+          "bytes": "c8",
+          "opcode": "Star6",
+          "operands": ""
+        },
+        {
+          "offset": 44,
+          "bytes": "0d 03",
+          "opcode": "LdaSmi",
+          "operands": "[3]"
+        },
+        {
+          "offset": 46,
+          "bytes": "75 f3 03",
+          "opcode": "TestLessThan",
+          "operands": "r6, [3]"
+        },
+        {
+          "offset": 49,
+          "bytes": "a3 04",
+          "opcode": "JumpIfFalse",
+          "operands": "[4]"
+        },
+        {
+          "offset": 51,
+          "bytes": "93 06",
+          "opcode": "Jump",
+          "operands": "[6]"
+        },
+        {
+          "offset": 53,
+          "bytes": "1d f4",
+          "opcode": "PopContext",
+          "operands": "r5"
+        },
+        {
+          "offset": 55,
+          "bytes": "93 32",
+          "opcode": "Jump",
+          "operands": "[50]"
+        },
+        {
+          "offset": 57,
+          "bytes": "0d 01",
+          "opcode": "LdaSmi",
+          "operands": "[1]"
+        },
+        {
+          "offset": 59,
+          "bytes": "73 f6 04",
+          "opcode": "TestEqual",
+          "operands": "r3, [4]"
+        },
+        {
+          "offset": 62,
+          "bytes": "a3 1a",
+          "opcode": "JumpIfFalse",
+          "operands": "[26]"
+        },
+        {
+          "offset": 64,
+          "bytes": "33 f9 01 05",
+          "opcode": "GetNamedProperty",
+          "operands": "r0, [1], [5]"
+        },
+        {
+          "offset": 68,
+          "bytes": "c8",
+          "opcode": "Star6",
+          "operands": ""
+        },
+        {
+          "offset": 69,
+          "bytes": "89 02 00 02",
+          "opcode": "CreateClosure",
+          "operands": "[2], [0], #2"
+        },
+        {
+          "offset": 73,
+          "bytes": "c6",
+          "opcode": "Star8",
+          "operands": ""
+        },
+        {
+          "offset": 74,
+          "bytes": "65 f3 f9 f1 07",
+          "opcode": "CallProperty1",
+          "operands": "r6, r0, r8, [7]"
+        },
+        {
+          "offset": 79,
+          "bytes": "0c",
+          "opcode": "LdaZero",
+          "operands": ""
+        },
+        {
+          "offset": 80,
+          "bytes": "cb",
+          "opcode": "Star3",
+          "operands": ""
+        },
+        {
+          "offset": 81,
+          "bytes": "17 02",
+          "opcode": "LdaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 83,
+          "bytes": "cd",
+          "opcode": "Star1",
+          "operands": ""
+        },
+        {
+          "offset": 84,
+          "bytes": "92 1b 01 09",
+          "opcode": "JumpLoop",
+          "operands": "[27], [1], [9]"
+        },
+        {
+          "offset": 88,
+          "bytes": "0d 01",
+          "opcode": "LdaSmi",
+          "operands": "[1]"
+        },
+        {
+          "offset": 90,
+          "bytes": "73 f6 0a",
+          "opcode": "TestEqual",
+          "operands": "r3, [10]"
+        },
+        {
+          "offset": 93,
+          "bytes": "a3 06",
+          "opcode": "JumpIfFalse",
+          "operands": "[6]"
+        },
+        {
+          "offset": 95,
+          "bytes": "1d f4",
+          "opcode": "PopContext",
+          "operands": "r5"
+        },
+        {
+          "offset": 97,
+          "bytes": "93 08",
+          "opcode": "Jump",
+          "operands": "[8]"
+        },
+        {
+          "offset": 99,
+          "bytes": "1d f4",
+          "opcode": "PopContext",
+          "operands": "r5"
+        },
+        {
+          "offset": 101,
+          "bytes": "92 5c 00 0b",
+          "opcode": "JumpLoop",
+          "operands": "[92], [0], [11]"
+        },
+        {
+          "offset": 105,
+          "bytes": "33 f9 03 0c",
+          "opcode": "GetNamedProperty",
+          "operands": "r0, [3], [12]"
+        },
+        {
+          "offset": 109,
+          "bytes": "c8",
+          "opcode": "Star6",
+          "operands": ""
+        },
+        {
+          "offset": 110,
+          "bytes": "89 04 01 02",
+          "opcode": "CreateClosure",
+          "operands": "[4], [1], #2"
+        },
+        {
+          "offset": 114,
+          "bytes": "c6",
+          "opcode": "Star8",
+          "operands": ""
+        },
+        {
+          "offset": 115,
+          "bytes": "65 f3 f9 f1 0e",
+          "opcode": "CallProperty1",
+          "operands": "r6, r0, r8, [14]"
+        },
+        {
+          "offset": 120,
+          "bytes": "c8",
+          "opcode": "Star6",
+          "operands": ""
+        },
+        {
+          "offset": 121,
+          "bytes": "33 f3 05 10",
+          "opcode": "GetNamedProperty",
+          "operands": "r6, [5], [16]"
+        },
+        {
+          "offset": 125,
+          "bytes": "c9",
+          "opcode": "Star5",
+          "operands": ""
+        },
+        {
+          "offset": 126,
+          "bytes": "13 06",
+          "opcode": "LdaConstant",
+          "operands": "[6]"
+        },
+        {
+          "offset": 128,
+          "bytes": "c7",
+          "opcode": "Star7",
+          "operands": ""
+        },
+        {
+          "offset": 129,
+          "bytes": "65 f4 f3 f2 12",
+          "opcode": "CallProperty1",
+          "operands": "r5, r6, r7, [18]"
+        },
+        {
+          "offset": 134,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "captured-loop-var",
+      "functionName": "capturedLoopVar",
+      "source": "function capturedLoopVar() {\n  const readers = [];\n  for (var index = 0; index < 3; index += 1) {\n    readers.push(function readLoopVar() {\n      return index;\n    });\n  }\n  return readers.map((read) => read()).join(\",\");\n}",
+      "bytecodeLength": 77,
+      "parameterCount": 1,
+      "registerCount": 6,
+      "frameSize": 48,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "8c 00 01",
+          "opcode": "CreateFunctionContext",
+          "operands": "[0], [1]"
+        },
+        {
+          "offset": 3,
+          "bytes": "1c f8",
+          "opcode": "PushContext",
+          "operands": "r1"
+        },
+        {
+          "offset": 5,
+          "bytes": "84 00",
+          "opcode": "CreateEmptyArrayLiteral",
+          "operands": "[0]"
+        },
+        {
+          "offset": 7,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 8,
+          "bytes": "0c",
+          "opcode": "LdaZero",
+          "operands": ""
+        },
+        {
+          "offset": 9,
+          "bytes": "27 02",
+          "opcode": "StaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 11,
+          "bytes": "17 02",
+          "opcode": "LdaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 13,
+          "bytes": "cc",
+          "opcode": "Star2",
+          "operands": ""
+        },
+        {
+          "offset": 14,
+          "bytes": "0d 03",
+          "opcode": "LdaSmi",
+          "operands": "[3]"
+        },
+        {
+          "offset": 16,
+          "bytes": "75 f7 01",
+          "opcode": "TestLessThan",
+          "operands": "r2, [1]"
+        },
+        {
+          "offset": 19,
+          "bytes": "a3 1c",
+          "opcode": "JumpIfFalse",
+          "operands": "[28]"
+        },
+        {
+          "offset": 21,
+          "bytes": "33 f9 01 02",
+          "opcode": "GetNamedProperty",
+          "operands": "r0, [1], [2]"
+        },
+        {
+          "offset": 25,
+          "bytes": "cc",
+          "opcode": "Star2",
+          "operands": ""
+        },
+        {
+          "offset": 26,
+          "bytes": "89 02 00 02",
+          "opcode": "CreateClosure",
+          "operands": "[2], [0], #2"
+        },
+        {
+          "offset": 30,
+          "bytes": "ca",
+          "opcode": "Star4",
+          "operands": ""
+        },
+        {
+          "offset": 31,
+          "bytes": "65 f7 f9 f5 04",
+          "opcode": "CallProperty1",
+          "operands": "r2, r0, r4, [4]"
+        },
+        {
+          "offset": 36,
+          "bytes": "17 02",
+          "opcode": "LdaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 38,
+          "bytes": "4b 01 06",
+          "opcode": "AddSmi",
+          "operands": "[1], [6]"
+        },
+        {
+          "offset": 41,
+          "bytes": "27 02",
+          "opcode": "StaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 43,
+          "bytes": "92 20 00 07",
+          "opcode": "JumpLoop",
+          "operands": "[32], [0], [7]"
+        },
+        {
+          "offset": 47,
+          "bytes": "33 f9 03 08",
+          "opcode": "GetNamedProperty",
+          "operands": "r0, [3], [8]"
+        },
+        {
+          "offset": 51,
+          "bytes": "cb",
+          "opcode": "Star3",
+          "operands": ""
+        },
+        {
+          "offset": 52,
+          "bytes": "89 04 01 02",
+          "opcode": "CreateClosure",
+          "operands": "[4], [1], #2"
+        },
+        {
+          "offset": 56,
+          "bytes": "c9",
+          "opcode": "Star5",
+          "operands": ""
+        },
+        {
+          "offset": 57,
+          "bytes": "65 f6 f9 f4 0a",
+          "opcode": "CallProperty1",
+          "operands": "r3, r0, r5, [10]"
+        },
+        {
+          "offset": 62,
+          "bytes": "cb",
+          "opcode": "Star3",
+          "operands": ""
+        },
+        {
+          "offset": 63,
+          "bytes": "33 f6 05 0c",
+          "opcode": "GetNamedProperty",
+          "operands": "r3, [5], [12]"
+        },
+        {
+          "offset": 67,
+          "bytes": "cc",
+          "opcode": "Star2",
+          "operands": ""
+        },
+        {
+          "offset": 68,
+          "bytes": "13 06",
+          "opcode": "LdaConstant",
+          "operands": "[6]"
+        },
+        {
+          "offset": 70,
+          "bytes": "ca",
+          "opcode": "Star4",
+          "operands": ""
+        },
+        {
+          "offset": 71,
+          "bytes": "65 f7 f6 f5 0e",
+          "opcode": "CallProperty1",
+          "operands": "r2, r3, r4, [14]"
+        },
+        {
+          "offset": 76,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    }
+  ],
+  "captureSha256": "beb44a0a3d7355d2b8ce683d1128bc3d7ff416aa2ba665f9a89bd9556ba49921"
+}

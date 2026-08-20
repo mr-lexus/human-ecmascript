@@ -31,6 +31,20 @@ const captures = [
       { id: "captured-symbol", functionName: "capturedSymbol" },
     ],
   },
+  {
+    id: "const-let-var-nesting",
+    sourcePath: "examples/declaration-nesting-bytecode.js",
+    cases: [
+      { id: "nested-let-read", functionName: "nestedLetRead" },
+      { id: "nested-var-read", functionName: "nestedVarRead" },
+      { id: "make-captured-let", functionName: "makeCapturedLet" },
+      { id: "make-captured-var", functionName: "makeCapturedVar" },
+      { id: "read-captured-let", functionName: "readCapturedLet" },
+      { id: "read-captured-var", functionName: "readCapturedVar" },
+      { id: "captured-loop-let", functionName: "capturedLoopLet" },
+      { id: "captured-loop-var", functionName: "capturedLoopVar" },
+    ],
+  },
 ];
 
 function sha256(value) {
