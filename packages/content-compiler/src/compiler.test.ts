@@ -71,6 +71,15 @@ describe("content compiler", () => {
         .find(({ id }) => id === "intentional-function-var")
         ?.instructions.map(({ opcode }) => opcode),
     ).not.toContain("ThrowReferenceErrorIfHole");
+    const functionVarOpcodes = artifact?.cases
+      .find(({ id }) => id === "intentional-function-var")
+      ?.instructions.map(({ opcode }) => opcode);
+    const functionLetOpcodes = artifact?.cases
+      .find(({ id }) => id === "intentional-function-let")
+      ?.instructions.map(({ opcode }) => opcode);
+    expect(functionLetOpcodes).not.toContain("ThrowReferenceErrorIfHole");
+    expect(functionVarOpcodes).not.toContain("LdaUndefined");
+    expect(functionLetOpcodes?.slice(0, 2)).toEqual(["LdaUndefined", "Star0"]);
   });
 
   it("separates syntactic nesting from captured and per-iteration context costs", () => {

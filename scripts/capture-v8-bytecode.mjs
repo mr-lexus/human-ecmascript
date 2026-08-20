@@ -27,6 +27,7 @@ const captures = [
       },
       { id: "initialized-shadowed-const", functionName: "initializedShadowedConst" },
       { id: "intentional-function-var", functionName: "intentionalFunctionVar" },
+      { id: "intentional-function-let", functionName: "intentionalFunctionLet" },
     ],
   },
   {

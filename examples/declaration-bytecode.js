@@ -89,6 +89,16 @@ function intentionalFunctionVar(mode) {
   return result;
 }
 
+function intentionalFunctionLet(mode) {
+  let result;
+  if (mode === "cache") {
+    result = 7;
+  } else if (mode === "network") {
+    result = 5;
+  }
+  return result;
+}
+
 console.log(String(varAcrossBranch(true)));
 
 for (const candidate of [letAcrossBranch, constAcrossBranch]) {
@@ -119,3 +129,4 @@ try {
 
 console.log(initializedShadowedConst());
 console.log(intentionalFunctionVar("cache"), String(intentionalFunctionVar("none")));
+console.log(intentionalFunctionLet("cache"), String(intentionalFunctionLet("none")));

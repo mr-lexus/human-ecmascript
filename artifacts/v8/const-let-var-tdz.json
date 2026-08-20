@@ -3,7 +3,7 @@
   "id": "const-let-var-tdz",
   "provider": "V8 Ignition",
   "sourcePath": "examples/declaration-bytecode.js",
-  "sourceSha256": "77990ef2d97a5454ce56a5e3fba4a62e06fde1bb5ec981023b9ff67e75e1192d",
+  "sourceSha256": "ea9a7eabdf92cad54527b9a270ca2779869a86d8c33d900ad178c41a3e3b34c4",
   "runtime": {
     "name": "Node.js",
     "version": "24.18.1",
@@ -782,7 +782,108 @@
           "operands": ""
         }
       ]
+    },
+    {
+      "id": "intentional-function-let",
+      "functionName": "intentionalFunctionLet",
+      "source": "function intentionalFunctionLet(mode) {\n  let result;\n  if (mode === \"cache\") {\n    result = 7;\n  } else if (mode === \"network\") {\n    result = 5;\n  }\n  return result;\n}",
+      "bytecodeLength": 27,
+      "parameterCount": 2,
+      "registerCount": 1,
+      "frameSize": 8,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "0e",
+          "opcode": "LdaUndefined",
+          "operands": ""
+        },
+        {
+          "offset": 1,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 2,
+          "bytes": "13 00",
+          "opcode": "LdaConstant",
+          "operands": "[0]"
+        },
+        {
+          "offset": 4,
+          "bytes": "74 03 00",
+          "opcode": "TestEqualStrict",
+          "operands": "a0, [0]"
+        },
+        {
+          "offset": 7,
+          "bytes": "a3 07",
+          "opcode": "JumpIfFalse",
+          "operands": "[7]"
+        },
+        {
+          "offset": 9,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 11,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 12,
+          "bytes": "93 0c",
+          "opcode": "Jump",
+          "operands": "[12]"
+        },
+        {
+          "offset": 14,
+          "bytes": "13 01",
+          "opcode": "LdaConstant",
+          "operands": "[1]"
+        },
+        {
+          "offset": 16,
+          "bytes": "74 03 01",
+          "opcode": "TestEqualStrict",
+          "operands": "a0, [1]"
+        },
+        {
+          "offset": 19,
+          "bytes": "a3 05",
+          "opcode": "JumpIfFalse",
+          "operands": "[5]"
+        },
+        {
+          "offset": 21,
+          "bytes": "0d 05",
+          "opcode": "LdaSmi",
+          "operands": "[5]"
+        },
+        {
+          "offset": 23,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 24,
+          "bytes": "0b f9",
+          "opcode": "Ldar",
+          "operands": "r0"
+        },
+        {
+          "offset": 26,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
     }
   ],
-  "captureSha256": "c44bbd9c213a94e481cd51083897e1d7e6e79a63bc8d8e5c9e93d6f394271f44"
+  "captureSha256": "74b5addf0b5e6d3a9282d5c5e403ea79ce70b4575812a7bd139b48456aaeb700"
 }

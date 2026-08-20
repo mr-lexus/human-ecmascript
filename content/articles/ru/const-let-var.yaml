@@ -2,13 +2,13 @@ id: const-let-var-ru
 slug: const-let-var
 locale: ru
 translationOf: const-let-var
-sourceContentHash: 5b805cae339f971c
+sourceContentHash: 99bf12f258080168
 title: "const, let и var: без мифов и запретов"
 eyebrow: "Переменная → инициализация → область видимости → производительность"
 dek: >-
   Ключевое слово выбирают по смыслу программы, а не ради мифического ускорения.
-  Разберём, когда появляется значение, откуда берётся TDZ и в каких редких случаях
-  `var` остаётся уместным и намеренным выбором.
+  Разберём, когда появляется значение, откуда берётся TDZ и какие именно правила
+  `var` — а не придуманные «лучшие практики» — отличают его от лексических объявлений.
 status: LOCALE_REVIEW
 sourceSnapshot: ECMA-262-ES2026
 readingMinutes: 40
@@ -31,15 +31,17 @@ sections:
           Объявление не просто резервирует имя. Оно определяет, где это имя видно, когда его уже
           можно читать и разрешено ли позже записать в переменную другое значение. Берите `const`,
           если сама переменная не должна указывать на другое значение. Берите `let`, если алгоритму
-          действительно нужно переназначение. `var` оставляйте для случаев, где намеренно нужна одна
-          переменная на всю функцию, либо важно сохранить поведение старого скрипта.
+          действительно нужно переназначение. `var` — не сокращение для «одна переменная на всю
+          функцию»: то же самое можно явно выразить через `let` в теле функции. Выбирайте `var`,
+          только если программе нужны именно его наблюдаемые правила VariableEnvironment.
       - id: declaration-choice-claims
         type: claims
         claims:
           - id: claim-choice-rule
             classification: INFORMATIVE
-            text: "Практичное правило: начинайте с `const`, переходите на `let` при настоящем переназначении, а `var` используйте только ради осознанной семантики VariableEnvironment или совместимости со старым кодом."
-            citationIds: [lexical-declarations, variable-statement]
+            text: "Практичное правило для нового кода: `const` при отсутствии переназначения, `let` при переназначении. `var` нужен только тогда, когда частью контракта являются его отличия: раннее значение undefined, отсутствие области обычного блока, слияние повторных объявлений или поведение глобального объявления Script."
+            citationIds:
+              [lexical-declarations, variable-statement, global-declaration-instantiation]
             sourceFingerprint: e9f03e4511a1a741
             confidence: 0.98
             reviewStatus: TECH_REVIEW
@@ -95,14 +97,14 @@ sections:
             detail: "Используйте для счётчика, курсора или накопителя: `let total = 0; total += price`. Инициализируйте переменную до ветвлений и держите её в самом узком блоке, где она действительно нужна."
             citationId: lexical-declarations
           - id: choose-var
-            label: "`var`: одна общая переменная на всю функцию"
-            operation: Переменная уровня функции
-            detail: "Уместен, когда несколько веток намеренно записывают одну переменную функции, а путь без присваивания должен вернуть `undefined`: `if (cacheHit) { var result = cache; } else if (shouldFetch) { var result = fetch(); } return result`. Это редкий, но нормальный контракт, а не устаревший синтаксис."
+            label: "`var`: нужна именно семантика VariableEnvironment"
+            operation: Специальный контракт
+            detail: "В обычной функции var-переменная создаётся и получает `undefined` до выполнения команд; `if` и обычный `{}` не создают ей новую область, а повторные объявления обозначают ту же переменную. Если нужна просто общая изменяемая переменная функции, объявите `let` перед ветками. `var` выбирают, только когда перечисленные отличия сами являются требованием."
             citationId: variable-statement
           - id: reject-keyword-speed-hack
             label: "Не выбирайте ключевое слово только по одной инструкции байткода"
             operation: Проверка здравого смысла
-            detail: "Замена `let` на `var` убирает TDZ ценой другого поведения. Если `undefined` означает ошибку, исправьте порядок инициализации или структуру блоков. В закреплённых примерах корректно инициализированные `let` и `const` тоже не требуют `ThrowReferenceErrorIfHole`; скорость горячего кода проверяют бенчмарком после оптимизации."
+            detail: "В примере с чтением до лексической инициализации замена `let` на `var` убирает TDZ ценой другого поведения. Это не универсальное преобразование. Если `undefined` означает ошибку, исправьте порядок инициализации или структуру блоков. Корректно инициализированные `let` и `const` тоже могут обходиться без `ThrowReferenceErrorIfHole`; скорость горячего кода проверяют бенчмарком после оптимизации."
             citationId: v8-hole-checks
   - id: declaration-normative-trace
     title: "Переменная создаётся заранее, но значение получает не сразу"
@@ -173,6 +175,13 @@ sections:
             sourceFingerprint: 4eb34a6c87a16d01
             confidence: 1
             reviewStatus: TECH_REVIEW
+          - id: claim-variable-environment-not-storage
+            classification: DERIVED
+            text: "VariableEnvironment — компонент модели спецификации, а не обещание о физическом объекте или куче. В V8 обычные локальные var/let/const могут находиться в виртуальных регистрах interpreter frame, а захваченные переменные — в Context; одно слово `var` не определяет место хранения."
+            citationIds: [execution-context-variable-environment, v8-sparkplug, v8-preparser]
+            sourceFingerprint: 6db1debd74c4b9fd
+            confidence: 1
+            reviewStatus: TECH_REVIEW
           - id: claim-const-binding
             classification: NORMATIVE
             text: "`const` создаёт неизменяемую привязку имени к значению; объект, записанный в эту переменную, спецификация неизменяемым не делает."
@@ -196,37 +205,55 @@ sections:
         body: >-
           Область видимости и момент инициализации меняют поведение программы. Примеры сравнивают
           раннее чтение, видимость после блока, изменение объекта через `const` и функции, которые
-          продолжают обращаться к переменным цикла.
-          В конце показаны обычная связка `const` с `let`, намеренный функциональный `var` и тот же
-          пример с веткой, по которому снят байткод. Это разбор инструмента, а не совет переписать
-          весь новый код на `var`.
+          продолжают обращаться к переменным цикла. Отдельный пример показывает `var` в ветках и
+          `let`, объявленный перед теми же ветками: для этих входов результат совпадает. Значит,
+          сама потребность в одной переменной результата ещё не делает `var` необходимым.
       - id: declaration-observable-claims
         type: claims
         claims:
           - id: claim-block-scope
             classification: OBSERVABLE
-            text: "Объявленный в обычном блоке `var` остаётся виден во всей содержащей функции, а `let` и `const` за границы блока не выходят."
-            citationIds: [lexical-declarations, variable-statement]
+            text: "В теле обычной функции `var`, объявленный внутри `if` или обычного блока `{}`, принадлежит VariableEnvironment этой функции и остаётся доступен после блока. Это не превращает любой `var` в «функциональный»: вне обычной функции Script, Module и static initialization block используют собственные алгоритмы инстанцирования."
+            citationIds:
+              [
+                lexical-declarations,
+                variable-statement,
+                execution-context-variable-environment,
+                global-declaration-instantiation,
+                module-declaration-instantiation,
+                class-static-block,
+              ]
             sourceFingerprint: 4eb34a6c87a16d01
             confidence: 1
             reviewStatus: TECH_REVIEW
           - id: claim-loop-bindings
             classification: OBSERVABLE
-            text: "Функция, созданная внутри `for (let ...)`, видит отдельную переменную своей итерации; функции из цикла `for (var ...)` обращаются к одной общей переменной функции."
+            text: "Функция, созданная внутри `for (let ...)`, видит отдельную переменную своей итерации; функции из цикла `for (var ...)` обращаются к одной общей переменной окружающего VariableEnvironment."
             citationIds: [create-per-iteration-environment, variable-statement]
             sourceFingerprint: 8f8f696aa7961cef
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-var-let-branch-equivalence
+            classification: OBSERVABLE
+            text: "В сравнительном примере вариант с `var` в ветках и вариант с `let result;` перед ветками возвращают одинаковые строки. Равенство достигается потому, что `let` выполняется до любого чтения и обе функции одинаково присваивают значения; это не делает `var` и `let` взаимозаменяемыми вообще."
+            citationIds: [lexical-declarations, variable-statement]
+            sourceFingerprint: ef66a654ef921ff4
             confidence: 1
             reviewStatus: TECH_REVIEW
       - id: declaration-var-note
         type: note
         tone: warning
-        title: "Когда `var` действительно уместен"
+        title: "Что должно быть причиной выбрать `var`"
         body: >-
-          Сохраняйте `var`, если старый код наблюдаемо зависит от области всей функции, повторных
-          объявлений или интеграции обычного скрипта с глобальным объектом. В новом коде делайте это
-          намерение заметным: лучше объявить `var` ближе к началу функции, чем прятать его внутри
-          блока. Не меняйте `let` на `var`, если вложенным функциям нужно своё значение на каждой
-          итерации.
+          У `var` нет магического бытового сценария, в котором он автоматически «правильнее» или
+          быстрее. Он оправдан, когда код должен наблюдаемо зависеть именно от одного из его правил:
+          чтение до текстового объявления даёт `undefined`; обычный блок не ограничивает область;
+          повторные `var`-объявления сливаются в одну переменную; верхнеуровневое объявление обычного
+          Script участвует в Global Environment иначе, чем `let`. Это встречается при сохранении
+          совместимости, в генераторах кода и в обычных Script, которые наблюдают связь глобального
+          var-объявления с глобальным объектом. Если нужна всего лишь одна изменяемая переменная
+          функции, `let` в теле функции выражает это явно. Не заменяйте `let` на `var`, если
+          функциям нужна отдельная переменная каждой итерации.
   - id: declaration-performance
     title: "Производительность: сначала сохранить смысл, потом измерять"
     mode: v8
@@ -270,11 +297,11 @@ sections:
             sourceFingerprint: 8af584f5e91414c8
             confidence: 1
             reviewStatus: TECH_REVIEW
-          - id: claim-intentional-var-bytecode
+          - id: claim-var-let-baseline-comparison
             classification: V8_IMPLEMENTATION
-            text: "В закреплённом примере один function-wide `var` используется в двух вложенных ветках и не требует hole-check; если ни одна ветка не сработала, функция намеренно возвращает `undefined`. Это полезная семантика `var`, а не доказательство его врождённого преимущества над инициализированным `let`."
-            citationIds: [variable-statement, v8-hole-checks]
-            sourceFingerprint: 4eb34a6c87a16d01
+            text: "В закреплённом V8 13.6 функции с `var result` в ветках и с `let result` перед теми же ветками возвращают одинаковые значения и не содержат hole-check. Baseline-байткод варианта `var` занимает 25 байт и 13 инструкций, а вариант `let` — 27 байт и 15 инструкций: `let result;` добавляет `LdaUndefined` и `Star0`. Это наблюдение об Ignition данной версии, а не гарантия скорости оптимизированного кода."
+            citationIds: [lexical-declarations, variable-statement, v8-hole-checks, v8-sparkplug]
+            sourceFingerprint: ea9a7eabdf92cad5
             confidence: 1
             reviewStatus: TECH_REVIEW
           - id: claim-nesting-no-runtime-scan
@@ -326,7 +353,7 @@ sections:
           - id: blazing-preserve-semantics
             label: "1. Решите, что должно означать раннее чтение"
             operation: Сначала поведение
-            detail: "Если это ошибка — сохраняйте лексическое объявление. Если `undefined` до присваивания является осознанным контрактом одной переменной на всю функцию, такой контракт можно выразить через `var`."
+            detail: "Если раннее чтение должно быть ошибкой, сохраняйте лексическое объявление. Если оно обязано вернуть `undefined` ещё до текстового объявления, это специфическое правило `var`. Когда раннего чтения нет, данное различие не является причиной выбирать ключевое слово."
             citationId: variable-statement
           - id: blazing-initialize-before-branch
             label: "2. Инициализируйте до ветвления"
@@ -357,21 +384,22 @@ sections:
       - id: declaration-intentional-var-note
         type: note
         tone: implementation
-        title: "Когда `var` действительно на своём месте"
+        title: "Что `var` даёт в сравнительном примере"
         body: >-
-          Используйте `var` осознанно, если функция действительно владеет одним необязательным
-          состоянием, общим для нескольких вложенных веток, а `undefined` до присваивания является
-          допустимым результатом. Повторные `var result` тогда описывают одну переменную функции, и
-          в закреплённом байткоде нет проверки TDZ. Это бывает полезно при поддержке совместимого
-          старого кода, в сгенерированном коде или в функции, чей контракт намеренно следует этим
-          правилам. Если путь без присваивания является ошибкой, лучше вычислить `const` выражением
-          либо объявить `let` до ветвления и читать только после инициализации. В этих корректных
-          лексических случаях hole-check в нашем capture тоже отсутствует.
+          Две функции ниже ведут себя одинаково на всех проверяемых входах. В первой повторные
+          `var result` в ветках обозначают одну переменную VariableEnvironment. Во второй перед
+          ветками явно выполняется `let result;`. Hole-check нет в обоих случаях. В закреплённом
+          Ignition вариант `var` короче на `LdaUndefined` и `Star0`, потому что var-переменная уже
+          инициализирована при создании окружения, а объявление `let result;` должно выполниться в
+          своей позиции. Это честный факт о baseline-байткоде, но не основание обещать выигрыш в
+          горячем оптимизированном коде. Для обычного прикладного кода явный `let` чаще понятнее;
+          `var` имеет смысл, только если требуются его правила или измерен важный эффект именно на
+          целевом runtime.
       - id: declaration-bytecode-artifact
         type: bytecode
         artifactId: const-let-var-tdz
         title: "Проверка TDZ в настоящем байткоде V8"
-        body: "Все одиннадцать функций сняты из одного файла закреплённым Linux-бинарником Node. Оранжевым отмечены инструкции внутреннего значения «ещё не инициализировано» и возможного ReferenceError."
+        body: "Все двенадцать функций сняты из одного файла закреплённым Linux-бинарником Node. Оранжевым отмечены инструкции внутреннего значения «ещё не инициализировано» и возможного ReferenceError."
         cases:
           - id: bytecode-var-branch
             caseId: var-across-branch
@@ -415,8 +443,12 @@ sections:
             explanation: "Если поставить `const p2 = 7` перед чтением, намеренное затенение сохраняется, а путь TDZ и hole-check в этом capture исчезают."
           - id: bytecode-intentional-function-var
             caseId: intentional-function-var
-            title: "Один намеренный `var` для нескольких веток"
-            explanation: "Обе вложенные ветки записывают в одну function-scoped переменную `result`. Hole-check отсутствует; если ни одна ветка не сработала, намеренным результатом остаётся `undefined`."
+            title: "`var result` внутри нескольких веток"
+            explanation: "Обе ветки записывают в одну переменную VariableEnvironment. Hole-check отсутствует. В этом capture функция занимает 25 байт и 13 инструкций."
+          - id: bytecode-intentional-function-let
+            caseId: intentional-function-let
+            title: "Эквивалентный `let result` перед ветками"
+            explanation: "Результаты совпадают с вариантом `var`, и hole-check также отсутствует. Выполнение `let result;` добавляет `LdaUndefined` и `Star0`: здесь 27 байт и 15 инструкций."
       - id: declaration-nesting-bytecode-artifact
         type: bytecode
         artifactId: const-let-var-nesting
@@ -496,6 +528,13 @@ citations:
     url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-variable-statement
     relevance: "Задаёт область `var`, создание со значением undefined и правила повторных объявлений."
     evidenceHash: 4eb34a6c87a16d01
+  - id: execution-context-variable-environment
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-execution-contexts
+    label: "ECMA-262 §9.4 — Execution Contexts"
+    url: https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-execution-contexts
+    relevance: "Определяет VariableEnvironment как Environment Record, хранящую переменные VariableStatement текущего execution context."
+    evidenceHash: 6db1debd74c4b9fd
   - id: declarative-environment
     snapshot: ECMA-262-ES2026
     nodeId: sec-declarative-environment-records
@@ -531,6 +570,13 @@ citations:
     url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-scripts-and-modules.html#sec-source-text-module-record-initialize-environment
     relevance: "Создаёт переменные модуля, включая верхнеуровневые var-объявления модульного кода."
     evidenceHash: 7d7d2fdbeec17ef0
+  - id: class-static-block
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-runtime-semantics-evaluateclassstaticblockbody
+    label: "ECMA-262 §15.7.12 — EvaluateClassStaticBlockBody"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html#sec-runtime-semantics-evaluateclassstaticblockbody
+    relevance: "Показывает, что static initialization block выполняет собственный FunctionDeclarationInstantiation и образует отдельную границу для var-объявлений."
+    evidenceHash: bac1417871673407
   - id: v8-hole-checks
     snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
     nodeId: bytecode-generator-hole-checks
@@ -626,12 +672,13 @@ examples:
     claimIds: [claim-loop-bindings]
     citationIds: [create-per-iteration-environment, variable-statement]
   - id: intentional-var-scope
-    title: "Намеренный `var` на всю функцию"
-    goal: "Показать, как повторные var-объявления в ветках работают с одной переменной."
+    title: "`var` в ветках и явный `let` перед ветками"
+    goal: "Сравнить повторные var-объявления с let-переменной, объявленной в теле функции."
     sourcePath: examples/intentional-var-scope.js
     timeoutMs: 1200
-    expectedOutput: ["cached value", "network value", "no value"]
-    claimIds: [claim-var-current, claim-block-scope]
+    expectedOutput:
+      ["cached value / cached value", "network value / network value", "no value / no value"]
+    claimIds: [claim-var-current, claim-block-scope, claim-var-let-branch-equivalence]
     citationIds: [variable-statement]
   - id: declaration-choice
     title: "Значения `const` и счётчик `let`"
@@ -659,6 +706,7 @@ examples:
         "ReferenceError",
         "7",
         "7 undefined",
+        "7 undefined",
       ]
     claimIds:
       [
@@ -667,7 +715,7 @@ examples:
         claim-shadowed-binding-tdz,
         claim-shadowing-not-nesting,
         claim-v8-bytecode-capture,
-        claim-intentional-var-bytecode,
+        claim-var-let-baseline-comparison,
       ]
     citationIds: [lexical-declarations, variable-statement, declarative-environment, v8-hole-checks]
   - id: declaration-nesting-bytecode
@@ -723,7 +771,7 @@ engineResults:
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
     binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
-    output: ["cached value", "network value", "no value"]
+    output: ["cached value / cached value", "network value / network value", "no value / no value"]
     capturedAt: "2026-08-20"
   - exampleId: declaration-choice
     engine: V8
@@ -749,6 +797,7 @@ engineResults:
         "7",
         "ReferenceError",
         "7",
+        "7 undefined",
         "7 undefined",
       ]
     capturedAt: "2026-08-20"

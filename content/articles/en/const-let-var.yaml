@@ -1,13 +1,13 @@
 id: const-let-var
 slug: const-let-var
 locale: en
-sourceContentHash: 5b805cae339f971c
+sourceContentHash: 99bf12f258080168
 title: "const, let, and var without folklore"
 eyebrow: "Bindings → initialization → scope → performance"
 dek: >-
   Choose a declaration for the semantics you need, not for a mythical speed boost.
-  We will trace how each binding is created, explain the temporal dead zone, and show
-  the narrow cases where `var` is still an intentional tool.
+  We will trace how each binding is created, explain the temporal dead zone, and identify
+  the actual `var` rules—rather than invented best practices—that differ from lexical declarations.
 status: TECH_REVIEW
 sourceSnapshot: ECMA-262-ES2026
 readingMinutes: 38
@@ -30,15 +30,17 @@ sections:
           A declaration does more than reserve a name. It chooses where that name is visible,
           when it becomes readable, and whether the binding may later point to another value.
           Use `const` when the binding should keep the same value, `let` when reassignment is part
-          of the algorithm, and `var` only when you deliberately want one function-scoped binding
-          or must preserve legacy script behavior.
+          of the algorithm. `var` is not shorthand for “one binding for the whole function”; a
+          `let` in the function body can express that explicitly. Choose `var` only when its
+          observable VariableEnvironment rules are themselves required.
       - id: declaration-choice-claims
         type: claims
         claims:
           - id: claim-choice-rule
             classification: INFORMATIVE
-            text: "A useful default is `const`; switch to `let` for an intentional reassignment, and use `var` only for intentional VariableEnvironment semantics or legacy compatibility."
-            citationIds: [lexical-declarations, variable-statement]
+            text: "A practical rule for new code is `const` without reassignment and `let` with reassignment. Use `var` only when its differences are part of the contract: an early undefined value, no ordinary-block scope, merged repeated declarations, or classic-Script global declaration behavior."
+            citationIds:
+              [lexical-declarations, variable-statement, global-declaration-instantiation]
             sourceFingerprint: e9f03e4511a1a741
             confidence: 0.98
             reviewStatus: TECH_REVIEW
@@ -94,14 +96,14 @@ sections:
             detail: "Use it for a counter, cursor, or accumulator: `let total = 0; total += price`. Initialize it before branching and keep it in the narrowest block that actually needs it."
             citationId: lexical-declarations
           - id: choose-var
-            label: "`var`: one binding is deliberately shared by the whole function"
-            operation: Function-wide binding
-            detail: "It fits when several branches intentionally assign one function binding and a path without assignment must return `undefined`: `if (cacheHit) { var result = cache; } else if (shouldFetch) { var result = fetch(); } return result`. This is a narrow but valid contract, not deprecated syntax."
+            label: "`var`: the VariableEnvironment semantics are required"
+            operation: Specialized contract
+            detail: "In an ordinary function, a var binding is created and initialized to `undefined` before statements execute; an `if` or ordinary `{}` does not create a new var scope, and repeated declarations denote the same binding. If you only need a shared mutable function local, declare `let` before the branches. Choose `var` only when the listed differences are requirements."
             citationId: variable-statement
           - id: reject-keyword-speed-hack
             label: "Do not choose a keyword from one bytecode instruction"
             operation: Sanity check
-            detail: "Replacing `let` with `var` removes the TDZ by changing behavior. If `undefined` would be a bug, fix initialization order or block structure instead. In the pinned fixtures, correctly initialized `let` and `const` also need no `ThrowReferenceErrorIfHole`; benchmark optimized hot code before making a performance claim."
+            detail: "In the fixture that reads before lexical initialization, replacing `let` with `var` removes the TDZ by changing behavior. This is not a universal transformation. If `undefined` would be a bug, fix initialization order or block structure instead. Correctly initialized `let` and `const` can also need no `ThrowReferenceErrorIfHole`; benchmark optimized hot code before making a performance claim."
             citationId: v8-hole-checks
   - id: declaration-normative-trace
     title: "Creation happens before execution; initialization does not"
@@ -172,6 +174,13 @@ sections:
             sourceFingerprint: 4eb34a6c87a16d01
             confidence: 1
             reviewStatus: TECH_REVIEW
+          - id: claim-variable-environment-not-storage
+            classification: DERIVED
+            text: "VariableEnvironment is a specification-model component, not a promise of a physical object or heap allocation. In V8, ordinary var/let/const locals may live in interpreter-frame virtual registers, while captured bindings may use a Context; the `var` keyword alone does not determine storage."
+            citationIds: [execution-context-variable-environment, v8-sparkplug, v8-preparser]
+            sourceFingerprint: 6db1debd74c4b9fd
+            confidence: 1
+            reviewStatus: TECH_REVIEW
           - id: claim-const-binding
             classification: NORMATIVE
             text: "`const` creates an immutable binding; the specification does not make an object stored in that binding immutable."
@@ -195,37 +204,55 @@ sections:
         body: >-
           Scope and initialization change program behavior. The examples contrast an early read,
           block visibility, object mutation through `const`, and functions that retain access to
-          loop bindings. The final examples
-          show a normal `const`/`let` combination, an intentional function-scoped `var`, and the
-          exact branch fixture used for the bytecode capture—not a blanket recommendation to write
-          new code with `var`.
+          loop bindings. A separate example compares `var` declarations inside branches with a
+          `let` declared before those same branches; their results match for these inputs. Merely
+          needing one result binding therefore does not make `var` necessary.
       - id: declaration-observable-claims
         type: claims
         claims:
           - id: claim-block-scope
             classification: OBSERVABLE
-            text: "A `var` declared inside an ordinary block remains visible in the containing function, while `let` and `const` do not escape that block."
-            citationIds: [lexical-declarations, variable-statement]
+            text: "In an ordinary function body, a `var` declared inside an `if` or ordinary `{}` belongs to that function's VariableEnvironment and remains accessible after the block. This does not make every var declaration 'function-scoped': outside an ordinary function, Script, Module, and a static initialization block use their own instantiation algorithms."
+            citationIds:
+              [
+                lexical-declarations,
+                variable-statement,
+                execution-context-variable-environment,
+                global-declaration-instantiation,
+                module-declaration-instantiation,
+                class-static-block,
+              ]
             sourceFingerprint: 4eb34a6c87a16d01
             confidence: 1
             reviewStatus: TECH_REVIEW
           - id: claim-loop-bindings
             classification: OBSERVABLE
-            text: "A function created in a `for (let ...)` iteration observes that iteration's distinct binding; functions created by a `for (var ...)` loop share one function-scoped binding."
+            text: "A function created in a `for (let ...)` iteration observes that iteration's distinct binding; functions created by a `for (var ...)` loop share one binding from the surrounding VariableEnvironment."
             citationIds: [create-per-iteration-environment, variable-statement]
             sourceFingerprint: 8f8f696aa7961cef
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-var-let-branch-equivalence
+            classification: OBSERVABLE
+            text: "In the comparison example, the branch-local `var` version and the `let result;`-before-branches version return the same strings. They match because the `let` statement executes before any read and both functions assign the same branch values; this does not make `var` and `let` generally interchangeable."
+            citationIds: [lexical-declarations, variable-statement]
+            sourceFingerprint: ef66a654ef921ff4
             confidence: 1
             reviewStatus: TECH_REVIEW
       - id: declaration-var-note
         type: note
         tone: warning
-        title: "When `var` is the right tool"
+        title: "What must justify choosing `var`"
         body: >-
-          Keep `var` when maintaining code whose observable behavior depends on function scope,
-          repeated declarations, or classic-script global integration. In new code, make that intent
-          conspicuous—prefer declaring the `var` near the top of the function instead of hiding it
-          inside a block. Never replace `let` with `var` when nested functions require a distinct
-          value for each iteration.
+          There is no magical everyday scenario in which `var` is automatically more correct or
+          faster. It is justified when code must observably depend on one of its rules: reading
+          before the textual declaration yields `undefined`; an ordinary block does not limit its
+          scope; repeated `var` declarations merge into one binding; or a top-level declaration in
+          a classic Script participates in the Global Environment differently from `let`. These
+          needs appear in compatibility work, code generators, and classic Scripts that observe a
+          global var declaration's relationship to the global object. If you only need one mutable
+          function local, a `let` in the function body says so directly. Do not replace `let` with
+          `var` when closures need a distinct binding per iteration.
   - id: declaration-performance
     title: "Performance: preserve semantics, then measure"
     mode: v8
@@ -269,11 +296,11 @@ sections:
             sourceFingerprint: 8af584f5e91414c8
             confidence: 1
             reviewStatus: TECH_REVIEW
-          - id: claim-intentional-var-bytecode
+          - id: claim-var-let-baseline-comparison
             classification: V8_IMPLEMENTATION
-            text: "The pinned function-wide `var` fixture uses one register across two nested branches and has no hole guard; the untouched path returns `undefined` by design. This demonstrates useful `var` semantics, not an inherent speed advantage over an initialized `let`."
-            citationIds: [variable-statement, v8-hole-checks]
-            sourceFingerprint: 4eb34a6c87a16d01
+            text: "In the pinned V8 13.6 capture, a function with `var result` in its branches and a function with `let result` before the same branches return the same values and contain no hole check. The `var` baseline bytecode is 25 bytes and 13 instructions; the `let` version is 27 bytes and 15 instructions because `let result;` emits `LdaUndefined` and `Star0`. This is an Ignition observation for this version, not an optimized-performance guarantee."
+            citationIds: [lexical-declarations, variable-statement, v8-hole-checks, v8-sparkplug]
+            sourceFingerprint: ea9a7eabdf92cad5
             confidence: 1
             reviewStatus: TECH_REVIEW
           - id: claim-nesting-no-runtime-scan
@@ -325,7 +352,7 @@ sections:
           - id: blazing-preserve-semantics
             label: "1. Decide what an early read should mean"
             operation: Semantics first
-            detail: "If it should be an error, keep the lexical declaration. If `undefined` before assignment is an intentional function-wide contract, `var` can express that contract."
+            detail: "Keep a lexical declaration if an early access should fail. If it must yield `undefined` even before the textual declaration, that is a specific `var` rule. When no early read exists, this difference is not a reason to choose a keyword."
             citationId: variable-statement
           - id: blazing-initialize-before-branch
             label: "2. Initialize before branching"
@@ -356,21 +383,22 @@ sections:
       - id: declaration-intentional-var-note
         type: note
         tone: implementation
-        title: "When `var` earns its place"
+        title: "What `var` changes in the comparison fixture"
         body: >-
-          Use `var` deliberately when the function really owns one optional piece of state shared
-          by several nested branches, and `undefined` before any branch assigns it is a valid result.
-          Repeated `var result` declarations then describe the same function binding and the pinned
-          bytecode needs no TDZ guard. This can be valuable in compatible maintenance code,
-          generated code, or a function whose contract intentionally follows those rules. If an
-          unassigned path is a bug, prefer `const` computed by an expression or declare `let` before
-          branching so all reads happen after initialization. Those initialized lexical cases also
-          contain no hole guard in this capture.
+          The two functions below behave alike for every tested input. In the first, repeated
+          `var result` declarations in branches denote one VariableEnvironment binding. In the
+          second, `let result;` explicitly executes before the branches. Neither contains a hole
+          check. In the pinned Ignition capture, the `var` version omits `LdaUndefined` and `Star0`
+          because its binding was initialized while the environment was created; the `let result;`
+          statement must execute at its source position. This is an honest baseline-bytecode fact,
+          not a promise about hot optimized code. Explicit `let` is usually clearer in ordinary
+          application code; `var` makes sense only when its rules are required or a relevant effect
+          has been measured on the target runtime.
       - id: declaration-bytecode-artifact
         type: bytecode
         artifactId: const-let-var-tdz
         title: "The TDZ guard in real V8 bytecode"
-        body: "These eleven functions were captured from the same source file with a pinned Linux Node binary. Orange rows are the instructions that represent V8's uninitialized lexical sentinel and the possible ReferenceError."
+        body: "These twelve functions were captured from the same source file with a pinned Linux Node binary. Orange rows are the instructions that represent V8's uninitialized lexical sentinel and the possible ReferenceError."
         cases:
           - id: bytecode-var-branch
             caseId: var-across-branch
@@ -414,8 +442,12 @@ sections:
             explanation: "Placing `const p2 = 7` before the read preserves intentional shadowing while removing the TDZ path and its hole guard in this capture."
           - id: bytecode-intentional-function-var
             caseId: intentional-function-var
-            title: "One intentional `var` across branches"
-            explanation: "Both nested branches write the same function-scoped `result`. The capture has no hole guard; when neither branch runs, the deliberate result is `undefined`."
+            title: "`var result` inside several branches"
+            explanation: "Both branches assign one VariableEnvironment binding. There is no hole check. In this capture the function is 25 bytes and 13 instructions."
+          - id: bytecode-intentional-function-let
+            caseId: intentional-function-let
+            title: "Equivalent `let result` before the branches"
+            explanation: "Results match the `var` version and there is still no hole check. Executing `let result;` adds `LdaUndefined` and `Star0`: 27 bytes and 15 instructions here."
       - id: declaration-nesting-bytecode-artifact
         type: bytecode
         artifactId: const-let-var-nesting
@@ -495,6 +527,13 @@ citations:
     url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-variable-statement
     relevance: "Defines `var` scope, creation, immediate undefined initialization, and repeated declarations."
     evidenceHash: 4eb34a6c87a16d01
+  - id: execution-context-variable-environment
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-execution-contexts
+    label: "ECMA-262 §9.4 — Execution Contexts"
+    url: https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-execution-contexts
+    relevance: "Defines VariableEnvironment as the Environment Record that holds VariableStatement bindings for an execution context."
+    evidenceHash: 6db1debd74c4b9fd
   - id: declarative-environment
     snapshot: ECMA-262-ES2026
     nodeId: sec-declarative-environment-records
@@ -530,6 +569,13 @@ citations:
     url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-scripts-and-modules.html#sec-source-text-module-record-initialize-environment
     relevance: "Creates module-scoped bindings, including top-level var declarations in module code."
     evidenceHash: 7d7d2fdbeec17ef0
+  - id: class-static-block
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-runtime-semantics-evaluateclassstaticblockbody
+    label: "ECMA-262 §15.7.12 — EvaluateClassStaticBlockBody"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html#sec-runtime-semantics-evaluateclassstaticblockbody
+    relevance: "Shows a static initialization block running its own FunctionDeclarationInstantiation, which gives its var declarations a separate boundary."
+    evidenceHash: bac1417871673407
   - id: v8-hole-checks
     snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
     nodeId: bytecode-generator-hole-checks
@@ -625,12 +671,13 @@ examples:
     claimIds: [claim-loop-bindings]
     citationIds: [create-per-iteration-environment, variable-statement]
   - id: intentional-var-scope
-    title: "An intentional function-scoped `var`"
-    goal: "Show repeated var declarations contributing to one binding across branches."
+    title: "Branch-local `var` declarations and an explicit outer `let`"
+    goal: "Compare repeated var declarations with a let binding declared in the function body."
     sourcePath: examples/intentional-var-scope.js
     timeoutMs: 1200
-    expectedOutput: ["cached value", "network value", "no value"]
-    claimIds: [claim-var-current, claim-block-scope]
+    expectedOutput:
+      ["cached value / cached value", "network value / network value", "no value / no value"]
+    claimIds: [claim-var-current, claim-block-scope, claim-var-let-branch-equivalence]
     citationIds: [variable-statement]
   - id: declaration-choice
     title: "`const` values and a `let` accumulator"
@@ -658,6 +705,7 @@ examples:
         "ReferenceError",
         "7",
         "7 undefined",
+        "7 undefined",
       ]
     claimIds:
       [
@@ -666,7 +714,7 @@ examples:
         claim-shadowed-binding-tdz,
         claim-shadowing-not-nesting,
         claim-v8-bytecode-capture,
-        claim-intentional-var-bytecode,
+        claim-var-let-baseline-comparison,
       ]
     citationIds: [lexical-declarations, variable-statement, declarative-environment, v8-hole-checks]
   - id: declaration-nesting-bytecode
@@ -722,7 +770,7 @@ engineResults:
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
     binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
-    output: ["cached value", "network value", "no value"]
+    output: ["cached value / cached value", "network value / network value", "no value / no value"]
     capturedAt: "2026-08-20"
   - exampleId: declaration-choice
     engine: V8
@@ -748,6 +796,7 @@ engineResults:
         "7",
         "ReferenceError",
         "7",
+        "7 undefined",
         "7 undefined",
       ]
     capturedAt: "2026-08-20"
