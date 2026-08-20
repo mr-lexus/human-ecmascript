@@ -3,14 +3,13 @@
 import { Badge } from "@mantine/core";
 import type { EngineResult, ExampleManifest } from "@human-ecmascript/model";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { sandboxDocument } from "../lib/exampleSandbox";
+import { parseSandboxRunMessage, sandboxDocument } from "../lib/exampleSandbox";
 import { CodeEditor } from "./CodeEditor";
 
-type RunMessage = {
-  type: "done" | "error" | "timeout";
+type PendingRun = {
   runId: string;
-  lines: string[];
-  error?: string;
+  source: string;
+  timeoutMs: number;
 };
 
 export function ExampleLab({
@@ -31,8 +30,11 @@ export function ExampleLab({
   const [runState, setRunState] = useState<"idle" | "running" | "done" | "error" | "timeout">(
     "idle",
   );
+  const [sandboxGeneration, setSandboxGeneration] = useState(0);
+  const [sandboxMounted, setSandboxMounted] = useState(false);
   const iframe = useRef<HTMLIFrameElement>(null);
   const activeRun = useRef<string | null>(null);
+  const pendingRun = useRef<PendingRun | null>(null);
   const runTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const labels =
     locale === "ru"
@@ -47,6 +49,7 @@ export function ExampleLab({
           idle: "Запустите код, чтобы увидеть вывод.",
           timeout: "Код выполнялся слишком долго, поэтому мы его остановили.",
           tooLong: "Код длиннее допустимых 10 000 символов.",
+          invalidResponse: "Песочница вернула некорректный ответ и была остановлена.",
         }
       : {
           run: "Run in browser",
@@ -59,24 +62,39 @@ export function ExampleLab({
           idle: "Run the code to see its output.",
           timeout: "Execution stopped at the time limit.",
           tooLong: "Source exceeds the 10,000 character limit.",
+          invalidResponse: "The sandbox returned an invalid response and was stopped.",
         };
 
   useEffect(() => {
-    const listener = (event: MessageEvent<RunMessage>) => {
-      if (event.source !== iframe.current?.contentWindow || event.data.runId !== activeRun.current)
+    const listener = (event: MessageEvent<unknown>) => {
+      if (event.source !== iframe.current?.contentWindow) return;
+
+      const message = parseSandboxRunMessage(event.data);
+      if (!message || message.runId !== activeRun.current) {
+        if (activeRun.current === null) return;
+        if (runTimeout.current) clearTimeout(runTimeout.current);
+        runTimeout.current = null;
+        activeRun.current = null;
+        pendingRun.current = null;
+        setSandboxMounted(false);
+        setOutput([labels.invalidResponse]);
+        setRunState("error");
         return;
+      }
       if (runTimeout.current) clearTimeout(runTimeout.current);
       runTimeout.current = null;
       activeRun.current = null;
-      setOutput(event.data.error ? [...event.data.lines, event.data.error] : event.data.lines);
-      setRunState(event.data.type);
+      pendingRun.current = null;
+      setSandboxMounted(false);
+      setOutput(message.error ? [...message.lines, message.error] : message.lines);
+      setRunState(message.type);
     };
     window.addEventListener("message", listener);
     return () => {
       window.removeEventListener("message", listener);
       if (runTimeout.current) clearTimeout(runTimeout.current);
     };
-  }, []);
+  }, [labels.invalidResponse]);
 
   const results = useMemo(
     () => engineResults.filter(({ exampleId }) => exampleId === selected.id),
@@ -86,6 +104,8 @@ export function ExampleLab({
     if (runTimeout.current) clearTimeout(runTimeout.current);
     runTimeout.current = null;
     activeRun.current = null;
+    pendingRun.current = null;
+    setSandboxMounted(false);
     setSelectedId(id);
     setSource(sources[id] ?? "");
     setOutput([]);
@@ -99,33 +119,45 @@ export function ExampleLab({
     }
     const runId = crypto.randomUUID();
     activeRun.current = runId;
+    pendingRun.current = { runId, source, timeoutMs: selected.timeoutMs };
     setRunState("running");
     setOutput([]);
+    setSandboxMounted(true);
+    setSandboxGeneration((generation) => generation + 1);
     if (runTimeout.current) clearTimeout(runTimeout.current);
     runTimeout.current = setTimeout(
       () => {
         if (activeRun.current !== runId) return;
         activeRun.current = null;
+        pendingRun.current = null;
         runTimeout.current = null;
+        setSandboxMounted(false);
         setRunState("timeout");
       },
-      Math.min(selected.timeoutMs, 5_000) + 250,
+      Math.min(selected.timeoutMs, 5_000) + 1_000,
     );
-    iframe.current?.contentWindow?.postMessage(
-      { type: "run", source, runId, timeoutMs: selected.timeoutMs },
-      "*",
-    );
+  };
+  const startPendingRun = () => {
+    const pending = pendingRun.current;
+    if (!pending || pending.runId !== activeRun.current) return;
+    iframe.current?.contentWindow?.postMessage({ type: "run", ...pending }, "*");
+    pendingRun.current = null;
   };
 
   return (
     <div className="example-lab">
-      <iframe
-        ref={iframe}
-        srcDoc={sandboxDocument}
-        sandbox="allow-scripts"
-        title="Opaque-origin JavaScript sandbox"
-        className="sandbox-frame"
-      />
+      {sandboxMounted ? (
+        <iframe
+          key={sandboxGeneration}
+          ref={iframe}
+          srcDoc={sandboxDocument}
+          sandbox="allow-scripts"
+          referrerPolicy="no-referrer"
+          onLoad={startPendingRun}
+          title="Opaque-origin JavaScript sandbox"
+          className="sandbox-frame"
+        />
+      ) : null}
       <div
         className="example-picker"
         role="tablist"
