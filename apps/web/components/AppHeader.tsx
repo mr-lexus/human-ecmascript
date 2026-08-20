@@ -19,7 +19,7 @@ export function AppHeader({ locale }: Readonly<{ locale: "en" | "ru" }>) {
           </span>
         </Link>
         <nav aria-label="Primary navigation">
-          <Link href={`/${locale}/guide/reference-call-this/`}>{labels.paths}</Link>
+          <Link href={`/${locale}/#learning-paths`}>{labels.paths}</Link>
           <Link href={`/${locale}/spec/`}>{labels.spec}</Link>
           <Link href={`/${locale}/glossary/`}>{labels.glossary}</Link>
         </nav>

@@ -378,6 +378,10 @@ a {
   font-size: 9px;
   line-height: 1.2;
 }
+.path-list {
+  display: grid;
+  gap: 18px;
+}
 .path-card {
   display: grid;
   grid-template-columns: 90px 1fr auto;
@@ -885,17 +889,17 @@ a {
   visibility: hidden;
 }
 .example-picker {
-  display: flex;
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
   border-bottom: 1px solid #3e4059;
   background: #292b45;
 }
 .example-picker button {
-  flex: 0 0 auto;
-  min-width: 165px;
+  min-width: 0;
   padding: 14px 18px;
   border: 0;
   border-right: 1px solid #3e4059;
+  border-bottom: 1px solid #3e4059;
   background: transparent;
   color: #aeb0c1;
   text-align: left;

@@ -9,6 +9,7 @@ export default tseslint.config(
       "**/out/**",
       "**/node_modules/**",
       "**/.toolchains/**",
+      "**/.cache/**",
       "docs/planning/roadmap.json",
     ],
   },

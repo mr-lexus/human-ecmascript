@@ -8,18 +8,22 @@ export async function generateMetadata({
   params: Promise<{ lang: "en" | "ru" }>;
 }): Promise<Metadata> {
   const { lang } = await params;
-  const article = loadArticle(lang, "reference-call-this");
+  const article = loadArticle(lang, "const-let-var");
   return {
     title: article.title,
     description: article.dek,
     alternates: {
-      languages: { en: "/en/guide/reference-call-this/", ru: "/ru/guide/reference-call-this/" },
+      languages: { en: "/en/guide/const-let-var/", ru: "/ru/guide/const-let-var/" },
     },
   };
 }
 
-export default async function GuidePage({ params }: { params: Promise<{ lang: "en" | "ru" }> }) {
+export default async function ConstLetVarPage({
+  params,
+}: {
+  params: Promise<{ lang: "en" | "ru" }>;
+}) {
   const { lang } = await params;
-  const article = loadArticle(lang, "reference-call-this");
-  return <GuideArticlePage article={article} locale={lang} sequence={1} />;
+  const article = loadArticle(lang, "const-let-var");
+  return <GuideArticlePage article={article} locale={lang} sequence={2} />;
 }

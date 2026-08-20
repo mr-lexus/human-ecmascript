@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import {
   articleSchema,
@@ -31,6 +31,13 @@ export function loadArticle(
     ]),
   );
   return { ...article, exampleSources };
+}
+
+export function listArticleSlugs(locale: Locale, root = findWorkspaceRoot()): string[] {
+  return readdirSync(join(root, "content", "articles", locale), { withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(".yaml"))
+    .map((entry) => entry.name.slice(0, -".yaml".length))
+    .sort();
 }
 
 function semanticShape(article: Article): string[] {

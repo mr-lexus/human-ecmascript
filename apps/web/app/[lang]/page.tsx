@@ -10,10 +10,13 @@ const copy = {
       "A bilingual field guide that connects normative algorithms, human explanations, executable examples, and engine evidence without mixing their authority.",
     start: "Start the first path",
     explore: "Explore operations",
-    pathLabel: "Learning path 01",
+    pathLabel: "Learning paths",
     pathTitle: "References, calls, and this",
     pathBody:
       "Follow `obj.method()` through seven specification transitions and seven observable pressure tests.",
+    declarationTitle: "const, let, and var without folklore",
+    declarationBody:
+      "Trace initialization, TDZ, scopes, loop bindings, and the real performance boundary behind each declaration.",
     evidence: "Evidence layers",
     evidenceBody:
       "Every statement tells you whether it is normative, derived, observable, host-defined, or implementation-specific.",
@@ -27,9 +30,12 @@ const copy = {
       "Путеводитель связывает текст стандарта, понятные объяснения и код, который можно запустить. Всегда видно, где требование ECMA-262, а где — вывод или деталь конкретного движка.",
     start: "Разобрать первую тему",
     explore: "Посмотреть операции",
-    pathLabel: "Первая тема",
+    pathLabel: "Учебные темы",
     pathTitle: "Ссылки, вызовы и this",
     pathBody: "Разберём `obj.method()` по шагам и проверим выводы на семи коротких примерах.",
+    declarationTitle: "const, let и var — без мифов",
+    declarationBody:
+      "Разберём инициализацию, TDZ, области видимости, циклы и честные правила выбора без мифов о скорости.",
     evidence: "Откуда мы это знаем",
     evidenceBody:
       "У каждого технического утверждения есть метка и источник: стандарт, логический вывод, запускаемый пример или данные конкретного движка.",
@@ -98,32 +104,46 @@ export default async function HomePage({ params }: { params: Promise<{ lang: "en
         </div>
       </section>
 
-      <section className="page-shell home-section">
+      <section className="page-shell home-section" id="learning-paths">
         <div className="section-heading">
           <div>
             <p className="overline">{t.pathLabel}</p>
             <h2>{t.pathTitle}</h2>
           </div>
           <div className="coverage-ring">
-            <strong>1</strong>
+            <strong>2</strong>
             <span>
-              / 1<br />
-              MVP
+              / 2<br />
+              NOW
             </span>
           </div>
         </div>
-        <Link className="path-card" href={`/${lang}/guide/reference-call-this/`}>
-          <div className="path-number">01</div>
-          <div>
-            <h3>{t.pathTitle}</h3>
-            <p>{t.pathBody}</p>
-          </div>
-          <div className="path-meta">
-            <span>18–20 min</span>
-            <span>7 examples</span>
-            <span aria-hidden="true">→</span>
-          </div>
-        </Link>
+        <div className="path-list">
+          <Link className="path-card" href={`/${lang}/guide/reference-call-this/`}>
+            <div className="path-number">01</div>
+            <div>
+              <h3>{t.pathTitle}</h3>
+              <p>{t.pathBody}</p>
+            </div>
+            <div className="path-meta">
+              <span>18–20 min</span>
+              <span>7 examples</span>
+              <span aria-hidden="true">→</span>
+            </div>
+          </Link>
+          <Link className="path-card" href={`/${lang}/guide/const-let-var/`}>
+            <div className="path-number">02</div>
+            <div>
+              <h3>{t.declarationTitle}</h3>
+              <p>{t.declarationBody}</p>
+            </div>
+            <div className="path-meta">
+              <span>22–24 min</span>
+              <span>6 examples</span>
+              <span aria-hidden="true">→</span>
+            </div>
+          </Link>
+        </div>
       </section>
 
       <section className="evidence-band">

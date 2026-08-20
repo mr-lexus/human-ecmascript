@@ -12,6 +12,12 @@ const entries = {
       href: "/en/guide/reference-call-this/",
     },
     {
+      title: "const, let, and var",
+      detail: "Bindings and performance · 22 min",
+      terms: "const let var tdz scope binding hoisting performance loop closure",
+      href: "/en/guide/const-let-var/",
+    },
+    {
       title: "GetValue",
       detail: "Abstract operation",
       terms: "getvalue reference value property",
@@ -36,6 +42,13 @@ const entries = {
       detail: "Первая тема · 20 минут",
       terms: "reference свойство метод this evaluatecall",
       href: "/ru/guide/reference-call-this/",
+    },
+    {
+      title: "const, let и var",
+      detail: "Переменные и производительность · 24 минуты",
+      terms:
+        "const let var tdz область видимости переменная всплытие производительность цикл замыкание",
+      href: "/ru/guide/const-let-var/",
     },
     {
       title: "GetValue",

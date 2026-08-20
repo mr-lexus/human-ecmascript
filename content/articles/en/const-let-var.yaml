@@ -1,0 +1,479 @@
+id: const-let-var
+slug: const-let-var
+locale: en
+sourceContentHash: 6022b71449513edf
+title: "const, let, and var without folklore"
+eyebrow: "Bindings → initialization → scope → performance"
+dek: >-
+  Choose a declaration for the semantics you need, not for a mythical speed boost.
+  We will trace how each binding is created, explain the temporal dead zone, and show
+  the narrow cases where `var` is still an intentional tool.
+status: TECH_REVIEW
+sourceSnapshot: ECMA-262-ES2026
+readingMinutes: 22
+learningObjectives:
+  - Explain the difference between creating, initializing, reading, and assigning a binding.
+  - Predict block scope, function scope, the temporal dead zone, and loop closure behavior.
+  - Choose `const`, `let`, or `var` without relying on performance folklore.
+prerequisites:
+  - A variable name resolves to a binding in an Environment Record.
+  - An object and the binding that currently points to it are different things.
+sections:
+  - id: declaration-mental-model
+    title: "Choose the lifetime of the binding"
+    mode: human
+    blocks:
+      - id: declaration-mental-model-prose
+        type: prose
+        body: >-
+          A declaration does more than reserve a name. It chooses where that name is visible,
+          when it becomes readable, and whether the binding may later point to another value.
+          Use `const` when the binding should keep the same value, `let` when reassignment is part
+          of the algorithm, and `var` only when you deliberately want one function-scoped binding
+          or must preserve legacy script behavior.
+      - id: declaration-choice-claims
+        type: claims
+        claims:
+          - id: claim-choice-rule
+            classification: INFORMATIVE
+            text: "A useful default is `const`; switch to `let` for an intentional reassignment, and use `var` only for intentional VariableEnvironment semantics or legacy compatibility."
+            citationIds: [lexical-declarations, variable-statement]
+            sourceFingerprint: e9f03e4511a1a741
+            confidence: 0.98
+            reviewStatus: TECH_REVIEW
+          - id: claim-var-current
+            classification: DERIVED
+            text: "`var` is not deprecated: ES2026 defines VariableStatement as a current normative language construct with its own scope and initialization rules."
+            citationIds: [variable-statement]
+            sourceFingerprint: 4eb34a6c87a16d01
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+      - id: declaration-operation-map
+        type: operations
+        operations:
+          - id: op-declarative-environment
+            name: Declarative Environment Record
+            kind: record
+            summary: "Stores lexical bindings and whether each one is mutable and initialized."
+            citationId: declarative-environment
+          - id: op-create-mutable-binding
+            name: CreateMutableBinding
+            kind: abstract-operation
+            summary: "Creates the uninitialized mutable binding used by `let`."
+            citationId: declarative-environment
+          - id: op-create-immutable-binding
+            name: CreateImmutableBinding
+            kind: abstract-operation
+            summary: "Creates the uninitialized immutable binding used by `const`."
+            citationId: declarative-environment
+          - id: op-initialize-binding
+            name: InitializeBinding
+            kind: abstract-operation
+            summary: "Gives an existing binding its first value and makes it readable."
+            citationId: declarative-environment
+      - id: declaration-choice-note
+        type: note
+        tone: insight
+        title: "`const` protects the binding, not the object"
+        body: >-
+          `const settings = {}` prevents `settings = anotherObject`. It does not freeze
+          `settings`: properties may still be added or changed. Use object immutability tools
+          only when the object itself must be protected.
+  - id: declaration-normative-trace
+    title: "Creation happens before execution; initialization does not"
+    mode: normative
+    blocks:
+      - id: declaration-normative-prose
+        type: prose
+        body: >-
+          The familiar word “hoisting” compresses several different rules. Before a block or
+          execution context runs, its declarations are collected and bindings are created.
+          A `var` binding is initialized to `undefined` immediately. A `let` or `const` binding
+          exists but remains uninitialized until evaluation reaches its declaration.
+      - id: declaration-trace
+        type: trace
+        steps:
+          - id: trace-collect-declarations
+            label: "1. Collect declared names"
+            operation: Scope analysis
+            detail: "The surrounding script, function, or block determines the lexical and var-scoped declarations it contains."
+            citationId: block-declaration-instantiation
+          - id: trace-create-var
+            label: "2. Create `var`"
+            operation: VariableEnvironment
+            detail: "Create one variable binding for the containing VariableEnvironment and initialize it to undefined."
+            citationId: variable-statement
+          - id: trace-create-lexical
+            label: "3. Create `let` and `const`"
+            operation: BlockDeclarationInstantiation
+            detail: "Create mutable `let` bindings and immutable `const` bindings, both initially uninitialized."
+            citationId: block-declaration-instantiation
+          - id: trace-read-before-init
+            label: "4. Reject an early read"
+            operation: GetBindingValue
+            detail: "Reading an uninitialized lexical binding throws ReferenceError. This interval is commonly called the TDZ."
+            citationId: declarative-environment
+          - id: trace-initialize
+            label: "5. Evaluate the declaration"
+            operation: InitializeBinding
+            detail: "Evaluate the initializer, then give the binding its first value. A `let` without an initializer receives undefined here."
+            citationId: lexical-declarations
+          - id: trace-reassign
+            label: "6. Handle later assignment"
+            operation: SetMutableBinding
+            detail: "A mutable `let` binding changes value; assignment to an immutable `const` binding throws TypeError."
+            citationId: declarative-environment
+      - id: declaration-normative-claims
+        type: claims
+        claims:
+          - id: claim-tdz
+            classification: NORMATIVE
+            text: "A lexical binding is created before its declaration executes, but GetBindingValue throws ReferenceError while that binding is uninitialized."
+            citationIds: [lexical-declarations, declarative-environment]
+            sourceFingerprint: 41c21f2f3e905eed
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-const-binding
+            classification: NORMATIVE
+            text: "`const` creates an immutable binding; the specification does not make an object stored in that binding immutable."
+            citationIds: [lexical-declarations, declarative-environment]
+            sourceFingerprint: e9f03e4511a1a741
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-global-script
+            classification: NORMATIVE
+            text: "At the top level of a classic Script, `var` and lexical declarations use different parts of the Global Environment Record; in a Module, top-level `var` is module-scoped rather than a global-object property."
+            citationIds: [global-declaration-instantiation, module-declaration-instantiation]
+            sourceFingerprint: 6b7d20470512a09a
+            confidence: 0.99
+            reviewStatus: TECH_REVIEW
+  - id: declaration-observable-cases
+    title: "The differences you can actually observe"
+    mode: observable
+    blocks:
+      - id: declaration-observable-prose
+        type: prose
+        body: >-
+          Scope and initialization change program behavior. The examples contrast an early read,
+          block visibility, object mutation through `const`, and loop closures. The final examples
+          show a normal `const`/`let` combination and an intentional function-scoped `var`—not a
+          blanket recommendation to write new code with `var`.
+      - id: declaration-observable-claims
+        type: claims
+        claims:
+          - id: claim-block-scope
+            classification: OBSERVABLE
+            text: "A `var` declared inside an ordinary block remains visible in the containing function, while `let` and `const` do not escape that block."
+            citationIds: [lexical-declarations, variable-statement]
+            sourceFingerprint: 4eb34a6c87a16d01
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-loop-bindings
+            classification: OBSERVABLE
+            text: "A captured `let` loop variable has a distinct binding for each iteration; closures over a `var` loop variable share the function-scoped binding."
+            citationIds: [create-per-iteration-environment, variable-statement]
+            sourceFingerprint: 8f8f696aa7961cef
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+      - id: declaration-var-note
+        type: note
+        tone: warning
+        title: "When `var` is the right tool"
+        body: >-
+          Keep `var` when maintaining code whose observable behavior depends on function scope,
+          repeated declarations, or classic-script global integration. In new code, make that intent
+          conspicuous—prefer declaring the `var` near the top of the function instead of hiding it
+          inside a block. Never replace `let` with `var` when closures require a value per iteration.
+  - id: declaration-performance
+    title: "Performance: preserve semantics, then measure"
+    mode: v8
+    blocks:
+      - id: declaration-performance-prose
+        type: prose
+        body: >-
+          ECMA-262 specifies results, not which keyword must be faster. A TDZ check is not a pause;
+          it is a guard against the engine's internal “uninitialized” value. Current V8 can emit such
+          a guard where control flow requires it and also tracks proven checks so redundant ones can
+          be removed. The specification's per-iteration Environment Records likewise do not prove
+          that a physical object must be allocated when no closure observes it.
+      - id: declaration-performance-claims
+        type: claims
+        claims:
+          - id: claim-v8-hole-check
+            classification: V8_IMPLEMENTATION
+            text: "V8's bytecode generator implements initialization checks for lexical variables and contains explicit hole-check elision machinery."
+            citationIds: [v8-hole-checks]
+            sourceFingerprint: c5e65ad43b90fb47
+            confidence: 0.97
+            reviewStatus: TECH_REVIEW
+          - id: claim-performance-no-guarantee
+            classification: INFORMATIVE
+            text: "There is no portable rule that `var`, `let`, or `const` is always faster; changing the declaration can also change scope, initialization, or closure semantics."
+            citationIds:
+              [lexical-declarations, variable-statement, create-per-iteration-environment]
+            sourceFingerprint: 8f8f696aa7961cef
+            confidence: 0.99
+            reviewStatus: TECH_REVIEW
+      - id: declaration-performance-note
+        type: note
+        tone: implementation
+        title: "A performance checklist that does not break the program"
+        body: >-
+          Choose the keyword for correctness. Avoid creating closures inside a hot loop when they
+          are unnecessary. If per-iteration capture is required, keep `let` and measure the real
+          workload on every target engine. Treat microbenchmarks without warm-up, escape behavior,
+          and representative data as diagnostics—not as a style guide.
+citations:
+  - id: lexical-declarations
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-let-and-const-declarations
+    label: "ECMA-262 §14.3.1 — Let and Const Declarations"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-let-and-const-declarations
+    relevance: "Defines lexical scope, delayed initialization, mutability, and declaration evaluation."
+    evidenceHash: e9f03e4511a1a741
+  - id: variable-statement
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-variable-statement
+    label: "ECMA-262 §14.3.2 — Variable Statement"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-variable-statement
+    relevance: "Defines `var` scope, creation, immediate undefined initialization, and repeated declarations."
+    evidenceHash: 4eb34a6c87a16d01
+  - id: declarative-environment
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-declarative-environment-records
+    label: "ECMA-262 §9.1.1.1 — Declarative Environment Records"
+    url: https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-declarative-environment-records
+    relevance: "Defines binding creation, initialization, reads, writes, and errors for uninitialized bindings."
+    evidenceHash: 41c21f2f3e905eed
+  - id: block-declaration-instantiation
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-blockdeclarationinstantiation
+    label: "ECMA-262 — BlockDeclarationInstantiation"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-blockdeclarationinstantiation
+    relevance: "Creates the mutable and immutable lexical bindings for a block before its statements run."
+    evidenceHash: 9a6e8804e4c6c01f
+  - id: create-per-iteration-environment
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-createperiterationenvironment
+    label: "ECMA-262 — CreatePerIterationEnvironment"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-createperiterationenvironment
+    relevance: "Defines the separate bindings observed by closures over a lexical for-loop variable."
+    evidenceHash: 8f8f696aa7961cef
+  - id: global-declaration-instantiation
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-globaldeclarationinstantiation
+    label: "ECMA-262 — GlobalDeclarationInstantiation"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-scripts-and-modules.html#sec-globaldeclarationinstantiation
+    relevance: "Separates top-level Script lexical bindings from global var bindings."
+    evidenceHash: 6b7d20470512a09a
+  - id: module-declaration-instantiation
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-source-text-module-record-initialize-environment
+    label: "ECMA-262 — Source Text Module InitializeEnvironment"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-scripts-and-modules.html#sec-source-text-module-record-initialize-environment
+    relevance: "Creates module-scoped bindings, including top-level var declarations in module code."
+    evidenceHash: 7d7d2fdbeec17ef0
+  - id: v8-hole-checks
+    snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
+    nodeId: bytecode-generator-hole-checks
+    label: "V8 source — lexical initialization checks and hole-check elision"
+    url: https://chromium.googlesource.com/v8/v8/+/241f63a62a3518ad4110e78e4f61815623c6e95d/src/interpreter/bytecode-generator.cc
+    relevance: "Shows V8's implementation of lexical initialization guards and redundant-check elimination."
+    evidenceHash: c5e65ad43b90fb47
+examples:
+  - id: declaration-tdz
+    title: "TDZ versus `var` initialization"
+    goal: "Compare an early lexical read with a var binding initialized to undefined."
+    sourcePath: examples/declaration-tdz.js
+    timeoutMs: 1200
+    expectedOutput: ["ReferenceError", "undefined"]
+    claimIds: [claim-tdz, claim-var-current]
+    citationIds: [lexical-declarations, variable-statement, declarative-environment]
+  - id: declaration-block-scope
+    title: "Block scope and function scope"
+    goal: "Observe which declarations remain visible after an ordinary block ends."
+    sourcePath: examples/declaration-block-scope.js
+    timeoutMs: 1200
+    expectedOutput:
+      [
+        "let stays in the block / const stays in the block",
+        "var survives the block",
+        "ReferenceError",
+      ]
+    claimIds: [claim-block-scope]
+    citationIds: [lexical-declarations, variable-statement]
+  - id: const-object-mutation
+    title: "A fixed binding to a mutable object"
+    goal: "Separate changing object properties from assigning a different value to a const binding."
+    sourcePath: examples/const-object-mutation.js
+    timeoutMs: 1200
+    expectedOutput: ["1", "TypeError"]
+    claimIds: [claim-const-binding]
+    citationIds: [lexical-declarations, declarative-environment]
+  - id: loop-bindings
+    title: "Loop bindings captured by closures"
+    goal: "Compare one binding per iteration with a single shared var binding."
+    sourcePath: examples/loop-bindings.js
+    timeoutMs: 1200
+    expectedOutput: ["0,1,2", "3,3,3"]
+    claimIds: [claim-loop-bindings]
+    citationIds: [create-per-iteration-environment, variable-statement]
+  - id: intentional-var-scope
+    title: "An intentional function-scoped `var`"
+    goal: "Show repeated var declarations contributing to one binding across branches."
+    sourcePath: examples/intentional-var-scope.js
+    timeoutMs: 1200
+    expectedOutput: ["cached value", "network value", "no value"]
+    claimIds: [claim-var-current, claim-block-scope]
+    citationIds: [variable-statement]
+  - id: declaration-choice
+    title: "`const` values and a `let` accumulator"
+    goal: "Use each lexical declaration according to whether its binding is reassigned."
+    sourcePath: examples/declaration-choice.js
+    timeoutMs: 1200
+    expectedOutput: ["60"]
+    claimIds: [claim-choice-rule]
+    citationIds: [lexical-declarations]
+engineResults:
+  - exampleId: declaration-tdz
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["ReferenceError", "undefined"]
+    capturedAt: "2026-08-20"
+  - exampleId: declaration-block-scope
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output:
+      [
+        "let stays in the block / const stays in the block",
+        "var survives the block",
+        "ReferenceError",
+      ]
+    capturedAt: "2026-08-20"
+  - exampleId: const-object-mutation
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["1", "TypeError"]
+    capturedAt: "2026-08-20"
+  - exampleId: loop-bindings
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["0,1,2", "3,3,3"]
+    capturedAt: "2026-08-20"
+  - exampleId: intentional-var-scope
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["cached value", "network value", "no value"]
+    capturedAt: "2026-08-20"
+  - exampleId: declaration-choice
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["60"]
+    capturedAt: "2026-08-20"
+graph:
+  nodes:
+    - {
+        id: lexical-declaration,
+        label: "LexicalDeclaration",
+        kind: syntax,
+        citationId: lexical-declarations,
+      }
+    - {
+        id: variable-statement-node,
+        label: "VariableStatement",
+        kind: syntax,
+        citationId: variable-statement,
+      }
+    - {
+        id: declarative-environment-node,
+        label: "Declarative Environment",
+        kind: record,
+        citationId: declarative-environment,
+      }
+    - {
+        id: create-mutable-binding,
+        label: "CreateMutableBinding",
+        kind: operation,
+        citationId: declarative-environment,
+      }
+    - {
+        id: create-immutable-binding,
+        label: "CreateImmutableBinding",
+        kind: operation,
+        citationId: declarative-environment,
+      }
+    - {
+        id: initialize-binding,
+        label: "InitializeBinding",
+        kind: operation,
+        citationId: declarative-environment,
+      }
+    - {
+        id: get-binding-value,
+        label: "GetBindingValue",
+        kind: operation,
+        citationId: declarative-environment,
+      }
+    - {
+        id: per-iteration-environment,
+        label: "Per-iteration environment",
+        kind: record,
+        citationId: create-per-iteration-environment,
+      }
+  edges:
+    - {
+        id: d1,
+        source: lexical-declaration,
+        target: declarative-environment-node,
+        kind: uses,
+        weight: 3,
+      }
+    - {
+        id: d2,
+        source: lexical-declaration,
+        target: create-mutable-binding,
+        kind: calls,
+        weight: 2,
+      }
+    - {
+        id: d3,
+        source: lexical-declaration,
+        target: create-immutable-binding,
+        kind: calls,
+        weight: 2,
+      }
+    - { id: d4, source: create-mutable-binding, target: initialize-binding, kind: binds, weight: 3 }
+    - {
+        id: d5,
+        source: create-immutable-binding,
+        target: initialize-binding,
+        kind: binds,
+        weight: 3,
+      }
+    - { id: d6, source: initialize-binding, target: get-binding-value, kind: uses, weight: 3 }
+    - {
+        id: d7,
+        source: variable-statement-node,
+        target: declarative-environment-node,
+        kind: uses,
+        weight: 2,
+      }
+    - {
+        id: d8,
+        source: lexical-declaration,
+        target: per-iteration-environment,
+        kind: produces,
+        weight: 2,
+      }

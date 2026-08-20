@@ -1,0 +1,481 @@
+id: const-let-var-ru
+slug: const-let-var
+locale: ru
+translationOf: const-let-var
+sourceContentHash: 6022b71449513edf
+title: "const, let и var: без мифов и запретов"
+eyebrow: "Переменная → инициализация → область видимости → производительность"
+dek: >-
+  Ключевое слово выбирают по смыслу программы, а не ради мифического ускорения.
+  Разберём, когда появляется значение, откуда берётся TDZ и в каких редких случаях
+  `var` остаётся уместным и намеренным выбором.
+status: LOCALE_REVIEW
+sourceSnapshot: ECMA-262-ES2026
+readingMinutes: 24
+learningObjectives:
+  - Различать создание переменной, первое присваивание значения, чтение и последующее переназначение.
+  - Предсказывать блочную и функциональную область видимости, TDZ и поведение замыканий в цикле.
+  - Выбирать `const`, `let` или `var`, не опираясь на мифы о производительности.
+prerequisites:
+  - Имя переменной связано с записью в Environment Record.
+  - Объект и переменная, которая сейчас на него указывает, — не одно и то же.
+sections:
+  - id: declaration-mental-model
+    title: "Сначала решите, сколько должна жить переменная"
+    mode: human
+    blocks:
+      - id: declaration-mental-model-prose
+        type: prose
+        body: >-
+          Объявление не просто резервирует имя. Оно определяет, где это имя видно, когда его уже
+          можно читать и разрешено ли позже записать в переменную другое значение. Берите `const`,
+          если сама переменная не должна указывать на другое значение. Берите `let`, если алгоритму
+          действительно нужно переназначение. `var` оставляйте для случаев, где намеренно нужна одна
+          переменная на всю функцию, либо важно сохранить поведение старого скрипта.
+      - id: declaration-choice-claims
+        type: claims
+        claims:
+          - id: claim-choice-rule
+            classification: INFORMATIVE
+            text: "Практичное правило: начинайте с `const`, переходите на `let` при настоящем переназначении, а `var` используйте только ради осознанной семантики VariableEnvironment или совместимости со старым кодом."
+            citationIds: [lexical-declarations, variable-statement]
+            sourceFingerprint: e9f03e4511a1a741
+            confidence: 0.98
+            reviewStatus: TECH_REVIEW
+          - id: claim-var-current
+            classification: DERIVED
+            text: "`var` не устарел и не объявлен deprecated: в ES2026 VariableStatement остаётся действующей нормативной конструкцией со своими правилами области видимости и инициализации."
+            citationIds: [variable-statement]
+            sourceFingerprint: 4eb34a6c87a16d01
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+      - id: declaration-operation-map
+        type: operations
+        operations:
+          - id: op-declarative-environment
+            name: Declarative Environment Record
+            kind: record
+            summary: "Хранит лексические переменные и помнит, можно ли их менять и получили ли они первое значение."
+            citationId: declarative-environment
+          - id: op-create-mutable-binding
+            name: CreateMutableBinding
+            kind: abstract-operation
+            summary: "Создаёт изменяемую, но пока не инициализированную переменную для `let`."
+            citationId: declarative-environment
+          - id: op-create-immutable-binding
+            name: CreateImmutableBinding
+            kind: abstract-operation
+            summary: "Создаёт неизменяемую и пока не инициализированную переменную для `const`."
+            citationId: declarative-environment
+          - id: op-initialize-binding
+            name: InitializeBinding
+            kind: abstract-operation
+            summary: "Записывает первое значение, после чего переменную уже можно читать."
+            citationId: declarative-environment
+      - id: declaration-choice-note
+        type: note
+        tone: insight
+        title: "`const` защищает переменную, а не объект"
+        body: >-
+          Запись `const settings = {}` запрещает лишь `settings = другойОбъект`. Сам объект
+          `settings` от этого не замораживается: его свойства можно добавлять и менять. Если нужно
+          защитить сам объект, потребуются отдельные средства работы с неизменяемыми данными.
+  - id: declaration-normative-trace
+    title: "Переменная создаётся заранее, но значение получает не сразу"
+    mode: normative
+    blocks:
+      - id: declaration-normative-prose
+        type: prose
+        body: >-
+          Словом «всплытие» часто называют сразу несколько разных правил. Перед выполнением блока,
+          функции или скрипта движок собирает объявления и создаёт переменные. Переменная `var`
+          сразу получает `undefined`. Переменные `let` и `const` уже существуют, но остаются без
+          значения, пока выполнение не дойдёт до их объявления.
+      - id: declaration-trace
+        type: trace
+        steps:
+          - id: trace-collect-declarations
+            label: "1. Собрать объявленные имена"
+            operation: Scope analysis
+            detail: "Скрипт, функция или блок определяют, какие лексические и var-переменные находятся внутри."
+            citationId: block-declaration-instantiation
+          - id: trace-create-var
+            label: "2. Создать `var`"
+            operation: VariableEnvironment
+            detail: "Для содержащего VariableEnvironment создаётся одна переменная, и ей сразу присваивается undefined."
+            citationId: variable-statement
+          - id: trace-create-lexical
+            label: "3. Создать `let` и `const`"
+            operation: BlockDeclarationInstantiation
+            detail: "Для `let` создаётся изменяемая переменная, для `const` — неизменяемая. Обе пока не инициализированы."
+            citationId: block-declaration-instantiation
+          - id: trace-read-before-init
+            label: "4. Остановить слишком раннее чтение"
+            operation: GetBindingValue
+            detail: "Попытка прочитать неинициализированную лексическую переменную завершается ReferenceError. Этот промежуток обычно называют TDZ."
+            citationId: declarative-environment
+          - id: trace-initialize
+            label: "5. Выполнить объявление"
+            operation: InitializeBinding
+            detail: "Сначала вычисляется правая часть, затем переменная получает первое значение. `let` без начального значения получает undefined именно здесь."
+            citationId: lexical-declarations
+          - id: trace-reassign
+            label: "6. Обработать следующее присваивание"
+            operation: SetMutableBinding
+            detail: "Значение `let` меняется, а присваивание нового значения переменной `const` завершается TypeError."
+            citationId: declarative-environment
+      - id: declaration-normative-claims
+        type: claims
+        claims:
+          - id: claim-tdz
+            classification: NORMATIVE
+            text: "Лексическая переменная создаётся до выполнения объявления, но GetBindingValue выбрасывает ReferenceError, пока переменная не инициализирована."
+            citationIds: [lexical-declarations, declarative-environment]
+            sourceFingerprint: 41c21f2f3e905eed
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-const-binding
+            classification: NORMATIVE
+            text: "`const` создаёт неизменяемую привязку имени к значению; объект, записанный в эту переменную, спецификация неизменяемым не делает."
+            citationIds: [lexical-declarations, declarative-environment]
+            sourceFingerprint: e9f03e4511a1a741
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-global-script
+            classification: NORMATIVE
+            text: "На верхнем уровне обычного Script объявления `var` и лексические объявления попадают в разные части Global Environment Record; в Module верхнеуровневый `var` остаётся внутри модуля и не становится свойством глобального объекта."
+            citationIds: [global-declaration-instantiation, module-declaration-instantiation]
+            sourceFingerprint: 6b7d20470512a09a
+            confidence: 0.99
+            reviewStatus: TECH_REVIEW
+  - id: declaration-observable-cases
+    title: "Различия, которые видны в работающем коде"
+    mode: observable
+    blocks:
+      - id: declaration-observable-prose
+        type: prose
+        body: >-
+          Область видимости и момент инициализации меняют поведение программы. Примеры сравнивают
+          раннее чтение, видимость после блока, изменение объекта через `const` и замыкания в цикле.
+          В конце показаны обычная связка `const` с `let` и намеренный функциональный `var` — это
+          частный инструмент, а не совет переписывать на `var` весь новый код.
+      - id: declaration-observable-claims
+        type: claims
+        claims:
+          - id: claim-block-scope
+            classification: OBSERVABLE
+            text: "Объявленный в обычном блоке `var` остаётся виден во всей содержащей функции, а `let` и `const` за границы блока не выходят."
+            citationIds: [lexical-declarations, variable-statement]
+            sourceFingerprint: 4eb34a6c87a16d01
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-loop-bindings
+            classification: OBSERVABLE
+            text: "Замыкание получает отдельную переменную `let` для каждой итерации цикла; замыкания над `var` делят одну переменную функции."
+            citationIds: [create-per-iteration-environment, variable-statement]
+            sourceFingerprint: 8f8f696aa7961cef
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+      - id: declaration-var-note
+        type: note
+        tone: warning
+        title: "Когда `var` действительно уместен"
+        body: >-
+          Сохраняйте `var`, если старый код наблюдаемо зависит от области всей функции, повторных
+          объявлений или интеграции обычного скрипта с глобальным объектом. В новом коде делайте это
+          намерение заметным: лучше объявить `var` ближе к началу функции, чем прятать его внутри
+          блока. Не меняйте `let` на `var`, если замыканиям нужно своё значение на каждой итерации.
+  - id: declaration-performance
+    title: "Производительность: сначала сохранить смысл, потом измерять"
+    mode: v8
+    blocks:
+      - id: declaration-performance-prose
+        type: prose
+        body: >-
+          ECMA-262 задаёт результат, но не обещает, какое ключевое слово окажется быстрее. TDZ — не
+          пауза в выполнении, а проверка внутреннего значения «ещё не инициализировано». V8 может
+          поставить такую проверку там, где она нужна из-за ветвлений, а уже доказанные повторные
+          проверки умеет убирать. Описанное спецификацией окружение каждой итерации тоже не означает,
+          что движок обязан физически создавать объект, если ни одно замыкание не сможет его увидеть.
+      - id: declaration-performance-claims
+        type: claims
+        claims:
+          - id: claim-v8-hole-check
+            classification: V8_IMPLEMENTATION
+            text: "Генератор байткода V8 выполняет проверки инициализации лексических переменных и содержит отдельный механизм удаления лишних повторных hole-check."
+            citationIds: [v8-hole-checks]
+            sourceFingerprint: c5e65ad43b90fb47
+            confidence: 0.97
+            reviewStatus: TECH_REVIEW
+          - id: claim-performance-no-guarantee
+            classification: INFORMATIVE
+            text: "Переносимого правила «`var`, `let` или `const` всегда быстрее» нет; замена объявления способна одновременно изменить область видимости, инициализацию и поведение замыканий."
+            citationIds:
+              [lexical-declarations, variable-statement, create-per-iteration-environment]
+            sourceFingerprint: 8f8f696aa7961cef
+            confidence: 0.99
+            reviewStatus: TECH_REVIEW
+      - id: declaration-performance-note
+        type: note
+        tone: implementation
+        title: "Как ускорять код, не ломая его"
+        body: >-
+          Сначала выбирайте объявление по смыслу. Не создавайте замыкания внутри горячего цикла,
+          если они не нужны. Если каждой итерации необходимо собственное захваченное значение,
+          оставьте `let` и измеряйте реальную нагрузку во всех целевых движках. Микробенчмарк без
+          прогрева, анализа выхода переменных из области и похожих на production данных — подсказка,
+          но не основание для общего style guide.
+citations:
+  - id: lexical-declarations
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-let-and-const-declarations
+    label: "ECMA-262 §14.3.1 — Let and Const Declarations"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-let-and-const-declarations
+    relevance: "Задаёт лексическую область, отложенную инициализацию, изменяемость и выполнение объявления."
+    evidenceHash: e9f03e4511a1a741
+  - id: variable-statement
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-variable-statement
+    label: "ECMA-262 §14.3.2 — Variable Statement"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-variable-statement
+    relevance: "Задаёт область `var`, создание со значением undefined и правила повторных объявлений."
+    evidenceHash: 4eb34a6c87a16d01
+  - id: declarative-environment
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-declarative-environment-records
+    label: "ECMA-262 §9.1.1.1 — Declarative Environment Records"
+    url: https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-declarative-environment-records
+    relevance: "Описывает создание, инициализацию, чтение и изменение переменных, включая ошибку до инициализации."
+    evidenceHash: 41c21f2f3e905eed
+  - id: block-declaration-instantiation
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-blockdeclarationinstantiation
+    label: "ECMA-262 — BlockDeclarationInstantiation"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-blockdeclarationinstantiation
+    relevance: "Создаёт изменяемые и неизменяемые лексические переменные блока до выполнения его команд."
+    evidenceHash: 9a6e8804e4c6c01f
+  - id: create-per-iteration-environment
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-createperiterationenvironment
+    label: "ECMA-262 — CreatePerIterationEnvironment"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-statements-and-declarations.html#sec-createperiterationenvironment
+    relevance: "Объясняет отдельные переменные, которые видят замыкания над `let` в цикле."
+    evidenceHash: 8f8f696aa7961cef
+  - id: global-declaration-instantiation
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-globaldeclarationinstantiation
+    label: "ECMA-262 — GlobalDeclarationInstantiation"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-scripts-and-modules.html#sec-globaldeclarationinstantiation
+    relevance: "Разделяет лексические объявления Script и глобальные var-переменные."
+    evidenceHash: 6b7d20470512a09a
+  - id: module-declaration-instantiation
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-source-text-module-record-initialize-environment
+    label: "ECMA-262 — Source Text Module InitializeEnvironment"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-scripts-and-modules.html#sec-source-text-module-record-initialize-environment
+    relevance: "Создаёт переменные модуля, включая верхнеуровневые var-объявления модульного кода."
+    evidenceHash: 7d7d2fdbeec17ef0
+  - id: v8-hole-checks
+    snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
+    nodeId: bytecode-generator-hole-checks
+    label: "Исходный код V8 — проверки лексической инициализации и их удаление"
+    url: https://chromium.googlesource.com/v8/v8/+/241f63a62a3518ad4110e78e4f61815623c6e95d/src/interpreter/bytecode-generator.cc
+    relevance: "Показывает реализацию проверок инициализации и удаления лишних проверок в V8."
+    evidenceHash: c5e65ad43b90fb47
+examples:
+  - id: declaration-tdz
+    title: "TDZ и ранняя инициализация `var`"
+    goal: "Сравнить раннее чтение лексической переменной с var-переменной, уже равной undefined."
+    sourcePath: examples/declaration-tdz.js
+    timeoutMs: 1200
+    expectedOutput: ["ReferenceError", "undefined"]
+    claimIds: [claim-tdz, claim-var-current]
+    citationIds: [lexical-declarations, variable-statement, declarative-environment]
+  - id: declaration-block-scope
+    title: "Блок и вся функция"
+    goal: "Проверить, какие переменные остаются видны после закрывающей фигурной скобки."
+    sourcePath: examples/declaration-block-scope.js
+    timeoutMs: 1200
+    expectedOutput:
+      [
+        "let stays in the block / const stays in the block",
+        "var survives the block",
+        "ReferenceError",
+      ]
+    claimIds: [claim-block-scope]
+    citationIds: [lexical-declarations, variable-statement]
+  - id: const-object-mutation
+    title: "Постоянная переменная с изменяемым объектом"
+    goal: "Отделить изменение свойства объекта от записи другого значения в const-переменную."
+    sourcePath: examples/const-object-mutation.js
+    timeoutMs: 1200
+    expectedOutput: ["1", "TypeError"]
+    claimIds: [claim-const-binding]
+    citationIds: [lexical-declarations, declarative-environment]
+  - id: loop-bindings
+    title: "Переменные цикла внутри замыканий"
+    goal: "Сравнить отдельную переменную каждой итерации с одной общей var-переменной."
+    sourcePath: examples/loop-bindings.js
+    timeoutMs: 1200
+    expectedOutput: ["0,1,2", "3,3,3"]
+    claimIds: [claim-loop-bindings]
+    citationIds: [create-per-iteration-environment, variable-statement]
+  - id: intentional-var-scope
+    title: "Намеренный `var` на всю функцию"
+    goal: "Показать, как повторные var-объявления в ветках работают с одной переменной."
+    sourcePath: examples/intentional-var-scope.js
+    timeoutMs: 1200
+    expectedOutput: ["cached value", "network value", "no value"]
+    claimIds: [claim-var-current, claim-block-scope]
+    citationIds: [variable-statement]
+  - id: declaration-choice
+    title: "Значения `const` и счётчик `let`"
+    goal: "Выбрать лексическое объявление по тому, переназначается ли сама переменная."
+    sourcePath: examples/declaration-choice.js
+    timeoutMs: 1200
+    expectedOutput: ["60"]
+    claimIds: [claim-choice-rule]
+    citationIds: [lexical-declarations]
+engineResults:
+  - exampleId: declaration-tdz
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["ReferenceError", "undefined"]
+    capturedAt: "2026-08-20"
+  - exampleId: declaration-block-scope
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output:
+      [
+        "let stays in the block / const stays in the block",
+        "var survives the block",
+        "ReferenceError",
+      ]
+    capturedAt: "2026-08-20"
+  - exampleId: const-object-mutation
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["1", "TypeError"]
+    capturedAt: "2026-08-20"
+  - exampleId: loop-bindings
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["0,1,2", "3,3,3"]
+    capturedAt: "2026-08-20"
+  - exampleId: intentional-var-scope
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["cached value", "network value", "no value"]
+    capturedAt: "2026-08-20"
+  - exampleId: declaration-choice
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f6145
+    status: verified
+    output: ["60"]
+    capturedAt: "2026-08-20"
+graph:
+  nodes:
+    - {
+        id: lexical-declaration,
+        label: "LexicalDeclaration",
+        kind: syntax,
+        citationId: lexical-declarations,
+      }
+    - {
+        id: variable-statement-node,
+        label: "VariableStatement",
+        kind: syntax,
+        citationId: variable-statement,
+      }
+    - {
+        id: declarative-environment-node,
+        label: "Declarative Environment",
+        kind: record,
+        citationId: declarative-environment,
+      }
+    - {
+        id: create-mutable-binding,
+        label: "CreateMutableBinding",
+        kind: operation,
+        citationId: declarative-environment,
+      }
+    - {
+        id: create-immutable-binding,
+        label: "CreateImmutableBinding",
+        kind: operation,
+        citationId: declarative-environment,
+      }
+    - {
+        id: initialize-binding,
+        label: "InitializeBinding",
+        kind: operation,
+        citationId: declarative-environment,
+      }
+    - {
+        id: get-binding-value,
+        label: "GetBindingValue",
+        kind: operation,
+        citationId: declarative-environment,
+      }
+    - {
+        id: per-iteration-environment,
+        label: "Окружение итерации",
+        kind: record,
+        citationId: create-per-iteration-environment,
+      }
+  edges:
+    - {
+        id: d1,
+        source: lexical-declaration,
+        target: declarative-environment-node,
+        kind: uses,
+        weight: 3,
+      }
+    - {
+        id: d2,
+        source: lexical-declaration,
+        target: create-mutable-binding,
+        kind: calls,
+        weight: 2,
+      }
+    - {
+        id: d3,
+        source: lexical-declaration,
+        target: create-immutable-binding,
+        kind: calls,
+        weight: 2,
+      }
+    - { id: d4, source: create-mutable-binding, target: initialize-binding, kind: binds, weight: 3 }
+    - {
+        id: d5,
+        source: create-immutable-binding,
+        target: initialize-binding,
+        kind: binds,
+        weight: 3,
+      }
+    - { id: d6, source: initialize-binding, target: get-binding-value, kind: uses, weight: 3 }
+    - {
+        id: d7,
+        source: variable-statement-node,
+        target: declarative-environment-node,
+        kind: uses,
+        weight: 2,
+      }
+    - {
+        id: d8,
+        source: lexical-declaration,
+        target: per-iteration-environment,
+        kind: produces,
+        weight: 2,
+      }

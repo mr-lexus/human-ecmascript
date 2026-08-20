@@ -123,7 +123,7 @@ export function KnowledgeMap({
     <div
       ref={container}
       className="knowledge-map"
-      aria-label="Interactive map from MemberExpression to Call"
+      aria-label="Interactive specification dependency map"
     />
   );
 }
