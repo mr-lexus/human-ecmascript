@@ -5,6 +5,7 @@ import {
   type Article,
   type CompiledArticle,
   type Locale,
+  v8BytecodeArtifactSchema,
 } from "@human-ecmascript/model";
 import { parse } from "yaml";
 
@@ -30,7 +31,32 @@ export function loadArticle(
       readFileSync(join(root, example.sourcePath), "utf8").trim(),
     ]),
   );
-  return { ...article, exampleSources };
+  const bytecodeBlocks = article.sections
+    .flatMap(({ blocks }) => blocks)
+    .filter((block) => block.type === "bytecode");
+  const bytecodeArtifacts = Object.fromEntries(
+    [...new Set(bytecodeBlocks.map(({ artifactId }) => artifactId))].map((artifactId) => {
+      const artifact = v8BytecodeArtifactSchema.parse(
+        JSON.parse(readFileSync(join(root, "artifacts", "v8", `${artifactId}.json`), "utf8")),
+      );
+      if (artifact.id !== artifactId) {
+        throw new Error(
+          `Bytecode artifact id mismatch: expected ${artifactId}, received ${artifact.id}`,
+        );
+      }
+      return [artifactId, artifact];
+    }),
+  );
+  for (const block of bytecodeBlocks) {
+    const artifact = bytecodeArtifacts[block.artifactId]!;
+    const artifactCaseIds = new Set(artifact.cases.map(({ id }) => id));
+    for (const item of block.cases) {
+      if (!artifactCaseIds.has(item.caseId)) {
+        throw new Error(`Bytecode block ${block.id} references missing case ${item.caseId}`);
+      }
+    }
+  }
+  return { ...article, exampleSources, bytecodeArtifacts };
 }
 
 export function listArticleSlugs(locale: Locale, root = findWorkspaceRoot()): string[] {
@@ -48,6 +74,9 @@ function semanticShape(article: Article): string[] {
       ...(block.type === "claims" ? block.claims.map(({ id }) => `claim:${id}`) : []),
       ...(block.type === "trace" ? block.steps.map(({ id }) => `step:${id}`) : []),
       ...(block.type === "operations" ? block.operations.map(({ id }) => `operation:${id}`) : []),
+      ...(block.type === "bytecode"
+        ? block.cases.map(({ id, caseId }) => `bytecode:${id}:${caseId}`)
+        : []),
     ]),
   ]);
 }

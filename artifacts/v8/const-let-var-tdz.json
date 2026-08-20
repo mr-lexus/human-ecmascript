@@ -1,0 +1,326 @@
+{
+  "schemaVersion": 1,
+  "id": "const-let-var-tdz",
+  "provider": "V8 Ignition",
+  "sourcePath": "examples/declaration-bytecode.js",
+  "sourceSha256": "3c2d010eb8ac6cbbd0612d6670c9060f9b502dc11bf80cd0b1ba79eaa3d2a9c2",
+  "runtime": {
+    "name": "Node.js",
+    "version": "24.18.1",
+    "v8Version": "13.6.233.17-node.50",
+    "platform": "linux-x64",
+    "binarySha256": "f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a"
+  },
+  "commandTemplate": "node --print-bytecode --print-bytecode-filter=<function> examples/declaration-bytecode.js",
+  "capturedAt": "2026-08-20",
+  "cases": [
+    {
+      "id": "var-across-branch",
+      "functionName": "varAcrossBranch",
+      "source": "function varAcrossBranch(flag) {\n  if (flag) return value;\n  var value = 7;\n  return value;\n}",
+      "bytecodeLength": 11,
+      "parameterCount": 2,
+      "registerCount": 1,
+      "frameSize": 8,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "0b 03",
+          "opcode": "Ldar",
+          "operands": "a0"
+        },
+        {
+          "offset": 2,
+          "bytes": "a1 05",
+          "opcode": "JumpIfToBooleanFalse",
+          "operands": "[5]"
+        },
+        {
+          "offset": 4,
+          "bytes": "0b f9",
+          "opcode": "Ldar",
+          "operands": "r0"
+        },
+        {
+          "offset": 6,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        },
+        {
+          "offset": 7,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 9,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 10,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "let-across-branch",
+      "functionName": "letAcrossBranch",
+      "source": "function letAcrossBranch(flag) {\n  if (flag) return value;\n  let value = 7;\n  return value;\n}",
+      "bytecodeLength": 15,
+      "parameterCount": 2,
+      "registerCount": 1,
+      "frameSize": 8,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "10",
+          "opcode": "LdaTheHole",
+          "operands": ""
+        },
+        {
+          "offset": 1,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 2,
+          "bytes": "0b 03",
+          "opcode": "Ldar",
+          "operands": "a0"
+        },
+        {
+          "offset": 4,
+          "bytes": "a1 07",
+          "opcode": "JumpIfToBooleanFalse",
+          "operands": "[7]"
+        },
+        {
+          "offset": 6,
+          "bytes": "0b f9",
+          "opcode": "Ldar",
+          "operands": "r0"
+        },
+        {
+          "offset": 8,
+          "bytes": "b4 00",
+          "opcode": "ThrowReferenceErrorIfHole",
+          "operands": "[0]"
+        },
+        {
+          "offset": 10,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        },
+        {
+          "offset": 11,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 13,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 14,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "const-across-branch",
+      "functionName": "constAcrossBranch",
+      "source": "function constAcrossBranch(flag) {\n  if (flag) return value;\n  const value = 7;\n  return value;\n}",
+      "bytecodeLength": 15,
+      "parameterCount": 2,
+      "registerCount": 1,
+      "frameSize": 8,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "10",
+          "opcode": "LdaTheHole",
+          "operands": ""
+        },
+        {
+          "offset": 1,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 2,
+          "bytes": "0b 03",
+          "opcode": "Ldar",
+          "operands": "a0"
+        },
+        {
+          "offset": 4,
+          "bytes": "a1 07",
+          "opcode": "JumpIfToBooleanFalse",
+          "operands": "[7]"
+        },
+        {
+          "offset": 6,
+          "bytes": "0b f9",
+          "opcode": "Ldar",
+          "operands": "r0"
+        },
+        {
+          "offset": 8,
+          "bytes": "b4 00",
+          "opcode": "ThrowReferenceErrorIfHole",
+          "operands": "[0]"
+        },
+        {
+          "offset": 10,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        },
+        {
+          "offset": 11,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 13,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 14,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "initialized-let",
+      "functionName": "initializedLet",
+      "source": "function initializedLet(flag) {\n  let value;\n  if (flag) value = 7;\n  return value;\n}",
+      "bytecodeLength": 12,
+      "parameterCount": 2,
+      "registerCount": 1,
+      "frameSize": 8,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "0e",
+          "opcode": "LdaUndefined",
+          "operands": ""
+        },
+        {
+          "offset": 1,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 2,
+          "bytes": "0b 03",
+          "opcode": "Ldar",
+          "operands": "a0"
+        },
+        {
+          "offset": 4,
+          "bytes": "a1 05",
+          "opcode": "JumpIfToBooleanFalse",
+          "operands": "[5]"
+        },
+        {
+          "offset": 6,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 8,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 9,
+          "bytes": "0b f9",
+          "opcode": "Ldar",
+          "operands": "r0"
+        },
+        {
+          "offset": 11,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "initialized-const",
+      "functionName": "initializedConst",
+      "source": "function initializedConst(flag) {\n  const value = flag ? 7 : 0;\n  return value;\n}",
+      "bytecodeLength": 11,
+      "parameterCount": 2,
+      "registerCount": 1,
+      "frameSize": 8,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "0b 03",
+          "opcode": "Ldar",
+          "operands": "a0"
+        },
+        {
+          "offset": 2,
+          "bytes": "a1 06",
+          "opcode": "JumpIfToBooleanFalse",
+          "operands": "[6]"
+        },
+        {
+          "offset": 4,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 6,
+          "bytes": "93 03",
+          "opcode": "Jump",
+          "operands": "[3]"
+        },
+        {
+          "offset": 8,
+          "bytes": "0c",
+          "opcode": "LdaZero",
+          "operands": ""
+        },
+        {
+          "offset": 9,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 10,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    }
+  ],
+  "captureSha256": "8af584f5e91414c848838c50b2fdde9587e9789613bba2fea77c5188ea8a6f4d"
+}

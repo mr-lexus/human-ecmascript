@@ -860,6 +860,194 @@ a {
   background: var(--orange);
 }
 
+.bytecode-artifact {
+  margin-top: 34px;
+  overflow: hidden;
+  border: 1px solid #3e4059;
+  background: #202237;
+  color: #f4f2ea;
+}
+.bytecode-artifact > header {
+  display: grid;
+  grid-template-columns: 46px 1fr;
+  gap: 18px;
+  padding: 24px;
+  border-bottom: 1px solid #3e4059;
+}
+.bytecode-artifact > header > span {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--orange);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 800;
+}
+.bytecode-artifact h3 {
+  margin: 0 0 5px;
+  font-family: Georgia, serif;
+  font-size: 23px;
+  font-weight: 500;
+}
+.bytecode-artifact header p,
+.bytecode-artifact footer p {
+  max-width: 760px;
+  margin: 0;
+  color: #bfc1d0;
+  font-size: 12px;
+}
+.bytecode-case-tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+  border-bottom: 1px solid #3e4059;
+}
+.bytecode-case-tabs button {
+  min-width: 0;
+  padding: 15px 17px;
+  border: 0;
+  border-right: 1px solid #3e4059;
+  background: #292b45;
+  color: #aeb0c1;
+  text-align: left;
+  cursor: pointer;
+}
+.bytecode-case-tabs button:hover,
+.bytecode-case-tabs button[aria-selected="true"] {
+  background: #353853;
+  color: white;
+  box-shadow: inset 0 -3px var(--orange);
+}
+.bytecode-case-tabs code,
+.bytecode-case-tabs strong {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.bytecode-case-tabs code {
+  color: #f3a36f;
+  font-size: 10px;
+}
+.bytecode-case-tabs strong {
+  margin-top: 4px;
+  font-size: 11px;
+}
+.bytecode-explanation {
+  margin: 0;
+  padding: 17px 24px;
+  border-bottom: 1px solid #3e4059;
+  background: #25273d;
+  color: #d9d9e3;
+  font-size: 13px;
+}
+.bytecode-explanation > code {
+  padding: 0.08em 0.28em;
+  border-radius: 3px;
+  background: #3a3d59;
+  color: #ffb181;
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+}
+.bytecode-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+}
+.bytecode-source,
+.bytecode-listing {
+  min-width: 0;
+  padding: 20px;
+}
+.bytecode-source {
+  border-right: 1px solid #3e4059;
+}
+.bytecode-source > span,
+.bytecode-listing > div:first-child > span {
+  color: #8f92a9;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.bytecode-source pre {
+  margin: 14px 0 0;
+  overflow-x: auto;
+  white-space: pre;
+  color: #f1f0ea;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.75;
+}
+.bytecode-listing > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.bytecode-listing small {
+  color: #898b9d;
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+.bytecode-table {
+  margin-top: 14px;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+.bytecode-table > div {
+  display: grid;
+  grid-template-columns: 68px 82px minmax(230px, 1fr);
+  min-width: 450px;
+  border-top: 1px solid #33354c;
+}
+.bytecode-table span,
+.bytecode-table code {
+  padding: 7px 9px;
+}
+.bytecode-table-head {
+  color: #77798c;
+  text-transform: uppercase;
+}
+.bytecode-table code:first-child,
+.bytecode-table code:nth-child(2) {
+  color: #77798c;
+}
+.bytecode-table code:last-child {
+  color: #cfd1de;
+}
+.bytecode-table code b {
+  color: #f1f0ea;
+}
+.bytecode-table .bytecode-tdz-instruction {
+  background: #4a2e35;
+  box-shadow: inset 3px 0 var(--orange);
+}
+.bytecode-table .bytecode-tdz-instruction code b {
+  color: #ffb181;
+}
+.bytecode-artifact footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
+  gap: 24px;
+  padding: 20px 24px;
+  border-top: 1px solid #3e4059;
+  background: #191b2d;
+}
+.bytecode-artifact footer div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.bytecode-artifact footer strong {
+  color: #f3a36f;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+.bytecode-artifact footer code {
+  overflow-wrap: anywhere;
+  color: #898b9d;
+  font-size: 9px;
+}
+
 .map-section {
   padding-block: 80px;
   border-block: 1px solid var(--line);
@@ -1329,6 +1517,14 @@ a {
   }
   .source-list {
     grid-template-columns: 1fr;
+  }
+  .bytecode-columns,
+  .bytecode-artifact footer {
+    grid-template-columns: 1fr;
+  }
+  .bytecode-source {
+    border-right: 0;
+    border-bottom: 1px solid #3e4059;
   }
   .footer-grid {
     grid-template-columns: 1fr;

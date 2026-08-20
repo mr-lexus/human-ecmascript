@@ -2,7 +2,7 @@ id: const-let-var-ru
 slug: const-let-var
 locale: ru
 translationOf: const-let-var
-sourceContentHash: 6022b71449513edf
+sourceContentHash: 228d0265dd83c418
 title: "const, let и var: без мифов и запретов"
 eyebrow: "Переменная → инициализация → область видимости → производительность"
 dek: >-
@@ -11,11 +11,12 @@ dek: >-
   `var` остаётся уместным и намеренным выбором.
 status: LOCALE_REVIEW
 sourceSnapshot: ECMA-262-ES2026
-readingMinutes: 24
+readingMinutes: 32
 learningObjectives:
   - Различать создание переменной, первое присваивание значения, чтение и последующее переназначение.
   - Предсказывать блочную и функциональную область видимости, TDZ и поведение замыканий в цикле.
   - Выбирать `const`, `let` или `var`, не опираясь на мифы о производительности.
+  - Читать закреплённый байткод Ignition и находить в нём проверку TDZ.
 prerequisites:
   - Имя переменной связано с записью в Environment Record.
   - Объект и переменная, которая сейчас на него указывает, — не одно и то же.
@@ -134,6 +135,21 @@ sections:
             sourceFingerprint: 41c21f2f3e905eed
             confidence: 1
             reviewStatus: TECH_REVIEW
+          - id: claim-branch-does-not-create-tdz
+            classification: DERIVED
+            text: "Сам по себе `if` не создаёт TDZ. Неинициализированный промежуток появляется из-за лексической области и объявления внутри неё; ветка лишь может открыть путь к слишком раннему чтению."
+            citationIds:
+              [lexical-declarations, block-declaration-instantiation, declarative-environment]
+            sourceFingerprint: 9a6e8804e4c6c01f
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-var-early-read
+            classification: NORMATIVE
+            text: "При раннем чтении локального `var` проверки TDZ нет: переменная уже инициализирована значением `undefined`. Это другое поведение программы, а не просто более быстрая запись `let`."
+            citationIds: [variable-statement]
+            sourceFingerprint: 4eb34a6c87a16d01
+            confidence: 1
+            reviewStatus: TECH_REVIEW
           - id: claim-const-binding
             classification: NORMATIVE
             text: "`const` создаёт неизменяемую привязку имени к значению; объект, записанный в эту переменную, спецификация неизменяемым не делает."
@@ -157,8 +173,9 @@ sections:
         body: >-
           Область видимости и момент инициализации меняют поведение программы. Примеры сравнивают
           раннее чтение, видимость после блока, изменение объекта через `const` и замыкания в цикле.
-          В конце показаны обычная связка `const` с `let` и намеренный функциональный `var` — это
-          частный инструмент, а не совет переписывать на `var` весь новый код.
+          В конце показаны обычная связка `const` с `let`, намеренный функциональный `var` и тот же
+          пример с веткой, по которому снят байткод. Это разбор инструмента, а не совет переписать
+          весь новый код на `var`.
       - id: declaration-observable-claims
         type: claims
         claims:
@@ -207,6 +224,13 @@ sections:
             sourceFingerprint: c5e65ad43b90fb47
             confidence: 0.97
             reviewStatus: TECH_REVIEW
+          - id: claim-v8-bytecode-capture
+            classification: V8_IMPLEMENTATION
+            text: "В закреплённом capture V8 13.6 опасные пути с `let` и `const` содержат `LdaTheHole` и `ThrowReferenceErrorIfHole`; в примерах с `var`, заранее инициализированным `let` и инициализированным выражением `const` инструкции `ThrowReferenceErrorIfHole` нет."
+            citationIds: [v8-hole-checks]
+            sourceFingerprint: 8af584f5e91414c8
+            confidence: 1
+            reviewStatus: TECH_REVIEW
           - id: claim-performance-no-guarantee
             classification: INFORMATIVE
             text: "Переносимого правила «`var`, `let` или `const` всегда быстрее» нет; замена объявления способна одновременно изменить область видимости, инициализацию и поведение замыканий."
@@ -215,16 +239,64 @@ sections:
             sourceFingerprint: 8f8f696aa7961cef
             confidence: 0.99
             reviewStatus: TECH_REVIEW
+      - id: declaration-blazing-checklist
+        type: trace
+        steps:
+          - id: blazing-preserve-semantics
+            label: "1. Решите, что должно означать раннее чтение"
+            operation: Сначала поведение
+            detail: "Если это ошибка — сохраняйте лексическое объявление. Если `undefined` до присваивания является осознанным контрактом одной переменной на всю функцию, такой контракт можно выразить через `var`."
+            citationId: variable-statement
+          - id: blazing-initialize-before-branch
+            label: "2. Инициализируйте до ветвления"
+            operation: Убрать опасный путь
+            detail: "Поставьте `let value;` перед `if` либо вычислите значение `const` прямо в инициализаторе. В снятом байткоде V8 последующему чтению уже не нужна инструкция проверки TDZ."
+            citationId: lexical-declarations
+          - id: blazing-keep-scope-small
+            label: "3. Не расширяйте область без причины"
+            operation: Сохранить смысл
+            detail: "Не растягивайте блочную переменную на всю функцию только ради удаления одной проверки. Широкая область может спрятать старое значение и изменить работу замыканий."
+            citationId: block-declaration-instantiation
+          - id: blazing-measure-workload
+            label: "4. Измеряйте оптимизированную нагрузку"
+            operation: Бенчмарк в конце
+            detail: "Прогрейте горячую функцию целиком, сохраните настоящие ветвления и выход значений из области, проверьте все целевые движки. Байткод Ignition сам по себе ещё не показывает скорость оптимизированного машинного кода."
+      - id: declaration-bytecode-artifact
+        type: bytecode
+        artifactId: const-let-var-tdz
+        title: "Проверка TDZ в настоящем байткоде V8"
+        body: "Все пять функций сняты из одного файла закреплённым Linux-бинарником Node. Оранжевым отмечены инструкции внутреннего значения «ещё не инициализировано» и возможного ReferenceError."
+        cases:
+          - id: bytecode-var-branch
+            caseId: var-across-branch
+            title: "Раннее чтение `var`"
+            explanation: "В регистре уже лежит `undefined`. V8 загружает и возвращает его без hole-check, но программа при этом молча получает `undefined`."
+          - id: bytecode-let-branch
+            caseId: let-across-branch
+            title: "Раннее чтение `let`"
+            explanation: "Сначала V8 записывает во внутренний регистр специальное значение hole. Ранняя ветка читает его и выполняет `ThrowReferenceErrorIfHole`."
+          - id: bytecode-const-branch
+            caseId: const-across-branch
+            title: "Раннее чтение `const`"
+            explanation: "Для `const` механизм TDZ тот же: переменная уже существует, но до выполнения объявления в ней остаётся hole."
+          - id: bytecode-initialized-let
+            caseId: initialized-let
+            title: "`let` объявлен перед `if`"
+            explanation: "Объявление выполняется до ветки и записывает `undefined`. Для последующего чтения `ThrowReferenceErrorIfHole` уже не требуется."
+          - id: bytecode-initialized-const
+            caseId: initialized-const
+            title: "`const` получает значение из выражения"
+            explanation: "Обе ветки условного выражения вычисляют начальное значение до возврата. В этом capture нет ни hole, ни инструкции выбрасывания TDZ-ошибки."
       - id: declaration-performance-note
         type: note
         tone: implementation
         title: "Как ускорять код, не ломая его"
         body: >-
-          Сначала выбирайте объявление по смыслу. Не создавайте замыкания внутри горячего цикла,
-          если они не нужны. Если каждой итерации необходимо собственное захваченное значение,
-          оставьте `let` и измеряйте реальную нагрузку во всех целевых движках. Микробенчмарк без
-          прогрева, анализа выхода переменных из области и похожих на production данных — подсказка,
-          но не основание для общего style guide.
+          Для быстрого кода лучше распутать управление, чем ослаблять объявление: вынесите
+          инициализацию `let` перед веткой, а `const` вычисляйте одним выражением. Берите `var`, когда
+          одна переменная на всю функцию и чтение `undefined` до присваивания действительно входят
+          в контракт этой функции. Уберите ненужные замыкания из горячих циклов, затем измерьте
+          прогретую нагрузку во всех целевых движках. Байткод — доказательство, но не общий style guide.
 citations:
   - id: lexical-declarations
     snapshot: ECMA-262-ES2026
@@ -336,18 +408,26 @@ examples:
     expectedOutput: ["60"]
     claimIds: [claim-choice-rule]
     citationIds: [lexical-declarations]
+  - id: declaration-bytecode
+    title: "Ветка, TDZ и безопасная инициализация"
+    goal: "Запустить те же функции с var, let и const, по которым сохранено сравнение байткода."
+    sourcePath: examples/declaration-bytecode.js
+    timeoutMs: 1200
+    expectedOutput: ["undefined", "ReferenceError", "ReferenceError", "7", "7"]
+    claimIds: [claim-branch-does-not-create-tdz, claim-var-early-read, claim-v8-bytecode-capture]
+    citationIds: [lexical-declarations, variable-statement, declarative-environment, v8-hole-checks]
 engineResults:
   - exampleId: declaration-tdz
     engine: V8
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
-    binaryHash: d6c664df3f3f6145
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output: ["ReferenceError", "undefined"]
     capturedAt: "2026-08-20"
   - exampleId: declaration-block-scope
     engine: V8
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
-    binaryHash: d6c664df3f3f6145
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output:
       [
@@ -359,31 +439,39 @@ engineResults:
   - exampleId: const-object-mutation
     engine: V8
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
-    binaryHash: d6c664df3f3f6145
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output: ["1", "TypeError"]
     capturedAt: "2026-08-20"
   - exampleId: loop-bindings
     engine: V8
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
-    binaryHash: d6c664df3f3f6145
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output: ["0,1,2", "3,3,3"]
     capturedAt: "2026-08-20"
   - exampleId: intentional-var-scope
     engine: V8
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
-    binaryHash: d6c664df3f3f6145
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output: ["cached value", "network value", "no value"]
     capturedAt: "2026-08-20"
   - exampleId: declaration-choice
     engine: V8
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
-    binaryHash: d6c664df3f6145
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output: ["60"]
     capturedAt: "2026-08-20"
+  - exampleId: declaration-bytecode
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
+    status: verified
+    output: ["undefined", "ReferenceError", "ReferenceError", "7", "7"]
+    capturedAt: "2026-08-20"
+    note: "Из этого же файла воспроизводимо снимается байткод Ignition."
 graph:
   nodes:
     - {

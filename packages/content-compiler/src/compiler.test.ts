@@ -23,6 +23,22 @@ describe("content compiler", () => {
     expect(declarations.exampleSources["declaration-tdz"]).toContain("let value");
   });
 
+  it("loads the pinned TDZ bytecode artifact and its normalized guard", () => {
+    const declarations = loadArticle("en", "const-let-var");
+    const artifact = declarations.bytecodeArtifacts["const-let-var-tdz"];
+    expect(artifact?.runtime.v8Version).toBe("13.6.233.17-node.50");
+    expect(
+      artifact?.cases
+        .find(({ id }) => id === "let-across-branch")
+        ?.instructions.map(({ opcode }) => opcode),
+    ).toContain("ThrowReferenceErrorIfHole");
+    expect(
+      artifact?.cases
+        .find(({ id }) => id === "initialized-let")
+        ?.instructions.map(({ opcode }) => opcode),
+    ).not.toContain("ThrowReferenceErrorIfHole");
+  });
+
   it("rejects a translation whose English source fingerprint is stale", () => {
     const en = loadArticle("en", "reference-call-this");
     const ru = loadArticle("ru", "reference-call-this");

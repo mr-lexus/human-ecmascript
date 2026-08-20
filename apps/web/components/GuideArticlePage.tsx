@@ -80,7 +80,12 @@ export function GuideArticlePage({
       </header>
 
       <section className="page-shell article-content">
-        <ArticleModes sections={article.sections} citations={article.citations} locale={locale} />
+        <ArticleModes
+          sections={article.sections}
+          citations={article.citations}
+          bytecodeArtifacts={article.bytecodeArtifacts}
+          locale={locale}
+        />
       </section>
 
       <section className="map-section">

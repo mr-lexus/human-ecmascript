@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   output: "export",
   trailingSlash: true,
   reactStrictMode: true,
+  agentRules: false,
   transpilePackages: ["@human-ecmascript/content-compiler", "@human-ecmascript/model"],
   basePath: isGitHubPages ? repositoryBasePath : "",
   assetPrefix: isGitHubPages ? repositoryBasePath : "",

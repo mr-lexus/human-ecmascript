@@ -11,8 +11,10 @@
     "pnpm": "11.4.0"
   },
   "scripts": {
-    "build": "pnpm validate:content && pnpm --filter @human-ecmascript/web build",
-    "check": "pnpm format:check && pnpm lint && pnpm check:types && pnpm test && pnpm validate:content && pnpm roadmap:check",
+    "build": "pnpm validate:content && pnpm bytecode:check && pnpm --filter @human-ecmascript/web build",
+    "bytecode:capture": "node scripts/capture-v8-bytecode.mjs --write",
+    "bytecode:check": "node scripts/capture-v8-bytecode.mjs",
+    "check": "pnpm format:check && pnpm lint && pnpm check:types && pnpm test && pnpm validate:content && pnpm bytecode:check && pnpm roadmap:check",
     "check:types": "tsc --noEmit -p tsconfig.check.json",
     "dev": "pnpm --filter @human-ecmascript/web dev",
     "doctor": "bash scripts/doctor.sh",

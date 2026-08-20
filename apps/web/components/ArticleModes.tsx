@@ -1,8 +1,14 @@
 "use client";
 
 import { Badge, Button, Drawer } from "@mantine/core";
-import type { ArticleSection, Citation, ClaimClassification } from "@human-ecmascript/model";
+import type {
+  ArticleSection,
+  Citation,
+  ClaimClassification,
+  V8BytecodeArtifact,
+} from "@human-ecmascript/model";
 import { Fragment, useMemo, useState } from "react";
+import { V8BytecodeBlock } from "./V8BytecodeBlock";
 
 const modeLabels = {
   en: {
@@ -80,8 +86,14 @@ function RichText({ children }: Readonly<{ children: string }>) {
 export function ArticleModes({
   sections,
   citations,
+  bytecodeArtifacts,
   locale,
-}: Readonly<{ sections: ArticleSection[]; citations: Citation[]; locale: "en" | "ru" }>) {
+}: Readonly<{
+  sections: ArticleSection[];
+  citations: Citation[];
+  bytecodeArtifacts: Record<string, V8BytecodeArtifact>;
+  locale: "en" | "ru";
+}>) {
   const [activeMode, setActiveMode] = useState<ArticleSection["mode"]>("human");
   const [operationId, setOperationId] = useState<string | null>(null);
   const activeSection = sections.find(({ mode }) => mode === activeMode) ?? sections[0]!;
@@ -194,6 +206,12 @@ export function ArticleModes({
                 ))}
               </div>
             );
+          if (block.type === "bytecode") {
+            const artifact = bytecodeArtifacts[block.artifactId];
+            return artifact ? (
+              <V8BytecodeBlock key={block.id} block={block} artifact={artifact} locale={locale} />
+            ) : null;
+          }
           return (
             <aside className={`article-note note-${block.tone}`} key={block.id}>
               <span aria-hidden="true">

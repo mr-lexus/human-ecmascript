@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
@@ -41,7 +42,35 @@ for (const slug of slugs) {
         `${example.id} output mismatch: expected ${JSON.stringify(example.expectedOutput)}, received ${JSON.stringify(output)}`,
       );
     }
+    for (const engineResult of en.engineResults.filter(
+      ({ exampleId, status }) => exampleId === example.id && status === "verified",
+    )) {
+      if (JSON.stringify(engineResult.output) !== JSON.stringify(example.expectedOutput)) {
+        throw new Error(`${example.id} verified engine result differs from its expected output`);
+      }
+    }
     exampleCount += 1;
+  }
+
+  for (const artifact of Object.values(en.bytecodeArtifacts)) {
+    const source = readFileSync(join(process.cwd(), artifact.sourcePath));
+    const sourceHash = createHash("sha256").update(source).digest("hex");
+    if (sourceHash !== artifact.sourceSha256) {
+      throw new Error(`${artifact.id} source fingerprint is stale`);
+    }
+    const captureHash = createHash("sha256").update(JSON.stringify(artifact.cases)).digest("hex");
+    if (captureHash !== artifact.captureSha256) {
+      throw new Error(`${artifact.id} normalized capture fingerprint is stale`);
+    }
+    const example = en.examples.find(({ sourcePath }) => sourcePath === artifact.sourcePath);
+    if (!example) throw new Error(`${artifact.id} source is not exposed as an executable example`);
+    const engineResult = en.engineResults.find(
+      ({ exampleId, engine, status }) =>
+        exampleId === example.id && engine === "V8" && status === "verified",
+    );
+    if (engineResult?.binaryHash !== artifact.runtime.binarySha256) {
+      throw new Error(`${artifact.id} binary provenance differs from its V8 engine result`);
+    }
   }
 }
 

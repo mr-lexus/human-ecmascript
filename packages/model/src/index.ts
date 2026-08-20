@@ -83,6 +83,23 @@ export const contentBlockSchema = z.discriminatedUnion("type", [
     title: z.string(),
     body: z.string(),
   }),
+  z.object({
+    id: z.string(),
+    type: z.literal("bytecode"),
+    artifactId: z.string().regex(/^[a-z0-9-]+$/),
+    title: z.string().min(1),
+    body: z.string().min(1),
+    cases: z
+      .array(
+        z.object({
+          id: z.string().min(1),
+          caseId: z.string().min(1),
+          title: z.string().min(1),
+          explanation: z.string().min(1),
+        }),
+      )
+      .min(1),
+  }),
 ]);
 export type ContentBlock = z.infer<typeof contentBlockSchema>;
 
@@ -117,6 +134,44 @@ export const engineResultSchema = z.object({
   note: z.string().optional(),
 });
 export type EngineResult = z.infer<typeof engineResultSchema>;
+
+export const v8BytecodeInstructionSchema = z.object({
+  offset: z.number().int().nonnegative(),
+  bytes: z.string().regex(/^[0-9a-f]{2}( [0-9a-f]{2})*$/),
+  opcode: z.string().min(1),
+  operands: z.string(),
+});
+
+export const v8BytecodeCaseSchema = z.object({
+  id: z.string().min(1),
+  functionName: z.string().min(1),
+  source: z.string().min(1),
+  bytecodeLength: z.number().int().positive(),
+  parameterCount: z.number().int().nonnegative(),
+  registerCount: z.number().int().nonnegative(),
+  frameSize: z.number().int().nonnegative(),
+  instructions: z.array(v8BytecodeInstructionSchema).min(1),
+});
+
+export const v8BytecodeArtifactSchema = z.object({
+  schemaVersion: z.literal(1),
+  id: z.string().regex(/^[a-z0-9-]+$/),
+  provider: z.literal("V8 Ignition"),
+  sourcePath: z.string().regex(/^examples\/[a-z0-9-]+\.(m?js)$/),
+  sourceSha256: z.string().regex(/^[0-9a-f]{64}$/),
+  runtime: z.object({
+    name: z.literal("Node.js"),
+    version: z.string().min(1),
+    v8Version: z.string().min(1),
+    platform: z.string().min(1),
+    binarySha256: z.string().regex(/^[0-9a-f]{64}$/),
+  }),
+  commandTemplate: z.string().min(1),
+  capturedAt: z.string().date(),
+  cases: z.array(v8BytecodeCaseSchema).min(1),
+  captureSha256: z.string().regex(/^[0-9a-f]{64}$/),
+});
+export type V8BytecodeArtifact = z.infer<typeof v8BytecodeArtifactSchema>;
 
 export const graphNodeSchema = z.object({
   id: z.string(),
@@ -202,7 +257,10 @@ export const articleSchema = z
   });
 
 export type Article = z.infer<typeof articleSchema>;
-export type CompiledArticle = Article & { exampleSources: Record<string, string> };
+export type CompiledArticle = Article & {
+  exampleSources: Record<string, string>;
+  bytecodeArtifacts: Record<string, V8BytecodeArtifact>;
+};
 
 export const specNodeSchema = z.object({
   id: z.string(),

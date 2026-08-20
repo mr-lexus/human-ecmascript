@@ -1,7 +1,7 @@
 id: const-let-var
 slug: const-let-var
 locale: en
-sourceContentHash: 6022b71449513edf
+sourceContentHash: 228d0265dd83c418
 title: "const, let, and var without folklore"
 eyebrow: "Bindings → initialization → scope → performance"
 dek: >-
@@ -10,11 +10,12 @@ dek: >-
   the narrow cases where `var` is still an intentional tool.
 status: TECH_REVIEW
 sourceSnapshot: ECMA-262-ES2026
-readingMinutes: 22
+readingMinutes: 30
 learningObjectives:
   - Explain the difference between creating, initializing, reading, and assigning a binding.
   - Predict block scope, function scope, the temporal dead zone, and loop closure behavior.
   - Choose `const`, `let`, or `var` without relying on performance folklore.
+  - Read a pinned Ignition bytecode listing and identify a TDZ guard.
 prerequisites:
   - A variable name resolves to a binding in an Environment Record.
   - An object and the binding that currently points to it are different things.
@@ -133,6 +134,21 @@ sections:
             sourceFingerprint: 41c21f2f3e905eed
             confidence: 1
             reviewStatus: TECH_REVIEW
+          - id: claim-branch-does-not-create-tdz
+            classification: DERIVED
+            text: "An `if` statement does not create a TDZ by itself. The enclosing lexical scope and declaration create the uninitialized interval; a branch only makes an early-read path possible."
+            citationIds:
+              [lexical-declarations, block-declaration-instantiation, declarative-environment]
+            sourceFingerprint: 9a6e8804e4c6c01f
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-var-early-read
+            classification: NORMATIVE
+            text: "An early read of a local `var` does not perform a TDZ check because its binding has already been initialized to `undefined`; that is different behavior, not merely a faster spelling of `let`."
+            citationIds: [variable-statement]
+            sourceFingerprint: 4eb34a6c87a16d01
+            confidence: 1
+            reviewStatus: TECH_REVIEW
           - id: claim-const-binding
             classification: NORMATIVE
             text: "`const` creates an immutable binding; the specification does not make an object stored in that binding immutable."
@@ -156,8 +172,9 @@ sections:
         body: >-
           Scope and initialization change program behavior. The examples contrast an early read,
           block visibility, object mutation through `const`, and loop closures. The final examples
-          show a normal `const`/`let` combination and an intentional function-scoped `var`—not a
-          blanket recommendation to write new code with `var`.
+          show a normal `const`/`let` combination, an intentional function-scoped `var`, and the
+          exact branch fixture used for the bytecode capture—not a blanket recommendation to write
+          new code with `var`.
       - id: declaration-observable-claims
         type: claims
         claims:
@@ -206,6 +223,13 @@ sections:
             sourceFingerprint: c5e65ad43b90fb47
             confidence: 0.97
             reviewStatus: TECH_REVIEW
+          - id: claim-v8-bytecode-capture
+            classification: V8_IMPLEMENTATION
+            text: "In the pinned V8 13.6 capture, the unsafe `let` and `const` paths contain `LdaTheHole` and `ThrowReferenceErrorIfHole`; the `var`, initialized `let`, and initialized `const` fixtures contain no `ThrowReferenceErrorIfHole`."
+            citationIds: [v8-hole-checks]
+            sourceFingerprint: 8af584f5e91414c8
+            confidence: 1
+            reviewStatus: TECH_REVIEW
           - id: claim-performance-no-guarantee
             classification: INFORMATIVE
             text: "There is no portable rule that `var`, `let`, or `const` is always faster; changing the declaration can also change scope, initialization, or closure semantics."
@@ -214,15 +238,64 @@ sections:
             sourceFingerprint: 8f8f696aa7961cef
             confidence: 0.99
             reviewStatus: TECH_REVIEW
+      - id: declaration-blazing-checklist
+        type: trace
+        steps:
+          - id: blazing-preserve-semantics
+            label: "1. Decide what an early read should mean"
+            operation: Semantics first
+            detail: "If it should be an error, keep the lexical declaration. If `undefined` before assignment is an intentional function-wide contract, `var` can express that contract."
+            citationId: variable-statement
+          - id: blazing-initialize-before-branch
+            label: "2. Initialize before branching"
+            operation: Remove the risky path
+            detail: "Put `let value;` before the `if`, or compute every `const` value in its initializer. The captured V8 bytecode then needs no TDZ throw instruction for the later read."
+            citationId: lexical-declarations
+          - id: blazing-keep-scope-small
+            label: "3. Keep the smallest correct scope"
+            operation: Avoid semantic regressions
+            detail: "Do not widen a block binding to the whole function merely to remove a guard. Wider scope can hide stale values and changes closure behavior."
+            citationId: block-declaration-instantiation
+          - id: blazing-measure-workload
+            label: "4. Measure the optimized workload"
+            operation: Benchmark last
+            detail: "Warm up the complete hot function, preserve realistic branches and escapes, and compare every target engine. Ignition bytecode alone is not optimized machine-code performance."
+      - id: declaration-bytecode-artifact
+        type: bytecode
+        artifactId: const-let-var-tdz
+        title: "The TDZ guard in real V8 bytecode"
+        body: "These five functions were captured from the same source file with a pinned Linux Node binary. Orange rows are the instructions that represent V8's uninitialized lexical sentinel and the possible ReferenceError."
+        cases:
+          - id: bytecode-var-branch
+            caseId: var-across-branch
+            title: "Early `var` read"
+            explanation: "The register is already `undefined`. V8 can load and return it directly, so there is no hole guard—but the program silently returns `undefined`."
+          - id: bytecode-let-branch
+            caseId: let-across-branch
+            title: "Early `let` read"
+            explanation: "V8 initializes the register with its internal hole sentinel. The early branch loads it and executes `ThrowReferenceErrorIfHole`."
+          - id: bytecode-const-branch
+            caseId: const-across-branch
+            title: "Early `const` read"
+            explanation: "The TDZ mechanism is the same for `const`: the binding exists but remains the hole until its declaration initializes it."
+          - id: bytecode-initialized-let
+            caseId: initialized-let
+            title: "Initialized `let` before `if`"
+            explanation: "The declaration runs before the branch and writes `undefined`; subsequent reads need no `ThrowReferenceErrorIfHole`."
+          - id: bytecode-initialized-const
+            caseId: initialized-const
+            title: "`const` initialized by an expression"
+            explanation: "Both sides of the conditional produce the initializer value before the return. This capture contains neither a hole sentinel nor a TDZ throw."
       - id: declaration-performance-note
         type: note
         tone: implementation
         title: "A performance checklist that does not break the program"
         body: >-
-          Choose the keyword for correctness. Avoid creating closures inside a hot loop when they
-          are unnecessary. If per-iteration capture is required, keep `let` and measure the real
-          workload on every target engine. Treat microbenchmarks without warm-up, escape behavior,
-          and representative data as diagnostics—not as a style guide.
+          For blazing code, remove ambiguous control flow rather than weakening the declaration:
+          initialize `let` before the branch and compute `const` in one expression. Use `var` when
+          one function-wide binding that reads as `undefined` before assignment is deliberately the
+          API of that function. Avoid unnecessary closures in hot loops, then benchmark the warmed-up
+          workload on every target engine. A bytecode listing is evidence, not a universal style guide.
 citations:
   - id: lexical-declarations
     snapshot: ECMA-262-ES2026
@@ -334,18 +407,26 @@ examples:
     expectedOutput: ["60"]
     claimIds: [claim-choice-rule]
     citationIds: [lexical-declarations]
+  - id: declaration-bytecode
+    title: "Branching, TDZ, and safe initialization"
+    goal: "Run the exact var/let/const functions used for the pinned bytecode comparison."
+    sourcePath: examples/declaration-bytecode.js
+    timeoutMs: 1200
+    expectedOutput: ["undefined", "ReferenceError", "ReferenceError", "7", "7"]
+    claimIds: [claim-branch-does-not-create-tdz, claim-var-early-read, claim-v8-bytecode-capture]
+    citationIds: [lexical-declarations, variable-statement, declarative-environment, v8-hole-checks]
 engineResults:
   - exampleId: declaration-tdz
     engine: V8
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
-    binaryHash: d6c664df3f3f6145
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output: ["ReferenceError", "undefined"]
     capturedAt: "2026-08-20"
   - exampleId: declaration-block-scope
     engine: V8
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
-    binaryHash: d6c664df3f3f6145
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output:
       [
@@ -357,31 +438,39 @@ engineResults:
   - exampleId: const-object-mutation
     engine: V8
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
-    binaryHash: d6c664df3f3f6145
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output: ["1", "TypeError"]
     capturedAt: "2026-08-20"
   - exampleId: loop-bindings
     engine: V8
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
-    binaryHash: d6c664df3f3f6145
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output: ["0,1,2", "3,3,3"]
     capturedAt: "2026-08-20"
   - exampleId: intentional-var-scope
     engine: V8
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
-    binaryHash: d6c664df3f3f6145
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output: ["cached value", "network value", "no value"]
     capturedAt: "2026-08-20"
   - exampleId: declaration-choice
     engine: V8
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
-    binaryHash: d6c664df3f3f6145
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
     output: ["60"]
     capturedAt: "2026-08-20"
+  - exampleId: declaration-bytecode
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
+    status: verified
+    output: ["undefined", "ReferenceError", "ReferenceError", "7", "7"]
+    capturedAt: "2026-08-20"
+    note: "The same source file is used by the reproducible Ignition bytecode capture."
 graph:
   nodes:
     - {
