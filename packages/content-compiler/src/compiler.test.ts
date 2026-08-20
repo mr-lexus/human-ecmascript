@@ -41,6 +41,16 @@ describe("content compiler", () => {
         .find(({ id }) => id === "initialized-let")
         ?.instructions.map(({ opcode }) => opcode),
     ).not.toContain("ThrowReferenceErrorIfHole");
+    expect(
+      artifact?.cases
+        .find(({ id }) => id === "shadowed-let-before-declaration")
+        ?.instructions.map(({ opcode }) => opcode),
+    ).toContain("ThrowReferenceErrorIfHole");
+    expect(
+      artifact?.cases
+        .find(({ id }) => id === "initialized-shadowed-let")
+        ?.instructions.map(({ opcode }) => opcode),
+    ).not.toContain("ThrowReferenceErrorIfHole");
   });
 
   it("loads the pinned V8 value representations without confusing spec types and storage", () => {

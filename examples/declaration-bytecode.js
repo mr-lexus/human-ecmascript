@@ -1,5 +1,7 @@
 "use strict";
 
+/* eslint-disable @typescript-eslint/no-unused-vars -- this fixture intentionally captures shadowed and unreachable bindings */
+
 function varAcrossBranch(flag) {
   if (flag) return value;
   var value = 7;
@@ -29,6 +31,28 @@ function initializedConst(flag) {
   return value;
 }
 
+function shadowedLetBeforeDeclaration() {
+  let p2 = 1;
+  let p1 = 5;
+  {
+    p2 = 7;
+    let p2;
+    let p3 = p1 + p2;
+  }
+  return;
+}
+
+function initializedShadowedLet() {
+  let p2 = 1;
+  let p1 = 5;
+  {
+    let p2;
+    p2 = 7;
+    let p3 = p1 + p2;
+    return p3;
+  }
+}
+
 console.log(String(varAcrossBranch(true)));
 
 for (const candidate of [letAcrossBranch, constAcrossBranch]) {
@@ -41,3 +65,11 @@ for (const candidate of [letAcrossBranch, constAcrossBranch]) {
 
 console.log(initializedLet(true));
 console.log(initializedConst(true));
+
+try {
+  shadowedLetBeforeDeclaration();
+} catch (error) {
+  console.log(error.name);
+}
+
+console.log(initializedShadowedLet());

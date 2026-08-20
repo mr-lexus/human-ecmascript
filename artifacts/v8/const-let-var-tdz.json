@@ -3,7 +3,7 @@
   "id": "const-let-var-tdz",
   "provider": "V8 Ignition",
   "sourcePath": "examples/declaration-bytecode.js",
-  "sourceSha256": "3c2d010eb8ac6cbbd0612d6670c9060f9b502dc11bf80cd0b1ba79eaa3d2a9c2",
+  "sourceSha256": "df81c4f888815c8a5d343937deb076b241ee315f704bd69cedd30455794cdea9",
   "runtime": {
     "name": "Node.js",
     "version": "24.18.1",
@@ -320,7 +320,209 @@
           "operands": ""
         }
       ]
+    },
+    {
+      "id": "shadowed-let-before-declaration",
+      "functionName": "shadowedLetBeforeDeclaration",
+      "source": "function shadowedLetBeforeDeclaration() {\n  let p2 = 1;\n  let p1 = 5;\n  {\n    p2 = 7;\n    let p2;\n    let p3 = p1 + p2;\n  }\n  return;\n}",
+      "bytecodeLength": 28,
+      "parameterCount": 1,
+      "registerCount": 5,
+      "frameSize": 40,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "0d 01",
+          "opcode": "LdaSmi",
+          "operands": "[1]"
+        },
+        {
+          "offset": 2,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 3,
+          "bytes": "0d 05",
+          "opcode": "LdaSmi",
+          "operands": "[5]"
+        },
+        {
+          "offset": 5,
+          "bytes": "cd",
+          "opcode": "Star1",
+          "operands": ""
+        },
+        {
+          "offset": 6,
+          "bytes": "10",
+          "opcode": "LdaTheHole",
+          "operands": ""
+        },
+        {
+          "offset": 7,
+          "bytes": "cc",
+          "opcode": "Star2",
+          "operands": ""
+        },
+        {
+          "offset": 8,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 10,
+          "bytes": "ca",
+          "opcode": "Star4",
+          "operands": ""
+        },
+        {
+          "offset": 11,
+          "bytes": "0b f7",
+          "opcode": "Ldar",
+          "operands": "r2"
+        },
+        {
+          "offset": 13,
+          "bytes": "b4 00",
+          "opcode": "ThrowReferenceErrorIfHole",
+          "operands": "[0]"
+        },
+        {
+          "offset": 15,
+          "bytes": "1b f5 f7",
+          "opcode": "Mov",
+          "operands": "r4, r2"
+        },
+        {
+          "offset": 18,
+          "bytes": "0e",
+          "opcode": "LdaUndefined",
+          "operands": ""
+        },
+        {
+          "offset": 19,
+          "bytes": "cc",
+          "opcode": "Star2",
+          "operands": ""
+        },
+        {
+          "offset": 20,
+          "bytes": "0b f7",
+          "opcode": "Ldar",
+          "operands": "r2"
+        },
+        {
+          "offset": 22,
+          "bytes": "3f f8 00",
+          "opcode": "Add",
+          "operands": "r1, [0]"
+        },
+        {
+          "offset": 25,
+          "bytes": "cb",
+          "opcode": "Star3",
+          "operands": ""
+        },
+        {
+          "offset": 26,
+          "bytes": "0e",
+          "opcode": "LdaUndefined",
+          "operands": ""
+        },
+        {
+          "offset": 27,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "initialized-shadowed-let",
+      "functionName": "initializedShadowedLet",
+      "source": "function initializedShadowedLet() {\n  let p2 = 1;\n  let p1 = 5;\n  {\n    let p2;\n    p2 = 7;\n    let p3 = p1 + p2;\n    return p3;\n  }\n}",
+      "bytecodeLength": 18,
+      "parameterCount": 1,
+      "registerCount": 4,
+      "frameSize": 32,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "0d 01",
+          "opcode": "LdaSmi",
+          "operands": "[1]"
+        },
+        {
+          "offset": 2,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 3,
+          "bytes": "0d 05",
+          "opcode": "LdaSmi",
+          "operands": "[5]"
+        },
+        {
+          "offset": 5,
+          "bytes": "cd",
+          "opcode": "Star1",
+          "operands": ""
+        },
+        {
+          "offset": 6,
+          "bytes": "0e",
+          "opcode": "LdaUndefined",
+          "operands": ""
+        },
+        {
+          "offset": 7,
+          "bytes": "cc",
+          "opcode": "Star2",
+          "operands": ""
+        },
+        {
+          "offset": 8,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 10,
+          "bytes": "cc",
+          "opcode": "Star2",
+          "operands": ""
+        },
+        {
+          "offset": 11,
+          "bytes": "0b f7",
+          "opcode": "Ldar",
+          "operands": "r2"
+        },
+        {
+          "offset": 13,
+          "bytes": "3f f8 00",
+          "opcode": "Add",
+          "operands": "r1, [0]"
+        },
+        {
+          "offset": 16,
+          "bytes": "cb",
+          "opcode": "Star3",
+          "operands": ""
+        },
+        {
+          "offset": 17,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
     }
   ],
-  "captureSha256": "8af584f5e91414c848838c50b2fdde9587e9789613bba2fea77c5188ea8a6f4d"
+  "captureSha256": "58d41984b5eb00a5d94b35c11f93f9c37cca84278fb954bb70af3f03c5687348"
 }

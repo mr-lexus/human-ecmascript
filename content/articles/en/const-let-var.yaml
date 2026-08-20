@@ -1,7 +1,7 @@
 id: const-let-var
 slug: const-let-var
 locale: en
-sourceContentHash: 228d0265dd83c418
+sourceContentHash: d5210b55851af115
 title: "const, let, and var without folklore"
 eyebrow: "Bindings → initialization → scope → performance"
 dek: >-
@@ -223,9 +223,16 @@ sections:
             sourceFingerprint: c5e65ad43b90fb47
             confidence: 0.97
             reviewStatus: TECH_REVIEW
+          - id: claim-shadowed-binding-tdz
+            classification: DERIVED
+            text: "In a block containing `let p2`, every `p2` reference in that block resolves to the inner lexical binding, including references textually before the declaration. `p2 = 7` therefore reaches the uninitialized inner binding and throws ReferenceError instead of assigning the outer `p2`."
+            citationIds: [block-declaration-instantiation, declarative-environment]
+            sourceFingerprint: 6ab2d8b76ed13fe1
+            confidence: 1
+            reviewStatus: TECH_REVIEW
           - id: claim-v8-bytecode-capture
             classification: V8_IMPLEMENTATION
-            text: "In the pinned V8 13.6 capture, the unsafe `let` and `const` paths contain `LdaTheHole` and `ThrowReferenceErrorIfHole`; the `var`, initialized `let`, and initialized `const` fixtures contain no `ThrowReferenceErrorIfHole`."
+            text: "In the pinned V8 13.6 capture, unsafe `let` and `const` paths—including assignment before a shadowing `let` declaration—contain `LdaTheHole` and `ThrowReferenceErrorIfHole`. Moving the shadowing declaration before its first use removes both instructions in this capture."
             citationIds: [v8-hole-checks]
             sourceFingerprint: 8af584f5e91414c8
             confidence: 1
@@ -264,7 +271,7 @@ sections:
         type: bytecode
         artifactId: const-let-var-tdz
         title: "The TDZ guard in real V8 bytecode"
-        body: "These five functions were captured from the same source file with a pinned Linux Node binary. Orange rows are the instructions that represent V8's uninitialized lexical sentinel and the possible ReferenceError."
+        body: "These seven functions were captured from the same source file with a pinned Linux Node binary. Orange rows are the instructions that represent V8's uninitialized lexical sentinel and the possible ReferenceError."
         cases:
           - id: bytecode-var-branch
             caseId: var-across-branch
@@ -286,16 +293,25 @@ sections:
             caseId: initialized-const
             title: "`const` initialized by an expression"
             explanation: "Both sides of the conditional produce the initializer value before the return. This capture contains neither a hole sentinel nor a TDZ throw."
+          - id: bytecode-shadowed-let-before-declaration
+            caseId: shadowed-let-before-declaration
+            title: "Assignment before shadowing `let`"
+            explanation: "The inner `p2` shadows the outer one from the beginning of the block. V8 stores the hole in `r2`; `p2 = 7` first checks that inner binding and throws before the assignment can happen."
+          - id: bytecode-initialized-shadowed-let
+            caseId: initialized-shadowed-let
+            title: "Shadowing `let` initialized first"
+            explanation: "Moving `let p2;` before `p2 = 7` initializes the inner binding with `undefined`. The function returns `12`, and this capture contains no hole guard."
       - id: declaration-performance-note
         type: note
         tone: implementation
-        title: "A performance checklist that does not break the program"
+        title: "What the `theSum` example actually proves"
         body: >-
-          For blazing code, remove ambiguous control flow rather than weakening the declaration:
-          initialize `let` before the branch and compute `const` in one expression. Use `var` when
-          one function-wide binding that reads as `undefined` before assignment is deliberately the
-          API of that function. Avoid unnecessary closures in hot loops, then benchmark the warmed-up
-          workload on every target engine. A bytecode listing is evidence, not a universal style guide.
+          The original function is an erroneous TDZ path, not a benchmark showing that `let` is
+          generally slow. Put the inner `let p2;` before `p2 = 7` and the function returns `12`
+          without a hole guard in this V8 capture. Replacing it with `var` also removes block
+          shadowing, but changes the program to one function-wide binding; use that only when those
+          semantics are intentional. Instruction count in Ignition is evidence about this cold
+          baseline path, not a portable measurement of optimized-code performance.
 citations:
   - id: lexical-declarations
     snapshot: ECMA-262-ES2026
@@ -412,8 +428,15 @@ examples:
     goal: "Run the exact var/let/const functions used for the pinned bytecode comparison."
     sourcePath: examples/declaration-bytecode.js
     timeoutMs: 1200
-    expectedOutput: ["undefined", "ReferenceError", "ReferenceError", "7", "7"]
-    claimIds: [claim-branch-does-not-create-tdz, claim-var-early-read, claim-v8-bytecode-capture]
+    expectedOutput:
+      ["undefined", "ReferenceError", "ReferenceError", "7", "7", "ReferenceError", "12"]
+    claimIds:
+      [
+        claim-branch-does-not-create-tdz,
+        claim-var-early-read,
+        claim-shadowed-binding-tdz,
+        claim-v8-bytecode-capture,
+      ]
     citationIds: [lexical-declarations, variable-statement, declarative-environment, v8-hole-checks]
 engineResults:
   - exampleId: declaration-tdz
@@ -468,7 +491,7 @@ engineResults:
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
     binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
-    output: ["undefined", "ReferenceError", "ReferenceError", "7", "7"]
+    output: ["undefined", "ReferenceError", "ReferenceError", "7", "7", "ReferenceError", "12"]
     capturedAt: "2026-08-20"
     note: "The same source file is used by the reproducible Ignition bytecode capture."
 graph:

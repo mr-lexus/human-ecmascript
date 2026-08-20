@@ -15,6 +15,11 @@ const captures = [
       { id: "const-across-branch", functionName: "constAcrossBranch" },
       { id: "initialized-let", functionName: "initializedLet" },
       { id: "initialized-const", functionName: "initializedConst" },
+      {
+        id: "shadowed-let-before-declaration",
+        functionName: "shadowedLetBeforeDeclaration",
+      },
+      { id: "initialized-shadowed-let", functionName: "initializedShadowedLet" },
     ],
   },
   {

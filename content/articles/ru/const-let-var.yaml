@@ -2,7 +2,7 @@ id: const-let-var-ru
 slug: const-let-var
 locale: ru
 translationOf: const-let-var
-sourceContentHash: 228d0265dd83c418
+sourceContentHash: d5210b55851af115
 title: "const, let и var: без мифов и запретов"
 eyebrow: "Переменная → инициализация → область видимости → производительность"
 dek: >-
@@ -224,9 +224,16 @@ sections:
             sourceFingerprint: c5e65ad43b90fb47
             confidence: 0.97
             reviewStatus: TECH_REVIEW
+          - id: claim-shadowed-binding-tdz
+            classification: DERIVED
+            text: "Если внутри блока есть `let p2`, все обращения к `p2` в этом блоке разрешаются во внутренний lexical binding — даже строки выше объявления. Поэтому `p2 = 7` обращается к ещё не инициализированному внутреннему binding и выбрасывает ReferenceError, а не меняет внешний `p2`."
+            citationIds: [block-declaration-instantiation, declarative-environment]
+            sourceFingerprint: 6ab2d8b76ed13fe1
+            confidence: 1
+            reviewStatus: TECH_REVIEW
           - id: claim-v8-bytecode-capture
             classification: V8_IMPLEMENTATION
-            text: "В закреплённом capture V8 13.6 опасные пути с `let` и `const` содержат `LdaTheHole` и `ThrowReferenceErrorIfHole`; в примерах с `var`, заранее инициализированным `let` и инициализированным выражением `const` инструкции `ThrowReferenceErrorIfHole` нет."
+            text: "В закреплённом capture V8 13.6 опасные пути с `let` и `const`, включая присваивание перед затеняющим `let`, содержат `LdaTheHole` и `ThrowReferenceErrorIfHole`. Если перенести затеняющее объявление выше первого использования, обе инструкции в этом capture исчезают."
             citationIds: [v8-hole-checks]
             sourceFingerprint: 8af584f5e91414c8
             confidence: 1
@@ -265,7 +272,7 @@ sections:
         type: bytecode
         artifactId: const-let-var-tdz
         title: "Проверка TDZ в настоящем байткоде V8"
-        body: "Все пять функций сняты из одного файла закреплённым Linux-бинарником Node. Оранжевым отмечены инструкции внутреннего значения «ещё не инициализировано» и возможного ReferenceError."
+        body: "Все семь функций сняты из одного файла закреплённым Linux-бинарником Node. Оранжевым отмечены инструкции внутреннего значения «ещё не инициализировано» и возможного ReferenceError."
         cases:
           - id: bytecode-var-branch
             caseId: var-across-branch
@@ -287,16 +294,25 @@ sections:
             caseId: initialized-const
             title: "`const` получает значение из выражения"
             explanation: "Обе ветки условного выражения вычисляют начальное значение до возврата. В этом capture нет ни hole, ни инструкции выбрасывания TDZ-ошибки."
+          - id: bytecode-shadowed-let-before-declaration
+            caseId: shadowed-let-before-declaration
+            title: "Присваивание перед затеняющим `let`"
+            explanation: "Внутренний `p2` затеняет внешний с самого начала блока. V8 записывает hole в `r2`; перед `p2 = 7` проверяется внутренний binding, и исключение возникает раньше самого присваивания."
+          - id: bytecode-initialized-shadowed-let
+            caseId: initialized-shadowed-let
+            title: "Сначала инициализируем затеняющий `let`"
+            explanation: "Если поставить `let p2;` перед `p2 = 7`, внутренний binding сначала получит `undefined`. Функция вернёт `12`, а hole-check в этом capture исчезнет."
       - id: declaration-performance-note
         type: note
         tone: implementation
-        title: "Как ускорять код, не ломая его"
+        title: "Что на самом деле доказывает пример `theSum`"
         body: >-
-          Для быстрого кода лучше распутать управление, чем ослаблять объявление: вынесите
-          инициализацию `let` перед веткой, а `const` вычисляйте одним выражением. Берите `var`, когда
-          одна переменная на всю функцию и чтение `undefined` до присваивания действительно входят
-          в контракт этой функции. Уберите ненужные замыкания из горячих циклов, затем измерьте
-          прогретую нагрузку во всех целевых движках. Байткод — доказательство, но не общий style guide.
+          Исходная функция показывает ошибочный путь через TDZ, а не общий проигрыш `let` по скорости.
+          Поставьте внутреннее `let p2;` перед `p2 = 7`: функция вернёт `12`, и в этом capture исчезнет
+          hole-check. Замена на `var` тоже уберёт блочное затенение, но превратит код в один binding на
+          всю функцию — это уже другая семантика, и выбирать её нужно намеренно. Число инструкций
+          Ignition описывает холодный baseline-путь этой версии V8, а не производительность
+          оптимизированного кода во всех движках.
 citations:
   - id: lexical-declarations
     snapshot: ECMA-262-ES2026
@@ -413,8 +429,15 @@ examples:
     goal: "Запустить те же функции с var, let и const, по которым сохранено сравнение байткода."
     sourcePath: examples/declaration-bytecode.js
     timeoutMs: 1200
-    expectedOutput: ["undefined", "ReferenceError", "ReferenceError", "7", "7"]
-    claimIds: [claim-branch-does-not-create-tdz, claim-var-early-read, claim-v8-bytecode-capture]
+    expectedOutput:
+      ["undefined", "ReferenceError", "ReferenceError", "7", "7", "ReferenceError", "12"]
+    claimIds:
+      [
+        claim-branch-does-not-create-tdz,
+        claim-var-early-read,
+        claim-shadowed-binding-tdz,
+        claim-v8-bytecode-capture,
+      ]
     citationIds: [lexical-declarations, variable-statement, declarative-environment, v8-hole-checks]
 engineResults:
   - exampleId: declaration-tdz
@@ -469,7 +492,7 @@ engineResults:
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
     binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
-    output: ["undefined", "ReferenceError", "ReferenceError", "7", "7"]
+    output: ["undefined", "ReferenceError", "ReferenceError", "7", "7", "ReferenceError", "12"]
     capturedAt: "2026-08-20"
     note: "Из этого же файла воспроизводимо снимается байткод Ignition."
 graph:
