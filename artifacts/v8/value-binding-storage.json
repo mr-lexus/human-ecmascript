@@ -1,0 +1,226 @@
+{
+  "schemaVersion": 1,
+  "id": "value-binding-storage",
+  "provider": "V8 Ignition",
+  "sourcePath": "examples/value-binding-bytecode.js",
+  "sourceSha256": "8a13b08b5d43f828555ffce082c2146454fcd626c7a5fb1f254fd624edaea624",
+  "runtime": {
+    "name": "Node.js",
+    "version": "24.18.1",
+    "v8Version": "13.6.233.17-node.50",
+    "platform": "linux-x64",
+    "binarySha256": "f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a"
+  },
+  "commandTemplate": "node --print-bytecode --print-bytecode-filter=<function> examples/value-binding-bytecode.js",
+  "capturedAt": "2026-08-20",
+  "cases": [
+    {
+      "id": "local-smi",
+      "functionName": "localSmi",
+      "source": "function localSmi(flag) {\n  let value = 42;\n  if (flag) value += 1;\n  return value;\n}",
+      "bytecodeLength": 16,
+      "parameterCount": 2,
+      "registerCount": 1,
+      "frameSize": 8,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "0d 2a",
+          "opcode": "LdaSmi",
+          "operands": "[42]"
+        },
+        {
+          "offset": 2,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 3,
+          "bytes": "0b 03",
+          "opcode": "Ldar",
+          "operands": "a0"
+        },
+        {
+          "offset": 5,
+          "bytes": "a1 08",
+          "opcode": "JumpIfToBooleanFalse",
+          "operands": "[8]"
+        },
+        {
+          "offset": 7,
+          "bytes": "0b f9",
+          "opcode": "Ldar",
+          "operands": "r0"
+        },
+        {
+          "offset": 9,
+          "bytes": "4b 01 00",
+          "opcode": "AddSmi",
+          "operands": "[1], [0]"
+        },
+        {
+          "offset": 12,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 13,
+          "bytes": "0b f9",
+          "opcode": "Ldar",
+          "operands": "r0"
+        },
+        {
+          "offset": 15,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "captured-smi",
+      "functionName": "capturedSmi",
+      "source": "function capturedSmi() {\n  let value = 42;\n  return function readSmi() {\n    return value;\n  };\n}",
+      "bytecodeLength": 17,
+      "parameterCount": 1,
+      "registerCount": 1,
+      "frameSize": 8,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "8c 00 01",
+          "opcode": "CreateFunctionContext",
+          "operands": "[0], [1]"
+        },
+        {
+          "offset": 3,
+          "bytes": "1c f9",
+          "opcode": "PushContext",
+          "operands": "r0"
+        },
+        {
+          "offset": 5,
+          "bytes": "10",
+          "opcode": "LdaTheHole",
+          "operands": ""
+        },
+        {
+          "offset": 6,
+          "bytes": "27 02",
+          "opcode": "StaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 8,
+          "bytes": "0d 2a",
+          "opcode": "LdaSmi",
+          "operands": "[42]"
+        },
+        {
+          "offset": 10,
+          "bytes": "27 02",
+          "opcode": "StaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 12,
+          "bytes": "89 01 00 02",
+          "opcode": "CreateClosure",
+          "operands": "[1], [0], #2"
+        },
+        {
+          "offset": 16,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "captured-symbol",
+      "functionName": "capturedSymbol",
+      "source": "function capturedSymbol() {\n  const value = Symbol(\"token\");\n  return function readSymbol() {\n    return value;\n  };\n}",
+      "bytecodeLength": 26,
+      "parameterCount": 1,
+      "registerCount": 3,
+      "frameSize": 24,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "8c 00 01",
+          "opcode": "CreateFunctionContext",
+          "operands": "[0], [1]"
+        },
+        {
+          "offset": 3,
+          "bytes": "1c f9",
+          "opcode": "PushContext",
+          "operands": "r0"
+        },
+        {
+          "offset": 5,
+          "bytes": "10",
+          "opcode": "LdaTheHole",
+          "operands": ""
+        },
+        {
+          "offset": 6,
+          "bytes": "27 02",
+          "opcode": "StaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 8,
+          "bytes": "23 01 00",
+          "opcode": "LdaGlobal",
+          "operands": "[1], [0]"
+        },
+        {
+          "offset": 11,
+          "bytes": "cd",
+          "opcode": "Star1",
+          "operands": ""
+        },
+        {
+          "offset": 12,
+          "bytes": "13 02",
+          "opcode": "LdaConstant",
+          "operands": "[2]"
+        },
+        {
+          "offset": 14,
+          "bytes": "cc",
+          "opcode": "Star2",
+          "operands": ""
+        },
+        {
+          "offset": 15,
+          "bytes": "69 f8 f7 02",
+          "opcode": "CallUndefinedReceiver1",
+          "operands": "r1, r2, [2]"
+        },
+        {
+          "offset": 19,
+          "bytes": "27 02",
+          "opcode": "StaCurrentContextSlot",
+          "operands": "[2]"
+        },
+        {
+          "offset": 21,
+          "bytes": "89 03 00 02",
+          "opcode": "CreateClosure",
+          "operands": "[3], [0], #2"
+        },
+        {
+          "offset": 25,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    }
+  ],
+  "captureSha256": "949daf6380fabf2fbc59b2fee37b7e30517dffecf8d56f205bad900745f492db"
+}

@@ -5,22 +5,34 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const workspaceRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
-const sourcePath = "examples/declaration-bytecode.js";
-const artifactPath = join(workspaceRoot, "artifacts/v8/const-let-var-tdz.json");
-const source = readFileSync(join(workspaceRoot, sourcePath), "utf8");
-const cases = [
-  { id: "var-across-branch", functionName: "varAcrossBranch" },
-  { id: "let-across-branch", functionName: "letAcrossBranch" },
-  { id: "const-across-branch", functionName: "constAcrossBranch" },
-  { id: "initialized-let", functionName: "initializedLet" },
-  { id: "initialized-const", functionName: "initializedConst" },
+const captures = [
+  {
+    id: "const-let-var-tdz",
+    sourcePath: "examples/declaration-bytecode.js",
+    cases: [
+      { id: "var-across-branch", functionName: "varAcrossBranch" },
+      { id: "let-across-branch", functionName: "letAcrossBranch" },
+      { id: "const-across-branch", functionName: "constAcrossBranch" },
+      { id: "initialized-let", functionName: "initializedLet" },
+      { id: "initialized-const", functionName: "initializedConst" },
+    ],
+  },
+  {
+    id: "value-binding-storage",
+    sourcePath: "examples/value-binding-bytecode.js",
+    cases: [
+      { id: "local-smi", functionName: "localSmi" },
+      { id: "captured-smi", functionName: "capturedSmi" },
+      { id: "captured-symbol", functionName: "capturedSymbol" },
+    ],
+  },
 ];
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
-function extractFunction(functionName) {
+function extractFunction(source, sourcePath, functionName) {
   const start = source.indexOf(`function ${functionName}(`);
   if (start < 0) throw new Error(`Cannot find ${functionName} in ${sourcePath}`);
   const bodyStart = source.indexOf("{", start);
@@ -33,7 +45,7 @@ function extractFunction(functionName) {
   throw new Error(`Cannot find the end of ${functionName}`);
 }
 
-function captureBytecode({ id, functionName }) {
+function captureBytecode(source, sourcePath, { id, functionName }) {
   const result = spawnSync(
     process.execPath,
     ["--print-bytecode", `--print-bytecode-filter=${functionName}`, sourcePath],
@@ -69,7 +81,7 @@ function captureBytecode({ id, functionName }) {
   return {
     id,
     functionName,
-    source: extractFunction(functionName),
+    source: extractFunction(source, sourcePath, functionName),
     bytecodeLength: readNumber("Bytecode length"),
     parameterCount: readNumber("Parameter count"),
     registerCount: readNumber("Register count"),
@@ -78,13 +90,16 @@ function captureBytecode({ id, functionName }) {
   };
 }
 
-function buildArtifact(capturedAt) {
-  const capturedCases = cases.map(captureBytecode);
+function buildArtifact(capture, capturedAt) {
+  const source = readFileSync(join(workspaceRoot, capture.sourcePath), "utf8");
+  const capturedCases = capture.cases.map((item) =>
+    captureBytecode(source, capture.sourcePath, item),
+  );
   return {
     schemaVersion: 1,
-    id: "const-let-var-tdz",
+    id: capture.id,
     provider: "V8 Ignition",
-    sourcePath,
+    sourcePath: capture.sourcePath,
     sourceSha256: sha256(source),
     runtime: {
       name: "Node.js",
@@ -93,8 +108,7 @@ function buildArtifact(capturedAt) {
       platform: `${process.platform}-${process.arch}`,
       binarySha256: sha256(readFileSync(process.execPath)),
     },
-    commandTemplate:
-      "node --print-bytecode --print-bytecode-filter=<function> examples/declaration-bytecode.js",
+    commandTemplate: `node --print-bytecode --print-bytecode-filter=<function> ${capture.sourcePath}`,
     capturedAt,
     cases: capturedCases,
     captureSha256: sha256(JSON.stringify(capturedCases)),
@@ -102,18 +116,22 @@ function buildArtifact(capturedAt) {
 }
 
 const shouldWrite = process.argv.includes("--write");
-const currentArtifact = shouldWrite ? undefined : JSON.parse(readFileSync(artifactPath, "utf8"));
-const artifact = buildArtifact(
-  currentArtifact?.capturedAt ?? new Date().toISOString().slice(0, 10),
-);
-
-if (shouldWrite) {
-  writeFileSync(artifactPath, `${JSON.stringify(artifact, null, 2)}\n`);
-  console.log(`Wrote ${artifactPath}`);
-} else if (JSON.stringify(currentArtifact) !== JSON.stringify(artifact)) {
-  throw new Error("V8 bytecode artifact is stale; run pnpm bytecode:capture");
-} else {
-  console.log(
-    `V8 bytecode artifact verified: ${artifact.cases.length} functions, ${artifact.runtime.version} / ${artifact.runtime.v8Version}`,
+for (const capture of captures) {
+  const artifactPath = join(workspaceRoot, `artifacts/v8/${capture.id}.json`);
+  const currentArtifact = shouldWrite ? undefined : JSON.parse(readFileSync(artifactPath, "utf8"));
+  const artifact = buildArtifact(
+    capture,
+    currentArtifact?.capturedAt ?? new Date().toISOString().slice(0, 10),
   );
+
+  if (shouldWrite) {
+    writeFileSync(artifactPath, `${JSON.stringify(artifact, null, 2)}\n`);
+    console.log(`Wrote ${artifactPath}`);
+  } else if (JSON.stringify(currentArtifact) !== JSON.stringify(artifact)) {
+    throw new Error(`${capture.id} bytecode artifact is stale; run pnpm bytecode:capture`);
+  } else {
+    console.log(
+      `V8 bytecode artifact verified: ${artifact.id}, ${artifact.cases.length} functions, ${artifact.runtime.version} / ${artifact.runtime.v8Version}`,
+    );
+  }
 }

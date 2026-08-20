@@ -18,9 +18,10 @@ const entries = {
       href: "/en/guide/const-let-var/",
     },
     {
-      title: "Values, objects, and reference-type myths",
-      detail: "Types and V8 representations · 28 min",
-      terms: "primitive value reference type object identity heap stack smi symbol bigint number",
+      title: "Primitive values, Reference Records, and actual storage",
+      detail: "Specification types and V8 storage · 34 min",
+      terms:
+        "primitive value reference record environment resolvebinding object identity heap stack context smi symbol bigint number",
       href: "/en/guide/values-types-memory/",
     },
     {
@@ -57,10 +58,10 @@ const entries = {
       href: "/ru/guide/const-let-var/",
     },
     {
-      title: "Значения, объекты и миф о ссылочных типах",
-      detail: "Типы и представления V8 · 30 минут",
+      title: "Primitive value, Reference Record и реальное хранение",
+      detail: "Типы спецификации и хранение V8 · 36 минут",
       terms:
-        "примитив primitive value ссылочный тип объект идентичность куча heap стек smi symbol bigint number",
+        "primitive value reference record environment resolvebinding ссылочный тип объект идентичность heap stack context smi symbol bigint number",
       href: "/ru/guide/values-types-memory/",
     },
     {

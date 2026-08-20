@@ -1017,11 +1017,11 @@ a {
 .bytecode-table code b {
   color: #f1f0ea;
 }
-.bytecode-table .bytecode-tdz-instruction {
+.bytecode-table .bytecode-highlight-instruction {
   background: #4a2e35;
   box-shadow: inset 3px 0 var(--orange);
 }
-.bytecode-table .bytecode-tdz-instruction code b {
+.bytecode-table .bytecode-highlight-instruction code b {
   color: #ffb181;
 }
 .bytecode-artifact footer {

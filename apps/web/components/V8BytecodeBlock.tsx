@@ -30,6 +30,9 @@ export function V8BytecodeBlock({
   const caseNote = block.cases.find(({ caseId }) => caseId === activeCaseId) ?? block.cases[0]!;
   const bytecodeCase =
     artifact.cases.find(({ id }) => id === caseNote.caseId) ?? artifact.cases[0]!;
+  const highlightedOpcodes = new Set(
+    block.highlightOpcodes ?? ["LdaTheHole", "ThrowReferenceErrorIfHole"],
+  );
   const labels =
     locale === "ru"
       ? {
@@ -103,9 +106,8 @@ export function V8BytecodeBlock({
               <div
                 role="row"
                 className={
-                  instruction.opcode === "LdaTheHole" ||
-                  instruction.opcode === "ThrowReferenceErrorIfHole"
-                    ? "bytecode-tdz-instruction"
+                  highlightedOpcodes.has(instruction.opcode)
+                    ? "bytecode-highlight-instruction"
                     : undefined
                 }
                 key={instruction.offset}

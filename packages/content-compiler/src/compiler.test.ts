@@ -58,6 +58,26 @@ describe("content compiler", () => {
     });
   });
 
+  it("shows that binding location and value representation are separate V8 decisions", () => {
+    const values = loadArticle("en", "values-types-memory");
+    const artifact = values.bytecodeArtifacts["value-binding-storage"];
+    expect(
+      artifact?.cases
+        .find(({ id }) => id === "local-smi")
+        ?.instructions.map(({ opcode }) => opcode),
+    ).toEqual(expect.arrayContaining(["LdaSmi", "Star0"]));
+    expect(
+      artifact?.cases
+        .find(({ id }) => id === "captured-smi")
+        ?.instructions.map(({ opcode }) => opcode),
+    ).toEqual(expect.arrayContaining(["CreateFunctionContext", "StaCurrentContextSlot"]));
+    expect(
+      artifact?.cases
+        .find(({ id }) => id === "captured-symbol")
+        ?.instructions.map(({ opcode }) => opcode),
+    ).toContain("StaCurrentContextSlot");
+  });
+
   it("rejects a translation whose English source fingerprint is stale", () => {
     const en = loadArticle("en", "reference-call-this");
     const ru = loadArticle("ru", "reference-call-this");

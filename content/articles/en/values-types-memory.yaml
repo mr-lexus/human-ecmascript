@@ -1,50 +1,65 @@
 id: values-types-memory
 slug: values-types-memory
 locale: en
-sourceContentHash: ae2e9596b25684cb
-title: "Values, objects, and the myth of reference types"
-eyebrow: "Language types → value semantics → V8 representations"
+sourceContentHash: 7c00036ebf52c50e
+title: "Primitive values, Reference Records, and actual storage"
+eyebrow: "Specification vocabulary → name resolution → V8 storage"
 dek: >-
-  JavaScript has primitive values, but it does not have an ECMAScript language type called
-  “reference”. Learn why object aliasing is not pass-by-reference, why integer is not a JavaScript
-  type, and why stack-versus-heap diagrams cannot explain the language.
+  ECMA-262 defines the exact term primitive value; it does not define a standalone type named
+  Primitive or a language type named reference. Follow an identifier through Environment Records
+  and a Reference Record, then compare that semantic model with V8's Smi and heap representations.
 status: TECH_REVIEW
 sourceSnapshot: ECMA-262-ES2026
-readingMinutes: 28
+readingMinutes: 34
 learningObjectives:
-  - Name the eight ECMAScript language types and distinguish language types from specification types.
-  - Explain assignment and argument passing without inventing a “reference type”.
-  - Predict primitive copying, object aliasing, String immutability, and Symbol identity.
-  - Separate ECMA-262 semantics from V8's Smi, heap-object, and optimized representations.
+  - Read an ECMAScript type as a set of values, not as a C++ storage declaration.
+  - Use the exact term primitive value and distinguish language types from specification types.
+  - Trace an identifier through ResolveBinding, Environment Records, a Reference Record, and GetValue.
+  - Separate V8 binding locations from Smi, heap-object, and optimized value representations.
 prerequisites:
-  - A binding stores a value; the binding and the value are different concepts.
-  - Reference Records are specification-only records used while evaluating expressions.
+  - An identifier, its binding, and the value obtained from that binding are different concepts.
+  - ECMA-262 specifies observable semantics, not a required stack-and-heap layout.
 sections:
   - id: values-mental-model
-    title: "Start with values, not memory boxes"
+    title: "Begin with the vocabulary the specification actually defines"
     mode: human
     blocks:
       - id: values-mental-model-prose
         type: prose
         body: >-
-          ECMA-262 divides values that JavaScript code can manipulate into eight language types:
-          Undefined, Null, Boolean, String, Symbol, Number, BigInt, and Object. Values in the first
-          seven types are primitive values. Object is the remaining language type. That taxonomy
-          describes program behavior; it does not say “stack”, “heap”, “inline”, or “pointer”.
+          ECMA-262 defines a type as a set of data values. The eight ECMAScript language types are
+          Undefined, Null, Boolean, String, Symbol, Number, BigInt, and Object. A primitive value is
+          a member of one of the first seven sets. `primitive value` is the defined term; the standard
+          does not introduce a separate language type named `Primitive`. None of these definitions
+          decides whether an implementation uses a stack slot, a machine register, or a heap object.
       - id: values-core-claims
         type: claims
         claims:
+          - id: claim-type-is-set
+            classification: NORMATIVE
+            text: "ECMA-262 defines a type as a set of data values. A language type therefore classifies values; it is not a declaration of their physical representation."
+            citationIds: [type-definition, language-types]
+            sourceFingerprint: d4667f472567921c
+            confidence: 1
+            reviewStatus: TECH_REVIEW
           - id: claim-language-types
             classification: NORMATIVE
-            text: "The ECMAScript language types are Undefined, Null, Boolean, String, Symbol, Number, BigInt, and Object; values in every language type except Object are primitive values."
+            text: "The ECMAScript language types are Undefined, Null, Boolean, String, Symbol, Number, BigInt, and Object. A primitive value is a member of Undefined, Null, Boolean, Number, BigInt, Symbol, or String."
             citationIds: [language-types, primitive-value-definition]
             sourceFingerprint: 7cad09a970ce4a31
             confidence: 1
             reviewStatus: TECH_REVIEW
+          - id: claim-no-primitive-type
+            classification: DERIVED
+            text: "`primitive value` is an exact specification term. The list of language types contains no standalone type named `Primitive`, so shortening the term to a noun must not be treated as another formal type or as a storage class."
+            citationIds: [primitive-value-definition, language-types]
+            sourceFingerprint: 2736b7f18ed084d3
+            confidence: 1
+            reviewStatus: TECH_REVIEW
           - id: claim-no-reference-language-type
             classification: DERIVED
-            text: "There is no ECMAScript language type named `reference`. A Reference Record belongs to the separate family of specification types and cannot be obtained as a JavaScript value."
-            citationIds: [language-types, reference-record]
+            text: "The language-type list also contains no type named `reference`. A Reference Record is instead a specification type used by algorithms and cannot be stored in an object property or language variable."
+            citationIds: [language-types, specification-types, reference-record]
             sourceFingerprint: 67cb5bfa268d443a
             confidence: 1
             reviewStatus: TECH_REVIEW
@@ -57,80 +72,102 @@ sections:
             reviewStatus: TECH_REVIEW
       - id: values-terminology-note
         type: note
-        tone: insight
-        title: "“Primitive” is shorthand; “primitive value” is the precise term"
+        tone: warning
+        title: "Do not turn primitive value into a memory category"
         body: >-
-          Saying “a primitive” is harmless when it clearly means “a primitive value”. The mistake
-          begins when that word is turned into a memory-layout promise such as “stored on the stack”
-          or paired with a made-up opposite called a “reference type”.
+          The informative note under the definition says a primitive value is represented directly
+          at the lowest level of a language implementation. That is not a normative “lives on the
+          stack” rule. In V8, one Number value may be a Smi while another Number, a String, a Symbol,
+          or a BigInt can be represented by a heap object. The specification category stays the same.
   - id: values-normative-model
-    title: "The specification passes and stores values"
+    title: "What happens when the program evaluates an identifier"
     mode: normative
     blocks:
       - id: values-normative-prose
         type: prose
         body: >-
-          Evaluation may temporarily produce a Reference Record for a name or property. `GetValue`
-          resolves that record to an ECMAScript language value. Assignment then writes the value to
-          another binding or property. When the value is an Object, both places can designate the same
-          Object; ECMA-262 does not need a second language type to express that identity.
+          For `let target = source`, the identifier `source` does not evaluate straight to an address.
+          Its runtime semantics call ResolveBinding. Starting from the running execution context's
+          LexicalEnvironment, GetIdentifierReference asks each Environment Record whether it has the
+          binding. When found, the algorithm creates a Reference Record whose [[Base]] is that
+          Environment Record and whose [[ReferencedName]] is `source`. GetValue then calls the
+          Environment Record's GetBindingValue method and obtains the ECMAScript language value.
       - id: values-operation-map
         type: operations
         operations:
-          - id: op-language-value
-            name: ECMAScript language value
+          - id: op-environment-record-value-topic
+            name: Environment Record
             kind: record
-            summary: "A value characterized by one of the eight language types."
-            citationId: language-types
+            summary: "A specification type that models identifier bindings and lexical nesting."
+            citationId: environment-records
+          - id: op-resolve-binding-value-topic
+            name: ResolveBinding
+            kind: abstract-operation
+            summary: "Starts identifier resolution from the running execution context's LexicalEnvironment."
+            citationId: resolve-binding
+          - id: op-get-identifier-reference-value-topic
+            name: GetIdentifierReference
+            kind: abstract-operation
+            summary: "Walks Environment Records and returns a Reference Record for the matching binding."
+            citationId: get-identifier-reference
           - id: op-reference-record-value-topic
             name: Reference Record
             kind: record
-            summary: "A specification-only record for a resolved name or property binding."
+            summary: "A specification value that identifies a resolved binding or property for later algorithms."
             citationId: reference-record
           - id: op-get-value-value-topic
             name: GetValue
             kind: abstract-operation
-            summary: "Turns a Reference Record into the language value currently stored there."
+            summary: "For an Environment Record base, calls GetBindingValue and returns the language value."
             citationId: reference-record
-          - id: op-function-instantiation-value-topic
-            name: FunctionDeclarationInstantiation
-            kind: runtime-semantics
-            summary: "Creates parameter bindings and initializes them with argument values."
-            citationId: function-instantiation
       - id: values-assignment-trace
         type: trace
         steps:
           - id: trace-evaluate-source
-            label: "1. Evaluate the source expression"
-            operation: Evaluation
-            detail: "An expression such as `source` first produces a Reference Record for that binding."
-            citationId: reference-record
+            label: "1. Evaluate IdentifierReference `source`"
+            operation: IdentifierReference Evaluation
+            detail: "The grammar's runtime semantics return ? ResolveBinding(StringValue of `source`)."
+            citationId: identifier-evaluation
+          - id: trace-resolve-binding
+            label: "2. Choose the starting lexical environment"
+            operation: ResolveBinding
+            detail: "ResolveBinding reads the running execution context's LexicalEnvironment and passes it to GetIdentifierReference."
+            citationId: resolve-binding
+          - id: trace-find-binding
+            label: "3. Walk the Environment Record chain"
+            operation: GetIdentifierReference
+            detail: "HasBinding is checked on the current Environment Record; if it fails, [[OuterEnv]] is followed. A match creates the Reference Record."
+            citationId: get-identifier-reference
           - id: trace-get-source-value
-            label: "2. Read its value"
+            label: "4. Obtain the language value"
             operation: GetValue
-            detail: "GetValue obtains the Number, String, Symbol, BigInt, Object, or other language value held by the source binding."
+            detail: "Because [[Base]] is an Environment Record, GetValue invokes GetBindingValue with [[ReferencedName]] and [[Strict]]."
             citationId: reference-record
           - id: trace-evaluate-target
-            label: "3. Resolve the destination"
+            label: "5. Initialize or assign the destination"
             operation: Assignment evaluation
-            detail: "The left side produces the Reference Record that identifies the destination binding or property."
+            detail: "The destination's algorithm receives that language value. ECMA-262 says nothing here about copying bytes, pointers, stacks, or heaps."
             citationId: assignment-operators
-          - id: trace-put-value
-            label: "4. Store that value"
-            operation: PutValue
-            detail: "Assignment stores the obtained language value. It does not switch between a copy operation and a pass-by-reference operation based on its type."
-            citationId: assignment-operators
-          - id: trace-observe-identity
-            label: "5. Object identity may now be shared"
-            operation: Object value
-            detail: "If the stored value designates an Object already stored elsewhere, both access paths reach that same Object. Reassigning either binding still changes only that binding."
-            citationId: object-type
       - id: values-normative-claims
         type: claims
         claims:
-          - id: claim-assignment-copies-value
+          - id: claim-reference-spec-artifact
+            classification: NORMATIVE
+            text: "Reference Record and Environment Record values are specification artefacts. Specification types do not necessarily correspond to implementation entities and cannot be stored in object properties or language variables."
+            citationIds: [specification-types, reference-record, environment-records]
+            sourceFingerprint: 0138fa96dbbfbb06
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-reference-not-pointer
             classification: DERIVED
-            text: "Assignment obtains an ECMAScript language value from the right-hand expression and stores that value at the left-hand reference. The algorithms do not define separate “copy by value” and “copy by reference” modes."
+            text: "A Reference Record is not a user-visible pointer or heap address. It is the specification's record-shaped input to algorithms such as GetValue, PutValue, and call evaluation."
+            citationIds: [specification-types, reference-record]
+            sourceFingerprint: 9b2abc96f6215bb2
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-assignment-transfers-value
+            classification: DERIVED
+            text: "Assignment obtains the right-hand ECMAScript language value and passes it to PutValue for the left-hand Reference Record. The algorithm defines no separate source-language modes called “copy by value” and “copy by reference”."
             citationIds: [assignment-operators, reference-record]
             sourceFingerprint: 07a6eab892028701
             confidence: 0.99
@@ -150,22 +187,22 @@ sections:
             confidence: 1
             reviewStatus: TECH_REVIEW
   - id: values-observable-behavior
-    title: "Aliasing is observable; pointers are not"
+    title: "What JavaScript can observe"
     mode: observable
     blocks:
       - id: values-observable-prose
         type: prose
         body: >-
-          You can observe whether two expressions produce the same Object, and you can mutate that
-          Object through either access path. You cannot observe an address, ask whether a value is on
-          a stack, or detect whether two equal strings share storage. Phrase the rule in terms of
-          values and identity, because those are the guarantees your program actually receives.
+          JavaScript can observe whether two expressions produce the same Object or the same Symbol,
+          and it can observe mutation of an Object through another binding. It cannot ask for an
+          address, query whether a binding uses a stack or heap slot, or detect whether two equal
+          strings share backing storage. Those are implementation decisions, not language types.
       - id: values-observable-claims
         type: claims
         claims:
-          - id: claim-primitive-reassignment-independent
+          - id: claim-value-rebinding-independent
             classification: OBSERVABLE
-            text: "After `let b = a`, assigning a new primitive value to `b` does not change `a`. Primitive values themselves have no mutable properties that could reveal shared identity."
+            text: "After `let b = a`, assigning a different Number or String value to `b` does not change the value obtained from `a`. This says nothing about the physical storage used for either binding."
             citationIds: [language-types, assignment-operators]
             sourceFingerprint: edc13cd582940a08
             confidence: 1
@@ -186,7 +223,7 @@ sections:
             reviewStatus: TECH_REVIEW
           - id: claim-symbol-identity
             classification: NORMATIVE
-            text: "Each call to `Symbol(description)` returns a unique Symbol value. The description is not its identity, and Symbol remains a primitive language type."
+            text: "Each call to `Symbol(description)` returns a unique Symbol value. Symbol is one of the language types, and every Symbol value is a primitive value; the description is not its identity."
             citationIds: [symbol-type, symbol-constructor]
             sourceFingerprint: 241183623c85395f
             confidence: 1
@@ -194,23 +231,24 @@ sections:
       - id: values-observable-note
         type: note
         tone: warning
-        title: "Do not teach “objects are copied by reference”"
+        title: "Object aliasing does not create a reference type"
         body: >-
-          That phrase predicts the common mutation example, but it predicts parameter replacement
-          badly and suggests that a reference is a user-visible value. Say “the same Object value is
-          stored in both bindings” and the mutation/reassignment distinction becomes straightforward.
+          Two bindings can yield the same Object value. Mutating that Object is then visible through
+          either path; rebinding one name does not redirect the other. This observable rule needs no
+          C++ reference, no exposed pointer, and no additional ECMAScript language type.
   - id: values-v8-representation
-    title: "One primitive is immediate; another is a heap object"
+    title: "V8 storage: value representation and binding location are separate"
     mode: v8
     blocks:
       - id: values-v8-prose
         type: prose
         body: >-
-          V8 represents general JavaScript values with several internal forms. In the pinned x64
-          build, `42` fits V8's Smi representation and its integer payload lives directly in a tagged
-          slot. The captured decimal Number, String, Symbol, and BigInt are represented by tagged
-          pointers to heap objects. These choices can change across builds and optimization tiers
-          without changing the program's ECMAScript type.
+          In the pinned x64 V8 build, `42` fits the Smi tagged-immediate representation: V8 allocates
+          no separate HeapNumber for that value. But “where `42` lives” is a different question. In
+          Ignition, an uncaptured local can occupy a frame register; if a closure captures the binding,
+          V8 creates a Context and writes the same Smi into a Context slot on the heap. A Symbol in
+          that slot is instead a tagged pointer to a Symbol heap object. The declaration syntax alone
+          therefore does not determine a permanent storage location.
       - id: values-v8-claims
         type: claims
         claims:
@@ -221,16 +259,30 @@ sections:
             sourceFingerprint: bbf2378a03431130
             confidence: 1
             reviewStatus: TECH_REVIEW
+          - id: claim-v8-binding-storage
+            classification: V8_IMPLEMENTATION
+            text: "The pinned Ignition capture uses a frame register for the uncaptured local Smi, but CreateFunctionContext and StaCurrentContextSlot for captured bindings. A captured Smi has no separate number object even though its tagged bits reside in a heap Context slot."
+            citationIds: [v8-ignition-frame, v8-pointer-compression]
+            sourceFingerprint: 5d92dfbba4cd5039
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-v8-string-internalization
+            classification: V8_IMPLEMENTATION
+            text: "Two bindings can contain a String value whose V8 slots point to the same internalized String object. That storage sharing is a V8 optimization; it is neither observable string identity nor pass-by-reference semantics in ECMAScript."
+            citationIds: [string-type, v8-strings]
+            sourceFingerprint: dc8bed6765990f12
+            confidence: 1
+            reviewStatus: TECH_REVIEW
           - id: claim-v8-symbol-heap
             classification: V8_IMPLEMENTATION
-            text: 'The same capture reports `Symbol("guide")` as a heap object with `SYMBOL_TYPE`. V8''s source declares Symbol as a Name, and Name extends PrimitiveHeapObject.'
+            text: 'The capture reports `Symbol("guide")` as a heap object with `SYMBOL_TYPE`. V8''s source declares Symbol as a Name, and Name extends PrimitiveHeapObject; a binding slot holds a tagged pointer to that object.'
             citationIds: [v8-symbol-source]
             sourceFingerprint: b10627869679eaf3
             confidence: 1
             reviewStatus: TECH_REVIEW
           - id: claim-layout-not-language-type
             classification: DERIVED
-            text: "Therefore “primitive = inline or stack” and “Object = heap reference” cannot be the ECMAScript type model: two primitive values already use different V8 representations."
+            text: "Therefore primitive value cannot mean “inline or stack”: a Symbol value is a primitive value yet is a V8 heap object, while a captured Smi can be stored inside a heap Context without becoming a separate heap object."
             citationIds: [language-types, v8-pointer-compression, v8-symbol-source]
             sourceFingerprint: ae193b5b1c8c74c4
             confidence: 1
@@ -242,16 +294,35 @@ sections:
             sourceFingerprint: f09b508effec5328
             confidence: 0.99
             reviewStatus: TECH_REVIEW
+      - id: values-v8-binding-bytecode
+        type: bytecode
+        artifactId: value-binding-storage
+        title: "The binding decides the slot; the value decides what the slot contains"
+        body: "Captured from the pinned Linux V8. Highlighted instructions show the local register path or creation and writing of a closure Context."
+        highlightOpcodes: [LdaSmi, Star0, CreateFunctionContext, StaCurrentContextSlot]
+        cases:
+          - id: binding-bytecode-local-smi
+            caseId: local-smi
+            title: "Uncaptured Smi local"
+            explanation: "`LdaSmi [42]` loads the immediate tagged value and `Star0` writes it to Ignition register `r0`. This virtual register is a frame slot, not necessarily a CPU register and not a property attached to the source identifier."
+          - id: binding-bytecode-captured-smi
+            caseId: captured-smi
+            title: "Captured Smi binding"
+            explanation: "`CreateFunctionContext` allocates the closure Context; `StaCurrentContextSlot [2]` writes the tagged Smi into its slot. The slot is in a heap object, but `42` still needs no separate HeapNumber."
+          - id: binding-bytecode-captured-symbol
+            caseId: captured-symbol
+            title: "Captured Symbol binding"
+            explanation: "The captured binding again uses a Context slot. After the `Symbol` call, that slot receives a tagged pointer to the separately allocated Symbol heap object."
       - id: values-v8-artifact
         type: representation
         artifactId: value-representations
-        title: "The same spec category, different V8 storage"
+        title: "One specification category, several V8 representations"
         body: "Each tab is reproduced with `%IsSmi` and `%DebugPrint` from the pinned Linux binary. Addresses and unstable object hashes are deliberately removed."
         cases:
           - id: representation-smi
             caseId: smi
             title: "Small integer Number"
-            explanation: "`42` is a Number primitive value in ECMA-262 and a tagged-immediate `Smi` in this V8 build. Smi is an implementation representation, not a ninth JavaScript type."
+            explanation: "`42` is a Number value and therefore a primitive value in ECMA-262. In this V8 build it is a tagged-immediate `Smi`; Smi is an implementation representation, not a ninth language type."
           - id: representation-heap-number
             caseId: heap-number
             title: "Decimal Number"
@@ -259,11 +330,11 @@ sections:
           - id: representation-string
             caseId: string
             title: "String value"
-            explanation: "The literal is an immutable String value by the standard. Here V8 has internalized it as a heap object; storage sharing does not make the String mutable or reference-typed."
+            explanation: "The literal is an immutable String value by the standard. In the supplied d8 experiment, `str1` and `str2` printed the same INTERNALIZED_ONE_BYTE_STRING_TYPE address; the pinned capture also sees an internalized heap String. This is V8 storage reuse, not pass-by-reference or an ECMA-262 guarantee."
           - id: representation-symbol
             caseId: symbol
             title: "Unique Symbol value"
-            explanation: "Symbol is a primitive language type, while V8 represents this Symbol as a `SYMBOL_TYPE` heap object. This is the cleanest counterexample to the stack/heap folklore."
+            explanation: "This Symbol is a primitive value by ECMA-262, while V8 represents it as a `SYMBOL_TYPE` heap object. Specification category and engine representation answer different questions."
           - id: representation-bigint
             caseId: bigint
             title: "BigInt value"
@@ -273,11 +344,19 @@ sections:
         tone: implementation
         title: "Performance rule: stabilize hot data, then measure"
         body: >-
-          Do not choose APIs based on “primitive versus reference” folklore. In genuinely hot numeric
-          code, stable representations and dense TypedArrays can matter; V8 can also unbox values or
-          eliminate allocations. Use representative benchmarks and profiling, because the optimizer,
-          surrounding operations, and engine version decide more than the source-level type label.
+          Smi is often cheap, but replacing `const` or `let` with `var` does not force values onto the
+          stack and cannot promise a faster representation. Capture, escape analysis, feedback, and
+          the optimizing tier matter. For hot numeric code, stabilize shapes and representations,
+          benchmark the real workload, and inspect the active V8 version instead of optimizing from
+          a “primitive versus reference” diagram.
 citations:
+  - id: type-definition
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-terms-and-definitions-type
+    label: "ECMA-262 §4.4.4 — type"
+    url: https://tc39.es/ecma262/2026/multipage/overview.html#sec-terms-and-definitions-type
+    relevance: "Defines a type as a set of data values as defined in clause 6."
+    evidenceHash: 7ec172d84550b45a
   - id: language-types
     snapshot: ECMA-262-ES2026
     nodeId: sec-ecmascript-language-types
@@ -290,8 +369,15 @@ citations:
     nodeId: sec-terms-and-definitions-primitive-value
     label: "ECMA-262 §4.4.5 — primitive value"
     url: https://tc39.es/ecma262/2026/multipage/overview.html#sec-terms-and-definitions-primitive-value
-    relevance: "Defines primitive value as a member of a non-Object language type."
+    relevance: "Defines primitive value as a member of Undefined, Null, Boolean, Number, BigInt, Symbol, or String."
     evidenceHash: ccf45a86557c9d66
+  - id: specification-types
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-ecmascript-specification-types
+    label: "ECMA-262 §6.2 — ECMAScript Specification Types"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-ecmascript-specification-types
+    relevance: "States that specification-type values are specification artefacts, need not map to implementation entities, and cannot be stored by ECMAScript programs."
+    evidenceHash: 038266656dbeed7b
   - id: object-type
     snapshot: ECMA-262-ES2026
     nodeId: sec-object-type
@@ -306,6 +392,34 @@ citations:
     url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-reference-record-specification-type
     relevance: "Places Reference Records among specification types and defines GetValue and PutValue."
     evidenceHash: 38d79e0ad4f58a73
+  - id: environment-records
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-environment-records
+    label: "ECMA-262 §9.1 — Environment Records"
+    url: https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-environment-records
+    relevance: "Defines the specification type that models identifier bindings and lexical nesting."
+    evidenceHash: 38847cef5dbe548e
+  - id: identifier-evaluation
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-identifiers-runtime-semantics-evaluation
+    label: "ECMA-262 — IdentifierReference runtime semantics"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-identifiers-runtime-semantics-evaluation
+    relevance: "Shows that evaluating an identifier returns ResolveBinding of its StringValue."
+    evidenceHash: 0cc89bb1b66a27c3
+  - id: resolve-binding
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-resolvebinding
+    label: "ECMA-262 — ResolveBinding"
+    url: https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-resolvebinding
+    relevance: "Starts resolution from the running execution context's LexicalEnvironment."
+    evidenceHash: 81dfb42f9afe689c
+  - id: get-identifier-reference
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-getidentifierreference
+    label: "ECMA-262 — GetIdentifierReference"
+    url: https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-getidentifierreference
+    relevance: "Walks Environment Records and creates the Reference Record for a resolved binding."
+    evidenceHash: 87e3a2d4199b2cc8
   - id: assignment-operators
     snapshot: ECMA-262-ES2026
     nodeId: sec-assignment-operators-runtime-semantics-evaluation
@@ -369,6 +483,20 @@ citations:
     url: https://chromium.googlesource.com/v8/v8/+/241f63a62a3518ad4110e78e4f61815623c6e95d/src/objects/smi.h
     relevance: "Defines V8's internal Smi small-integer representation."
     evidenceHash: 2f7ef3b1b435f380
+  - id: v8-strings
+    snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
+    nodeId: docs-objects-strings
+    label: "Pinned V8 documentation — Strings in V8"
+    url: https://chromium.googlesource.com/v8/v8/+/241f63a62a3518ad4110e78e4f61815623c6e95d/docs/objects/strings.md
+    relevance: "Documents V8's string representations, internalization, and String Table reuse."
+    evidenceHash: d93f5feff1d87763
+  - id: v8-ignition-frame
+    snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
+    nodeId: v8-ignition-frame-registers
+    label: "V8 — Ignition frame registers and LdaSmi"
+    url: https://v8.dev/blog/adaptor-frame
+    relevance: "Describes Ignition frame registers for function locals and shows LdaSmi and Star bytecode."
+    evidenceHash: 8603bd1dfe459ec4
   - id: v8-symbol-source
     snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
     nodeId: src-objects-name-tq
@@ -385,12 +513,12 @@ citations:
     evidenceHash: d6f22747e76d2a0c
 examples:
   - id: primitive-value-copy
-    title: "Independent primitive bindings"
-    goal: "Observe that rebinding a copied Number or String does not change the first binding."
+    title: "Rebinding Number and String values"
+    goal: "Observe that rebinding a Number or String does not change the value obtained from the first binding."
     sourcePath: examples/primitive-value-copy.js
     timeoutMs: 1200
     expectedOutput: ["7 7", "7 9", "hello hello", "hello goodbye"]
-    claimIds: [claim-primitive-reassignment-independent, claim-assignment-copies-value]
+    claimIds: [claim-value-rebinding-independent, claim-assignment-transfers-value]
     citationIds: [language-types, assignment-operators]
   - id: object-value-alias
     title: "Mutation versus rebinding"
@@ -398,7 +526,7 @@ examples:
     sourcePath: examples/object-value-alias.js
     timeoutMs: 1200
     expectedOutput: ["2", "2 3"]
-    claimIds: [claim-object-aliasing, claim-assignment-copies-value]
+    claimIds: [claim-object-aliasing, claim-assignment-transfers-value]
     citationIds: [object-type, assignment-operators]
   - id: argument-passing-values
     title: "An argument does not pass a variable by reference"
@@ -432,6 +560,14 @@ examples:
     expectedOutput: ["TypeError", "cat"]
     claimIds: [claim-strings-immutable]
     citationIds: [string-type]
+  - id: value-binding-bytecode
+    title: "Local and captured binding storage in V8"
+    goal: "Compare an uncaptured local Smi with captured Smi and Symbol bindings."
+    sourcePath: examples/value-binding-bytecode.js
+    timeoutMs: 1200
+    expectedOutput: ["42", "42", "symbol"]
+    claimIds: [claim-v8-smi, claim-v8-binding-storage, claim-v8-symbol-heap]
+    citationIds: [v8-pointer-compression, v8-ignition-frame, v8-symbol-source]
 engineResults:
   - {
       exampleId: primitive-value-copy,
@@ -487,6 +623,15 @@ engineResults:
       output: ["TypeError", "cat"],
       capturedAt: "2026-08-20",
     }
+  - {
+      exampleId: value-binding-bytecode,
+      engine: V8,
+      version: "Node.js 24.18.1 / V8 13.6.233.17-node.50",
+      binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a,
+      status: verified,
+      output: ["42", "42", "symbol"],
+      capturedAt: "2026-08-20",
+    }
 graph:
   nodes:
     - {
@@ -503,6 +648,24 @@ graph:
       }
     - { id: object-value, label: "Object value", kind: type, citationId: object-type }
     - {
+        id: environment-record-value-map,
+        label: "Environment Record",
+        kind: record,
+        citationId: environment-records,
+      }
+    - {
+        id: resolve-binding-map,
+        label: "ResolveBinding",
+        kind: operation,
+        citationId: resolve-binding,
+      }
+    - {
+        id: get-identifier-reference-map,
+        label: "GetIdentifierReference",
+        kind: operation,
+        citationId: get-identifier-reference,
+      }
+    - {
         id: reference-record-value-map,
         label: "Reference Record",
         kind: record,
@@ -517,12 +680,45 @@ graph:
       }
     - { id: v8-smi, label: "Smi", kind: representation, citationId: v8-smi-source }
     - {
+        id: v8-frame-register,
+        label: "Ignition frame register",
+        kind: representation,
+        citationId: v8-ignition-frame,
+      }
+    - {
+        id: v8-context-slot,
+        label: "V8 Context slot",
+        kind: representation,
+        citationId: v8-ignition-frame,
+      }
+    - {
         id: v8-heap-object,
         label: "Heap object",
         kind: representation,
         citationId: v8-symbol-source,
       }
   edges:
+    - {
+        id: value-edge-0a,
+        source: resolve-binding-map,
+        target: get-identifier-reference-map,
+        kind: calls,
+        weight: 3,
+      }
+    - {
+        id: value-edge-0b,
+        source: get-identifier-reference-map,
+        target: environment-record-value-map,
+        kind: uses,
+        weight: 3,
+      }
+    - {
+        id: value-edge-0c,
+        source: get-identifier-reference-map,
+        target: reference-record-value-map,
+        kind: produces,
+        weight: 3,
+      }
     - {
         id: value-edge-1,
         source: language-value,
@@ -546,6 +742,14 @@ graph:
       }
     - { id: value-edge-4, source: get-value-map, target: language-value, kind: produces, weight: 3 }
     - { id: value-edge-5, source: v8-tagged-value, target: v8-smi, kind: implements, weight: 2 }
+    - {
+        id: value-edge-5a,
+        source: v8-frame-register,
+        target: v8-tagged-value,
+        kind: uses,
+        weight: 2,
+      }
+    - { id: value-edge-5b, source: v8-context-slot, target: v8-tagged-value, kind: uses, weight: 2 }
     - {
         id: value-edge-6,
         source: v8-tagged-value,

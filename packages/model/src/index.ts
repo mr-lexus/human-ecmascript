@@ -89,6 +89,7 @@ export const contentBlockSchema = z.discriminatedUnion("type", [
     artifactId: z.string().regex(/^[a-z0-9-]+$/),
     title: z.string().min(1),
     body: z.string().min(1),
+    highlightOpcodes: z.array(z.string().min(1)).optional(),
     cases: z
       .array(
         z.object({

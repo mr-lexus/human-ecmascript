@@ -2,50 +2,65 @@ id: values-types-memory-ru
 slug: values-types-memory
 locale: ru
 translationOf: values-types-memory
-sourceContentHash: ae2e9596b25684cb
-title: "Значения, объекты и миф о ссылочных типах"
-eyebrow: "Типы языка → поведение значений → представление в V8"
+sourceContentHash: 7c00036ebf52c50e
+title: "Primitive value, Reference Record и реальное хранение"
+eyebrow: "Термины спецификации → поиск имени → устройство V8"
 dek: >-
-  Примитивные значения в JavaScript действительно есть. А вот отдельного «ссылочного типа»
-  в списке типов языка нет. Разберёмся, почему общий объект — это не передача переменной по
-  ссылке, почему integer не является типом JavaScript и чем плохи схемы «стек против кучи».
+  ECMA-262 определяет точный термин primitive value, но не отдельный тип Primitive и не тип языка
+  reference. Проследим, как имя проходит через Environment Record и Reference Record, а затем
+  отделим эту смысловую модель от Smi, heap-объектов и слотов V8.
 status: LOCALE_REVIEW
 sourceSnapshot: ECMA-262-ES2026
-readingMinutes: 30
+readingMinutes: 36
 learningObjectives:
-  - Назвать восемь типов языка ECMAScript и не путать их со служебными типами спецификации.
-  - Объяснить присваивание и передачу аргументов без выдуманного «ссылочного типа».
-  - Предсказать копирование примитивных значений, общий объект, неизменяемость строк и уникальность Symbol.
-  - Отделить правила ECMA-262 от Smi, heap-объектов и оптимизированных представлений V8.
+  - Читать тип ECMAScript как множество значений, а не как C++-описание памяти.
+  - Пользоваться точным термином primitive value и отличать типы языка от служебных типов спецификации.
+  - Проследить имя через ResolveBinding, Environment Records, Reference Record и GetValue.
+  - Не смешивать место binding в V8 с представлением Smi, heap-объекта или оптимизированного значения.
 prerequisites:
-  - Переменная хранит значение; сама переменная и хранимое значение — разные вещи.
-  - Reference Record — служебная запись спецификации, которая появляется при вычислении выражений.
+  - Идентификатор, его binding и полученное из binding значение — разные вещи.
+  - ECMA-262 задаёт наблюдаемое поведение, а не обязательную раскладку по stack и heap.
 sections:
   - id: values-mental-model
-    title: "Сначала разберитесь со значениями — память подождёт"
+    title: "Начнём с терминов, которые действительно есть в спецификации"
     mode: human
     blocks:
       - id: values-mental-model-prose
         type: prose
         body: >-
-          ECMA-262 делит доступные JavaScript-коду значения на восемь типов: Undefined, Null,
-          Boolean, String, Symbol, Number, BigInt и Object. Значения первых семи типов называются
-          примитивными. Object стоит отдельно. Это классификация поведения программы, а не схема
-          памяти: в ней ничего не сказано про стек, кучу, указатели или хранение «прямо на месте».
+          В ECMA-262 тип — это множество значений. Типов языка восемь: Undefined, Null, Boolean,
+          String, Symbol, Number, BigInt и Object. Primitive value — значение, которое входит в одно
+          из первых семи множеств. Именно primitive value является термином стандарта; отдельного типа
+          `Primitive` в списке нет. Из этого определения нельзя узнать, попадёт значение в stack,
+          машинный регистр или heap-объект: стандарт здесь отвечает на другой вопрос.
       - id: values-core-claims
         type: claims
         claims:
+          - id: claim-type-is-set
+            classification: NORMATIVE
+            text: "ECMA-262 определяет тип как множество значений. Тип языка классифицирует значения, но не задаёт их физическое представление."
+            citationIds: [type-definition, language-types]
+            sourceFingerprint: d4667f472567921c
+            confidence: 1
+            reviewStatus: LOCALE_REVIEW
           - id: claim-language-types
             classification: NORMATIVE
-            text: "Типы языка ECMAScript — Undefined, Null, Boolean, String, Symbol, Number, BigInt и Object. Значения всех типов, кроме Object, называются примитивными значениями."
+            text: "Типы языка ECMAScript: Undefined, Null, Boolean, String, Symbol, Number, BigInt и Object. Primitive value — член множества Undefined, Null, Boolean, Number, BigInt, Symbol или String."
             citationIds: [language-types, primitive-value-definition]
             sourceFingerprint: 7cad09a970ce4a31
             confidence: 1
             reviewStatus: LOCALE_REVIEW
+          - id: claim-no-primitive-type
+            classification: DERIVED
+            text: "`primitive value` — точный термин спецификации. Отдельного типа `Primitive` в списке типов языка нет, поэтому слово «примитив» нельзя превращать в формальный тип или класс хранения."
+            citationIds: [primitive-value-definition, language-types]
+            sourceFingerprint: 2736b7f18ed084d3
+            confidence: 1
+            reviewStatus: LOCALE_REVIEW
           - id: claim-no-reference-language-type
             classification: DERIVED
-            text: "Типа языка с названием `reference` в этом списке нет. Reference Record относится к служебным типам спецификации; получить такую запись как значение в JavaScript-коде нельзя."
-            citationIds: [language-types, reference-record]
+            text: "Типа языка `reference` в списке тоже нет. Reference Record — служебный тип спецификации; его нельзя положить в свойство объекта или переменную JavaScript."
+            citationIds: [language-types, specification-types, reference-record]
             sourceFingerprint: 67cb5bfa268d443a
             confidence: 1
             reviewStatus: LOCALE_REVIEW
@@ -58,80 +73,102 @@ sections:
             reviewStatus: LOCALE_REVIEW
       - id: values-terminology-note
         type: note
-        tone: insight
-        title: "«Примитив» — разговорное сокращение"
+        tone: warning
+        title: "Primitive value — не категория памяти"
         body: >-
-          Если под «примитивом» имеют в виду primitive value, ничего страшного. Ошибка начинается,
-          когда этому слову приписывают устройство памяти: «лежит в стеке», «не имеет адреса» —
-          и для симметрии придумывают «ссылочный тип».
+          В информативном примечании к определению сказано, что primitive value представляется
+          напрямую на нижнем уровне реализации. Это не нормативное правило «всегда лежит в stack».
+          В V8 один Number может быть Smi, другой Number — HeapNumber, а String, Symbol и BigInt могут
+          быть heap-объектами. Категория спецификации при этом не меняется.
   - id: values-normative-model
-    title: "Спецификация читает и записывает значения"
+    title: "Что происходит, когда программа вычисляет имя"
     mode: normative
     blocks:
       - id: values-normative-prose
         type: prose
         body: >-
-          Во время вычисления имени или свойства спецификация временно использует Reference Record.
-          Операция `GetValue` получает из этой записи обычное значение языка. Затем присваивание
-          записывает значение в другую переменную или свойство. Если это значение Object, оба места
-          могут вести к одному и тому же объекту. Придумывать для этого ещё один тип языка не нужно.
+          Возьмём `let target = source`. Идентификатор `source` не превращается прямо в адрес.
+          Его runtime semantics вызывают ResolveBinding. Операция берёт LexicalEnvironment текущего
+          execution context, а GetIdentifierReference спрашивает у Environment Records, где объявлен
+          binding. При успехе создаётся Reference Record: в [[Base]] попадает найденный Environment
+          Record, в [[ReferencedName]] — строка `source`. Затем GetValue вызывает GetBindingValue и
+          получает уже значение языка ECMAScript.
       - id: values-operation-map
         type: operations
         operations:
-          - id: op-language-value
-            name: ECMAScript language value
+          - id: op-environment-record-value-topic
+            name: Environment Record
             kind: record
-            summary: "Значение, принадлежащее одному из восьми типов языка."
-            citationId: language-types
+            summary: "Служебный тип, которым спецификация моделирует bindings имён и лексическую вложенность."
+            citationId: environment-records
+          - id: op-resolve-binding-value-topic
+            name: ResolveBinding
+            kind: abstract-operation
+            summary: "Начинает поиск имени с LexicalEnvironment текущего execution context."
+            citationId: resolve-binding
+          - id: op-get-identifier-reference-value-topic
+            name: GetIdentifierReference
+            kind: abstract-operation
+            summary: "Идёт по цепочке Environment Records и возвращает Reference Record найденного binding."
+            citationId: get-identifier-reference
           - id: op-reference-record-value-topic
             name: Reference Record
             kind: record
-            summary: "Служебная запись для найденной переменной или свойства."
+            summary: "Служебное значение, которое описывает найденный binding или свойство для следующих алгоритмов."
             citationId: reference-record
           - id: op-get-value-value-topic
             name: GetValue
             kind: abstract-operation
-            summary: "Получает из Reference Record значение, которое сейчас хранится в найденном месте."
+            summary: "Если [[Base]] — Environment Record, вызывает GetBindingValue и возвращает значение языка."
             citationId: reference-record
-          - id: op-function-instantiation-value-topic
-            name: FunctionDeclarationInstantiation
-            kind: runtime-semantics
-            summary: "Создаёт параметры функции и инициализирует их значениями аргументов."
-            citationId: function-instantiation
       - id: values-assignment-trace
         type: trace
         steps:
           - id: trace-evaluate-source
-            label: "1. Вычислить правое выражение"
-            operation: Evaluation
-            detail: "Выражение вроде `source` сначала даёт Reference Record для найденной переменной."
-            citationId: reference-record
+            label: "1. Вычислить IdentifierReference `source`"
+            operation: IdentifierReference Evaluation
+            detail: "Runtime semantics грамматики возвращают ? ResolveBinding(StringValue имени `source`)."
+            citationId: identifier-evaluation
+          - id: trace-resolve-binding
+            label: "2. Выбрать начальное лексическое окружение"
+            operation: ResolveBinding
+            detail: "ResolveBinding берёт LexicalEnvironment работающего execution context и передаёт его в GetIdentifierReference."
+            citationId: resolve-binding
+          - id: trace-find-binding
+            label: "3. Пройти по цепочке Environment Records"
+            operation: GetIdentifierReference
+            detail: "На текущем Environment Record вызывается HasBinding. Если имени нет, поиск идёт в [[OuterEnv]]; при успехе создаётся Reference Record."
+            citationId: get-identifier-reference
           - id: trace-get-source-value
-            label: "2. Прочитать значение"
+            label: "4. Получить значение языка"
             operation: GetValue
-            detail: "GetValue получает хранимое значение: Number, String, Symbol, BigInt, Object или значение другого типа языка."
+            detail: "Поскольку [[Base]] — Environment Record, GetValue вызывает GetBindingValue с [[ReferencedName]] и [[Strict]]."
             citationId: reference-record
           - id: trace-evaluate-target
-            label: "3. Найти место назначения"
+            label: "5. Инициализировать или присвоить destination"
             operation: Assignment evaluation
-            detail: "Левая часть даёт Reference Record переменной или свойства, куда пойдёт результат."
+            detail: "Алгоритм назначения получает значение языка. Про копирование байтов, указатели, stack или heap ECMA-262 на этом шаге ничего не говорит."
             citationId: assignment-operators
-          - id: trace-put-value
-            label: "4. Записать полученное значение"
-            operation: PutValue
-            detail: "Присваивание записывает значение. Спецификация не переключается между режимами «копировать значение» и «передать ссылку» в зависимости от его типа."
-            citationId: assignment-operators
-          - id: trace-observe-identity
-            label: "5. У объекта может быть два пути доступа"
-            operation: Object value
-            detail: "Если такое же значение Object уже хранится в другом месте, оба пути приводят к одному объекту. Но новое присваивание одной переменной по-прежнему меняет только её."
-            citationId: object-type
       - id: values-normative-claims
         type: claims
         claims:
-          - id: claim-assignment-copies-value
+          - id: claim-reference-spec-artifact
+            classification: NORMATIVE
+            text: "Reference Record и Environment Record — служебные артефакты спецификации. Они не обязаны соответствовать отдельным сущностям реализации, и JavaScript-код не может хранить их в переменных или свойствах."
+            citationIds: [specification-types, reference-record, environment-records]
+            sourceFingerprint: 0138fa96dbbfbb06
+            confidence: 1
+            reviewStatus: LOCALE_REVIEW
+          - id: claim-reference-not-pointer
             classification: DERIVED
-            text: "Присваивание получает значение языка из правого выражения и записывает его по Reference из левой части. В этих алгоритмах нет двух режимов — «по значению» для одних типов и «по ссылке» для других."
+            text: "Reference Record — не доступный программе указатель и не адрес в heap. Это запись спецификации, которую используют GetValue, PutValue и алгоритмы вызова."
+            citationIds: [specification-types, reference-record]
+            sourceFingerprint: 9b2abc96f6215bb2
+            confidence: 1
+            reviewStatus: LOCALE_REVIEW
+          - id: claim-assignment-transfers-value
+            classification: DERIVED
+            text: "Присваивание получает значение языка из правого выражения и передаёт его в PutValue для Reference Record левой части. Отдельных режимов языка «копировать по значению» и «копировать по ссылке» алгоритм не задаёт."
             citationIds: [assignment-operators, reference-record]
             sourceFingerprint: 07a6eab892028701
             confidence: 0.99
@@ -151,22 +188,22 @@ sections:
             confidence: 1
             reviewStatus: LOCALE_REVIEW
   - id: values-observable-behavior
-    title: "Общий объект виден, указатель — нет"
+    title: "Что действительно наблюдается из JavaScript"
     mode: observable
     blocks:
       - id: values-observable-prose
         type: prose
         body: >-
-          Код может проверить, получили ли два выражения один объект, и изменить этот объект через
-          любой путь доступа. Но обычный JavaScript не умеет запросить адрес значения, узнать, лежит
-          ли оно в стеке, или проверить, разделяют ли две одинаковые строки одну область памяти.
-          Поэтому надёжная модель строится на значениях и идентичности, а не на воображаемых адресах.
+          JavaScript позволяет проверить, дали ли два выражения один Object или один Symbol, и увидеть
+          изменение Object через другой binding. Но нельзя получить адрес, спросить, где находится
+          слот binding, или узнать, разделяют ли равные строки внутреннее хранилище. Это решения
+          реализации, а не типы языка.
       - id: values-observable-claims
         type: claims
         claims:
-          - id: claim-primitive-reassignment-independent
+          - id: claim-value-rebinding-independent
             classification: OBSERVABLE
-            text: "После `let b = a` присваивание нового примитивного значения в `b` не меняет `a`. У примитивного значения нет изменяемых свойств, через которые можно было бы заметить общую идентичность."
+            text: "После `let b = a` присваивание другого Number или String в `b` не меняет значение, получаемое из `a`. Это наблюдение ничего не говорит о физическом хранении bindings."
             citationIds: [language-types, assignment-operators]
             sourceFingerprint: edc13cd582940a08
             confidence: 1
@@ -187,7 +224,7 @@ sections:
             reviewStatus: LOCALE_REVIEW
           - id: claim-symbol-identity
             classification: NORMATIVE
-            text: "Каждый вызов `Symbol(description)` возвращает новое уникальное значение Symbol. Одинаковое описание не делает символы равными. При этом Symbol остаётся примитивным типом языка."
+            text: "Каждый вызов `Symbol(description)` возвращает уникальное значение Symbol. Symbol — один из типов языка, каждое его значение является primitive value, а описание не задаёт идентичность."
             citationIds: [symbol-type, symbol-constructor]
             sourceFingerprint: 241183623c85395f
             confidence: 1
@@ -195,23 +232,24 @@ sections:
       - id: values-observable-note
         type: note
         tone: warning
-        title: "Фраза «объекты копируются по ссылке» только мешает"
+        title: "Общий Object не создаёт ссылочный тип"
         body: >-
-          На простом примере с мутацией она будто бы работает, но плохо объясняет переназначение
-          параметра и создаёт несуществующее значение-ссылку. Скажите точнее: «обе переменные содержат
-          одно значение Object». Тогда различие между мутацией объекта и переназначением переменной
-          становится очевидным.
+          Два binding могут выдавать одно значение Object. Изменение этого Object видно через оба
+          пути, а переприсваивание одного имени не перенаправляет второе. Для этого правила не нужны
+          C++-ссылка, доступный указатель или дополнительный тип ECMAScript.
   - id: values-v8-representation
-    title: "Один примитив хранится сразу, другой — в heap"
+    title: "Хранение в V8: представление значения и место binding — разные решения"
     mode: v8
     blocks:
       - id: values-v8-prose
         type: prose
         body: >-
-          У V8 есть несколько внутренних представлений JavaScript-значений. В закреплённой x64-сборке
-          число `42` помещается в Smi: целая часть хранится прямо внутри tagged slot. А взятые для
-          сравнения дробное число, строка, Symbol и BigInt представлены tagged-указателями на
-          heap-объекты. Движок и оптимизатор могут менять это устройство, не меняя тип по ECMA-262.
+          В закреплённой x64-сборке V8 число `42` помещается в tagged-immediate Smi: отдельный
+          HeapNumber для него не создаётся. Но место хранения `42` — другой вопрос. В Ignition
+          незахваченная локальная переменная может жить в регистре frame. Если binding захватывает
+          closure, V8 создаёт Context и пишет тот же Smi в слот heap-контекста. Symbol в таком слоте —
+          уже tagged-указатель на отдельный Symbol-объект. По одному объявлению нельзя нарисовать
+          постоянное место значения.
       - id: values-v8-claims
         type: claims
         claims:
@@ -222,16 +260,30 @@ sections:
             sourceFingerprint: bbf2378a03431130
             confidence: 1
             reviewStatus: LOCALE_REVIEW
+          - id: claim-v8-binding-storage
+            classification: V8_IMPLEMENTATION
+            text: "В capture Ignition незахваченный локальный Smi находится в регистре frame, а для захваченных bindings видны CreateFunctionContext и StaCurrentContextSlot. У захваченного Smi нет отдельного number-объекта, хотя его tagged-биты лежат в слоте heap-контекста."
+            citationIds: [v8-ignition-frame, v8-pointer-compression]
+            sourceFingerprint: 5d92dfbba4cd5039
+            confidence: 1
+            reviewStatus: LOCALE_REVIEW
+          - id: claim-v8-string-internalization
+            classification: V8_IMPLEMENTATION
+            text: "Два binding могут содержать String value, а их слоты V8 — указывать на один internalized String object. Это переиспользование памяти в V8, а не наблюдаемая идентичность String и не передача переменной по ссылке в ECMAScript."
+            citationIds: [string-type, v8-strings]
+            sourceFingerprint: dc8bed6765990f12
+            confidence: 1
+            reviewStatus: LOCALE_REVIEW
           - id: claim-v8-symbol-heap
             classification: V8_IMPLEMENTATION
-            text: 'В том же capture `Symbol("guide")` — heap-объект с типом `SYMBOL_TYPE`. В исходниках V8 Symbol наследуется от Name, а Name — от PrimitiveHeapObject.'
+            text: 'В capture `Symbol("guide")` — heap-объект с типом `SYMBOL_TYPE`. В исходниках V8 Symbol наследуется от Name, Name — от PrimitiveHeapObject, а слот binding хранит tagged-указатель на этот объект.'
             citationIds: [v8-symbol-source]
             sourceFingerprint: b10627869679eaf3
             confidence: 1
             reviewStatus: LOCALE_REVIEW
           - id: claim-layout-not-language-type
             classification: DERIVED
-            text: "Поэтому схема «примитив — это inline или stack, объект — это ссылка в heap» не может быть моделью типов ECMAScript: даже два примитивных значения в V8 представлены по-разному."
+            text: "Primitive value не означает «inline или stack»: Symbol является primitive value, но представлен V8 heap-объектом; захваченный Smi лежит внутри heap-контекста, хотя не становится отдельным heap-объектом."
             citationIds: [language-types, v8-pointer-compression, v8-symbol-source]
             sourceFingerprint: ae193b5b1c8c74c4
             confidence: 1
@@ -243,42 +295,69 @@ sections:
             sourceFingerprint: f09b508effec5328
             confidence: 0.99
             reviewStatus: LOCALE_REVIEW
+      - id: values-v8-binding-bytecode
+        type: bytecode
+        artifactId: value-binding-storage
+        title: "Binding выбирает слот, значение определяет содержимое слота"
+        body: "Байткод получен из закреплённой Linux-сборки V8. Подсвечены команды локального регистра и создания или записи closure Context."
+        highlightOpcodes: [LdaSmi, Star0, CreateFunctionContext, StaCurrentContextSlot]
+        cases:
+          - id: binding-bytecode-local-smi
+            caseId: local-smi
+            title: "Локальный незахваченный Smi"
+            explanation: "`LdaSmi [42]` загружает immediate tagged value, а `Star0` пишет его в регистр Ignition `r0`. Это виртуальный регистр — слот frame, а не обязательно регистр CPU и не хранилище «внутри идентификатора»."
+          - id: binding-bytecode-captured-smi
+            caseId: captured-smi
+            title: "Захваченный binding со Smi"
+            explanation: "`CreateFunctionContext` создаёт Context для closure, затем `StaCurrentContextSlot [2]` пишет Smi в его слот. Слот находится в heap-объекте, но отдельный HeapNumber для `42` не нужен."
+          - id: binding-bytecode-captured-symbol
+            caseId: captured-symbol
+            title: "Захваченный binding с Symbol"
+            explanation: "Binding снова находится в слоте Context. После вызова `Symbol` в слот попадает tagged-указатель на отдельно созданный Symbol heap-объект."
       - id: values-v8-artifact
         type: representation
         artifactId: value-representations
-        title: "Одна категория стандарта — разные способы хранения в V8"
+        title: "Одна категория спецификации — разные представления V8"
         body: "Каждая вкладка воспроизводится через `%IsSmi` и `%DebugPrint` закреплённого Linux-бинарника. Адреса и нестабильные хеши объектов намеренно удалены."
         cases:
           - id: representation-smi
             caseId: smi
             title: "Небольшое целое Number"
-            explanation: "Для ECMA-262 значение `42` относится к примитивному типу Number. Эта сборка V8 хранит его как `Smi` прямо в tagged slot. Smi — внутреннее представление, а не девятый тип JavaScript."
+            explanation: "`42` — значение Number и потому primitive value по ECMA-262. В этой сборке V8 оно представлено tagged-immediate `Smi`; Smi — устройство реализации, а не девятый тип языка."
           - id: representation-heap-number
             caseId: heap-number
             title: "Дробное Number"
-            explanation: "`3.141592653589793` тоже относится к примитивному типу Number, но здесь V8 использует `HeapNumber` и tagged-указатель. У одного типа языка может быть несколько представлений движка."
+            explanation: "`3.141592653589793` тоже является значением Number и потому primitive value, но здесь V8 использует `HeapNumber` и tagged-указатель. У одного типа языка может быть несколько представлений движка."
           - id: representation-string
             caseId: string
             title: "Значение String"
-            explanation: "По стандарту литерал создаёт неизменяемое значение String. V8 интернировал его как heap-объект; совместное хранение строки не делает её изменяемой или «ссылочной»."
+            explanation: "По стандарту литерал даёт неизменяемое значение String. В вашем d8-эксперименте `str1` и `str2` печатали один адрес INTERNALIZED_ONE_BYTE_STRING_TYPE; закреплённый capture тоже видит internalized heap String. Это переиспользование V8, а не передача переменной по ссылке и не гарантия ECMA-262."
           - id: representation-symbol
             caseId: symbol
             title: "Уникальное значение Symbol"
-            explanation: "Symbol — примитивный тип языка, а этот Symbol в V8 представлен heap-объектом `SYMBOL_TYPE`. Это особенно наглядно ломает правило «примитив значит не heap»."
+            explanation: "Этот Symbol является primitive value по ECMA-262, а V8 представляет его heap-объектом `SYMBOL_TYPE`. Категория спецификации и форма реализации отвечают на разные вопросы."
           - id: representation-bigint
             caseId: bigint
             title: "Значение BigInt"
-            explanation: "В этом capture примитивное значение BigInt представлено heap-объектом `BIG_INT_BASE_TYPE`: его целое произвольного размера не помещается в Smi."
+            explanation: "В этом capture значение BigInt — то есть primitive value — представлено heap-объектом `BIG_INT_BASE_TYPE`: его целое произвольного размера не помещается в Smi."
       - id: values-performance-note
         type: note
         tone: implementation
         title: "Правило производительности: стабильные данные, затем замер"
         body: >-
-          Не выбирайте структуру программы по мифу «примитив против ссылки». В действительно горячих
-          вычислениях важны стабильные представления, а для плотных числовых данных могут помочь
-          TypedArray. Но V8 умеет распаковывать значения и удалять лишние аллокации. Решение принимают
-          по профилю и реалистичному benchmark: слишком многое зависит от кода вокруг и версии движка.
+          Smi обычно дёшев, но замена `const` или `let` на `var` не заставляет значение жить в stack
+          и не обещает ускорение. Важны захват closure, escape analysis, feedback и активный уровень
+          оптимизации. В горячем числовом коде стабилизируйте shapes и представления, измеряйте
+          реальную нагрузку и проверяйте конкретную версию V8 — схема «примитив против ссылки» здесь
+          ничего надёжного не предсказывает.
 citations:
+  - id: type-definition
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-terms-and-definitions-type
+    label: "ECMA-262 §4.4.4 — type"
+    url: https://tc39.es/ecma262/2026/multipage/overview.html#sec-terms-and-definitions-type
+    relevance: "Определяет тип как множество значений из раздела 6."
+    evidenceHash: 7ec172d84550b45a
   - id: language-types
     snapshot: ECMA-262-ES2026
     nodeId: sec-ecmascript-language-types
@@ -291,8 +370,15 @@ citations:
     nodeId: sec-terms-and-definitions-primitive-value
     label: "ECMA-262 §4.4.5 — primitive value"
     url: https://tc39.es/ecma262/2026/multipage/overview.html#sec-terms-and-definitions-primitive-value
-    relevance: "Определяет primitive value как значение типа языка, отличного от Object."
+    relevance: "Определяет primitive value как член Undefined, Null, Boolean, Number, BigInt, Symbol или String."
     evidenceHash: ccf45a86557c9d66
+  - id: specification-types
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-ecmascript-specification-types
+    label: "ECMA-262 §6.2 — служебные типы спецификации"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-ecmascript-specification-types
+    relevance: "Уточняет, что служебные значения — артефакты спецификации, не обязаны иметь отдельный объект реализации и недоступны для хранения из JavaScript."
+    evidenceHash: 038266656dbeed7b
   - id: object-type
     snapshot: ECMA-262-ES2026
     nodeId: sec-object-type
@@ -307,6 +393,34 @@ citations:
     url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-reference-record-specification-type
     relevance: "Относит Reference Record к служебным типам и определяет GetValue и PutValue."
     evidenceHash: 38d79e0ad4f58a73
+  - id: environment-records
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-environment-records
+    label: "ECMA-262 §9.1 — Environment Records"
+    url: https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-environment-records
+    relevance: "Определяет служебный тип, который моделирует bindings имён и лексическую вложенность."
+    evidenceHash: 38847cef5dbe548e
+  - id: identifier-evaluation
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-identifiers-runtime-semantics-evaluation
+    label: "ECMA-262 — runtime semantics IdentifierReference"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-identifiers-runtime-semantics-evaluation
+    relevance: "Показывает, что вычисление идентификатора возвращает ResolveBinding его StringValue."
+    evidenceHash: 0cc89bb1b66a27c3
+  - id: resolve-binding
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-resolvebinding
+    label: "ECMA-262 — ResolveBinding"
+    url: https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-resolvebinding
+    relevance: "Начинает поиск с LexicalEnvironment текущего execution context."
+    evidenceHash: 81dfb42f9afe689c
+  - id: get-identifier-reference
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-getidentifierreference
+    label: "ECMA-262 — GetIdentifierReference"
+    url: https://tc39.es/ecma262/2026/multipage/executable-code-and-execution-contexts.html#sec-getidentifierreference
+    relevance: "Проходит по Environment Records и создаёт Reference Record найденного binding."
+    evidenceHash: 87e3a2d4199b2cc8
   - id: assignment-operators
     snapshot: ECMA-262-ES2026
     nodeId: sec-assignment-operators-runtime-semantics-evaluation
@@ -347,7 +461,7 @@ citations:
     nodeId: sec-ecmascript-language-types-symbol-type
     label: "ECMA-262 §6.1.5 — тип Symbol"
     url: https://tc39.es/ecma262/2026/multipage/ecmascript-data-types-and-values.html#sec-ecmascript-language-types-symbol-type
-    relevance: "Определяет Symbol как примитивный тип с уникальными неизменяемыми значениями."
+    relevance: "Определяет тип Symbol; его значения уникальны, неизменяемы и относятся к primitive values."
     evidenceHash: b0644897d57c8fe6
   - id: symbol-constructor
     snapshot: ECMA-262-ES2026
@@ -370,6 +484,20 @@ citations:
     url: https://chromium.googlesource.com/v8/v8/+/241f63a62a3518ad4110e78e4f61815623c6e95d/src/objects/smi.h
     relevance: "Определяет внутреннее представление небольших целых Smi."
     evidenceHash: 2f7ef3b1b435f380
+  - id: v8-strings
+    snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
+    nodeId: docs-objects-strings
+    label: "Закреплённая документация V8 — Strings in V8"
+    url: https://chromium.googlesource.com/v8/v8/+/241f63a62a3518ad4110e78e4f61815623c6e95d/docs/objects/strings.md
+    relevance: "Описывает представления строк, internalization и переиспользование через String Table."
+    evidenceHash: d93f5feff1d87763
+  - id: v8-ignition-frame
+    snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
+    nodeId: v8-ignition-frame-registers
+    label: "V8 — регистры frame в Ignition и LdaSmi"
+    url: https://v8.dev/blog/adaptor-frame
+    relevance: "Описывает регистры frame для локальных значений и показывает байткод LdaSmi и Star."
+    evidenceHash: 8603bd1dfe459ec4
   - id: v8-symbol-source
     snapshot: V8-MAIN-241f63a62a3518ad4110e78e4f61815623c6e95d
     nodeId: src-objects-name-tq
@@ -386,12 +514,12 @@ citations:
     evidenceHash: d6f22747e76d2a0c
 examples:
   - id: primitive-value-copy
-    title: "Две независимые переменные с примитивными значениями"
-    goal: "Проверить, что новое значение Number или String во второй переменной не меняет первую."
+    title: "Переприсваивание значений Number и String"
+    goal: "Проверить, что новое значение Number или String во втором binding не меняет значение первого."
     sourcePath: examples/primitive-value-copy.js
     timeoutMs: 1200
     expectedOutput: ["7 7", "7 9", "hello hello", "hello goodbye"]
-    claimIds: [claim-primitive-reassignment-independent, claim-assignment-copies-value]
+    claimIds: [claim-value-rebinding-independent, claim-assignment-transfers-value]
     citationIds: [language-types, assignment-operators]
   - id: object-value-alias
     title: "Мутация объекта и новое присваивание"
@@ -399,7 +527,7 @@ examples:
     sourcePath: examples/object-value-alias.js
     timeoutMs: 1200
     expectedOutput: ["2", "2 3"]
-    claimIds: [claim-object-aliasing, claim-assignment-copies-value]
+    claimIds: [claim-object-aliasing, claim-assignment-transfers-value]
     citationIds: [object-type, assignment-operators]
   - id: argument-passing-values
     title: "Аргумент не передаёт переменную по ссылке"
@@ -433,6 +561,14 @@ examples:
     expectedOutput: ["TypeError", "cat"]
     claimIds: [claim-strings-immutable]
     citationIds: [string-type]
+  - id: value-binding-bytecode
+    title: "Локальные и захваченные bindings в V8"
+    goal: "Сравнить незахваченный локальный Smi с захваченными bindings Smi и Symbol."
+    sourcePath: examples/value-binding-bytecode.js
+    timeoutMs: 1200
+    expectedOutput: ["42", "42", "symbol"]
+    claimIds: [claim-v8-smi, claim-v8-binding-storage, claim-v8-symbol-heap]
+    citationIds: [v8-pointer-compression, v8-ignition-frame, v8-symbol-source]
 engineResults:
   - {
       exampleId: primitive-value-copy,
@@ -488,6 +624,15 @@ engineResults:
       output: ["TypeError", "cat"],
       capturedAt: "2026-08-20",
     }
+  - {
+      exampleId: value-binding-bytecode,
+      engine: V8,
+      version: "Node.js 24.18.1 / V8 13.6.233.17-node.50",
+      binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a,
+      status: verified,
+      output: ["42", "42", "symbol"],
+      capturedAt: "2026-08-20",
+    }
 graph:
   nodes:
     - {
@@ -504,6 +649,24 @@ graph:
       }
     - { id: object-value, label: "Значение Object", kind: type, citationId: object-type }
     - {
+        id: environment-record-value-map,
+        label: "Environment Record",
+        kind: record,
+        citationId: environment-records,
+      }
+    - {
+        id: resolve-binding-map,
+        label: "ResolveBinding",
+        kind: operation,
+        citationId: resolve-binding,
+      }
+    - {
+        id: get-identifier-reference-map,
+        label: "GetIdentifierReference",
+        kind: operation,
+        citationId: get-identifier-reference,
+      }
+    - {
         id: reference-record-value-map,
         label: "Reference Record",
         kind: record,
@@ -518,12 +681,45 @@ graph:
       }
     - { id: v8-smi, label: "Smi", kind: representation, citationId: v8-smi-source }
     - {
+        id: v8-frame-register,
+        label: "Регистр frame в Ignition",
+        kind: representation,
+        citationId: v8-ignition-frame,
+      }
+    - {
+        id: v8-context-slot,
+        label: "Слот V8 Context",
+        kind: representation,
+        citationId: v8-ignition-frame,
+      }
+    - {
         id: v8-heap-object,
         label: "Heap-объект",
         kind: representation,
         citationId: v8-symbol-source,
       }
   edges:
+    - {
+        id: value-edge-0a,
+        source: resolve-binding-map,
+        target: get-identifier-reference-map,
+        kind: calls,
+        weight: 3,
+      }
+    - {
+        id: value-edge-0b,
+        source: get-identifier-reference-map,
+        target: environment-record-value-map,
+        kind: uses,
+        weight: 3,
+      }
+    - {
+        id: value-edge-0c,
+        source: get-identifier-reference-map,
+        target: reference-record-value-map,
+        kind: produces,
+        weight: 3,
+      }
     - {
         id: value-edge-1,
         source: language-value,
@@ -547,6 +743,14 @@ graph:
       }
     - { id: value-edge-4, source: get-value-map, target: language-value, kind: produces, weight: 3 }
     - { id: value-edge-5, source: v8-tagged-value, target: v8-smi, kind: implements, weight: 2 }
+    - {
+        id: value-edge-5a,
+        source: v8-frame-register,
+        target: v8-tagged-value,
+        kind: uses,
+        weight: 2,
+      }
+    - { id: value-edge-5b, source: v8-context-slot, target: v8-tagged-value, kind: uses, weight: 2 }
     - {
         id: value-edge-6,
         source: v8-tagged-value,

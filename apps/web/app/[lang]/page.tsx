@@ -17,9 +17,9 @@ const copy = {
     declarationTitle: "const, let, and var without folklore",
     declarationBody:
       "Trace initialization, TDZ, scopes, loop bindings, and the real performance boundary behind each declaration.",
-    valuesTitle: "Values, objects, and the myth of reference types",
+    valuesTitle: "Primitive values, Reference Records, and actual storage",
     valuesBody:
-      "Replace stack-versus-heap folklore with the ECMA-262 value model, observable identity, and a pinned V8 Smi/Symbol comparison.",
+      "Trace name resolution in ECMA-262, then compare local and captured Smi, String, and Symbol storage in pinned V8 bytecode.",
     evidence: "Evidence layers",
     evidenceBody:
       "Every statement tells you whether it is normative, derived, observable, host-defined, or implementation-specific.",
@@ -39,9 +39,9 @@ const copy = {
     declarationTitle: "const, let и var — без мифов",
     declarationBody:
       "Разберём инициализацию, TDZ, области видимости, циклы и честные правила выбора без мифов о скорости.",
-    valuesTitle: "Значения, объекты и миф о ссылочных типах",
+    valuesTitle: "Primitive value, Reference Record и реальное хранение",
     valuesBody:
-      "Отделим типы ECMA-262 от устройства памяти и сравним, как V8 представляет небольшое число и Symbol.",
+      "Проследим поиск имени по ECMA-262 и сравним хранение локальных и захваченных Smi, String и Symbol в закреплённом V8.",
     evidence: "Откуда мы это знаем",
     evidenceBody:
       "У каждого технического утверждения есть метка и источник: стандарт, логический вывод, запускаемый пример или данные конкретного движка.",
