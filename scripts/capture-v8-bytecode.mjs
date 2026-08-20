@@ -20,6 +20,13 @@ const captures = [
         functionName: "shadowedLetBeforeDeclaration",
       },
       { id: "initialized-shadowed-let", functionName: "initializedShadowedLet" },
+      { id: "nested-without-shadowing", functionName: "nestedWithoutShadowing" },
+      {
+        id: "shadowed-const-before-declaration",
+        functionName: "shadowedConstBeforeDeclaration",
+      },
+      { id: "initialized-shadowed-const", functionName: "initializedShadowedConst" },
+      { id: "intentional-function-var", functionName: "intentionalFunctionVar" },
     ],
   },
   {

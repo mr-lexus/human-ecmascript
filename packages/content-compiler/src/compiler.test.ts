@@ -51,6 +51,26 @@ describe("content compiler", () => {
         .find(({ id }) => id === "initialized-shadowed-let")
         ?.instructions.map(({ opcode }) => opcode),
     ).not.toContain("ThrowReferenceErrorIfHole");
+    expect(
+      artifact?.cases
+        .find(({ id }) => id === "nested-without-shadowing")
+        ?.instructions.map(({ opcode }) => opcode),
+    ).not.toContain("ThrowReferenceErrorIfHole");
+    expect(
+      artifact?.cases
+        .find(({ id }) => id === "shadowed-const-before-declaration")
+        ?.instructions.map(({ opcode }) => opcode),
+    ).toContain("ThrowReferenceErrorIfHole");
+    expect(
+      artifact?.cases
+        .find(({ id }) => id === "initialized-shadowed-const")
+        ?.instructions.map(({ opcode }) => opcode),
+    ).not.toContain("ThrowReferenceErrorIfHole");
+    expect(
+      artifact?.cases
+        .find(({ id }) => id === "intentional-function-var")
+        ?.instructions.map(({ opcode }) => opcode),
+    ).not.toContain("ThrowReferenceErrorIfHole");
   });
 
   it("separates syntactic nesting from captured and per-iteration context costs", () => {

@@ -1,7 +1,7 @@
 id: const-let-var
 slug: const-let-var
 locale: en
-sourceContentHash: 82387690804e0e9a
+sourceContentHash: 5b805cae339f971c
 title: "const, let, and var without folklore"
 eyebrow: "Bindings → initialization → scope → performance"
 dek: >-
@@ -80,6 +80,29 @@ sections:
           `const settings = {}` prevents `settings = anotherObject`. It does not freeze
           `settings`: properties may still be added or changed. Use object immutability tools
           only when the object itself must be protected.
+      - id: declaration-keyword-decision-guide
+        type: trace
+        steps:
+          - id: choose-const
+            label: "`const`: initialize now and do not reassign"
+            operation: Stable binding
+            detail: "Use it for dependencies, configuration, and intermediate results: `const config = loadConfig()`. It fixes the name-to-value association but does not freeze an object. The keyword itself provides no performance guarantee."
+            citationId: lexical-declarations
+          - id: choose-let
+            label: "`let`: one local binding is meant to change"
+            operation: Mutable local
+            detail: "Use it for a counter, cursor, or accumulator: `let total = 0; total += price`. Initialize it before branching and keep it in the narrowest block that actually needs it."
+            citationId: lexical-declarations
+          - id: choose-var
+            label: "`var`: one binding is deliberately shared by the whole function"
+            operation: Function-wide binding
+            detail: "It fits when several branches intentionally assign one function binding and a path without assignment must return `undefined`: `if (cacheHit) { var result = cache; } else if (shouldFetch) { var result = fetch(); } return result`. This is a narrow but valid contract, not deprecated syntax."
+            citationId: variable-statement
+          - id: reject-keyword-speed-hack
+            label: "Do not choose a keyword from one bytecode instruction"
+            operation: Sanity check
+            detail: "Replacing `let` with `var` removes the TDZ by changing behavior. If `undefined` would be a bug, fix initialization order or block structure instead. In the pinned fixtures, correctly initialized `let` and `const` also need no `ThrowReferenceErrorIfHole`; benchmark optimized hot code before making a performance claim."
+            citationId: v8-hole-checks
   - id: declaration-normative-trace
     title: "Creation happens before execution; initialization does not"
     mode: normative
@@ -232,11 +255,25 @@ sections:
             sourceFingerprint: 6ab2d8b76ed13fe1
             confidence: 1
             reviewStatus: TECH_REVIEW
+          - id: claim-shadowing-not-nesting
+            classification: DERIVED
+            text: "Entering a nested block does not itself create a TDZ for an outer binding. The risk appears when that block declares a same-named `let` or `const`: the new binding shadows the outer one throughout the block and any access before initialization must fail."
+            citationIds: [block-declaration-instantiation, declarative-environment]
+            sourceFingerprint: 6ab2d8b76ed13fe1
+            confidence: 1
+            reviewStatus: TECH_REVIEW
           - id: claim-v8-bytecode-capture
             classification: V8_IMPLEMENTATION
-            text: "In the pinned V8 13.6 capture, unsafe `let` and `const` paths—including assignment before a shadowing `let` declaration—contain `LdaTheHole` and `ThrowReferenceErrorIfHole`. Moving the shadowing declaration before its first use removes both instructions in this capture."
+            text: "In the pinned V8 13.6 capture, early access to a shadowing `let` or `const` contains `LdaTheHole` and `ThrowReferenceErrorIfHole`. A nested block without redeclaration and the initialize-first `let`/`const` pairs contain no such guard."
             citationIds: [v8-hole-checks]
             sourceFingerprint: 8af584f5e91414c8
+            confidence: 1
+            reviewStatus: TECH_REVIEW
+          - id: claim-intentional-var-bytecode
+            classification: V8_IMPLEMENTATION
+            text: "The pinned function-wide `var` fixture uses one register across two nested branches and has no hole guard; the untouched path returns `undefined` by design. This demonstrates useful `var` semantics, not an inherent speed advantage over an initialized `let`."
+            citationIds: [variable-statement, v8-hole-checks]
+            sourceFingerprint: 4eb34a6c87a16d01
             confidence: 1
             reviewStatus: TECH_REVIEW
           - id: claim-nesting-no-runtime-scan
@@ -304,11 +341,36 @@ sections:
             label: "4. Measure the optimized workload"
             operation: Benchmark last
             detail: "Warm up the complete hot function, preserve realistic branches and escapes, and compare every target engine. Ignition bytecode alone is not optimized machine-code performance."
+      - id: declaration-shadowing-guidance-note
+        type: note
+        tone: insight
+        title: "Practical rule for `let` and `const` in nested blocks"
+        body: >-
+          Keep a binding in the smallest block that correctly describes its lifetime. Descending
+          into another block is safe: if that block does not redeclare the name, references continue
+          to resolve to the initialized outer binding. If you intentionally reuse the name with
+          `let` or `const`, initialize the new binding before every read or write. Otherwise the
+          inner declaration shadows the outer binding from the start of the block and creates a TDZ
+          path. Renaming the inner binding is often clearer than replacing it with function-scoped
+          `var`, which would change the program's semantics.
+      - id: declaration-intentional-var-note
+        type: note
+        tone: implementation
+        title: "When `var` earns its place"
+        body: >-
+          Use `var` deliberately when the function really owns one optional piece of state shared
+          by several nested branches, and `undefined` before any branch assigns it is a valid result.
+          Repeated `var result` declarations then describe the same function binding and the pinned
+          bytecode needs no TDZ guard. This can be valuable in compatible maintenance code,
+          generated code, or a function whose contract intentionally follows those rules. If an
+          unassigned path is a bug, prefer `const` computed by an expression or declare `let` before
+          branching so all reads happen after initialization. Those initialized lexical cases also
+          contain no hole guard in this capture.
       - id: declaration-bytecode-artifact
         type: bytecode
         artifactId: const-let-var-tdz
         title: "The TDZ guard in real V8 bytecode"
-        body: "These seven functions were captured from the same source file with a pinned Linux Node binary. Orange rows are the instructions that represent V8's uninitialized lexical sentinel and the possible ReferenceError."
+        body: "These eleven functions were captured from the same source file with a pinned Linux Node binary. Orange rows are the instructions that represent V8's uninitialized lexical sentinel and the possible ReferenceError."
         cases:
           - id: bytecode-var-branch
             caseId: var-across-branch
@@ -338,6 +400,22 @@ sections:
             caseId: initialized-shadowed-let
             title: "Shadowing `let` initialized first"
             explanation: "Moving `let p2;` before `p2 = 7` initializes the inner binding with `undefined`. The function returns `12`, and this capture contains no hole guard."
+          - id: bytecode-nested-without-shadowing
+            caseId: nested-without-shadowing
+            title: "Nested block without redeclaration"
+            explanation: "The inner block assigns and reads the already initialized outer `p2`. This capture is only 8 bytes and contains neither `LdaTheHole` nor `ThrowReferenceErrorIfHole`."
+          - id: bytecode-shadowed-const-before-declaration
+            caseId: shadowed-const-before-declaration
+            title: "Read before shadowing `const`"
+            explanation: "The inner `const p2` shadows the outer constant throughout the block. Reading `p2` above the declaration therefore executes `ThrowReferenceErrorIfHole`."
+          - id: bytecode-initialized-shadowed-const
+            caseId: initialized-shadowed-const
+            title: "Shadowing `const` initialized first"
+            explanation: "Placing `const p2 = 7` before the read preserves intentional shadowing while removing the TDZ path and its hole guard in this capture."
+          - id: bytecode-intentional-function-var
+            caseId: intentional-function-var
+            title: "One intentional `var` across branches"
+            explanation: "Both nested branches write the same function-scoped `result`. The capture has no hole guard; when neither branch runs, the deliberate result is `undefined`."
       - id: declaration-nesting-bytecode-artifact
         type: bytecode
         artifactId: const-let-var-nesting
@@ -568,13 +646,27 @@ examples:
     sourcePath: examples/declaration-bytecode.js
     timeoutMs: 1200
     expectedOutput:
-      ["undefined", "ReferenceError", "ReferenceError", "7", "7", "ReferenceError", "12"]
+      [
+        "undefined",
+        "ReferenceError",
+        "ReferenceError",
+        "7",
+        "7",
+        "ReferenceError",
+        "12",
+        "7",
+        "ReferenceError",
+        "7",
+        "7 undefined",
+      ]
     claimIds:
       [
         claim-branch-does-not-create-tdz,
         claim-var-early-read,
         claim-shadowed-binding-tdz,
+        claim-shadowing-not-nesting,
         claim-v8-bytecode-capture,
+        claim-intentional-var-bytecode,
       ]
     citationIds: [lexical-declarations, variable-statement, declarative-environment, v8-hole-checks]
   - id: declaration-nesting-bytecode
@@ -644,7 +736,20 @@ engineResults:
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
     binaryHash: f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a
     status: verified
-    output: ["undefined", "ReferenceError", "ReferenceError", "7", "7", "ReferenceError", "12"]
+    output:
+      [
+        "undefined",
+        "ReferenceError",
+        "ReferenceError",
+        "7",
+        "7",
+        "ReferenceError",
+        "12",
+        "7",
+        "ReferenceError",
+        "7",
+        "7 undefined",
+      ]
     capturedAt: "2026-08-20"
     note: "The same source file is used by the reproducible Ignition bytecode capture."
   - exampleId: declaration-nesting-bytecode

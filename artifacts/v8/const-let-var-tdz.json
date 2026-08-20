@@ -3,7 +3,7 @@
   "id": "const-let-var-tdz",
   "provider": "V8 Ignition",
   "sourcePath": "examples/declaration-bytecode.js",
-  "sourceSha256": "df81c4f888815c8a5d343937deb076b241ee315f704bd69cedd30455794cdea9",
+  "sourceSha256": "77990ef2d97a5454ce56a5e3fba4a62e06fde1bb5ec981023b9ff67e75e1192d",
   "runtime": {
     "name": "Node.js",
     "version": "24.18.1",
@@ -522,7 +522,267 @@
           "operands": ""
         }
       ]
+    },
+    {
+      "id": "nested-without-shadowing",
+      "functionName": "nestedWithoutShadowing",
+      "source": "function nestedWithoutShadowing() {\n  let p2 = 1;\n  {\n    p2 = 7;\n    let p3 = p2;\n    return p3;\n  }\n}",
+      "bytecodeLength": 8,
+      "parameterCount": 1,
+      "registerCount": 2,
+      "frameSize": 16,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "0d 01",
+          "opcode": "LdaSmi",
+          "operands": "[1]"
+        },
+        {
+          "offset": 2,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 3,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 5,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 6,
+          "bytes": "cd",
+          "opcode": "Star1",
+          "operands": ""
+        },
+        {
+          "offset": 7,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "shadowed-const-before-declaration",
+      "functionName": "shadowedConstBeforeDeclaration",
+      "source": "function shadowedConstBeforeDeclaration() {\n  const p2 = 1;\n  {\n    const p3 = p2;\n    const p2 = 7;\n    return p3 + p2;\n  }\n}",
+      "bytecodeLength": 17,
+      "parameterCount": 1,
+      "registerCount": 3,
+      "frameSize": 24,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "0d 01",
+          "opcode": "LdaSmi",
+          "operands": "[1]"
+        },
+        {
+          "offset": 2,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 3,
+          "bytes": "10",
+          "opcode": "LdaTheHole",
+          "operands": ""
+        },
+        {
+          "offset": 4,
+          "bytes": "cc",
+          "opcode": "Star2",
+          "operands": ""
+        },
+        {
+          "offset": 5,
+          "bytes": "b4 00",
+          "opcode": "ThrowReferenceErrorIfHole",
+          "operands": "[0]"
+        },
+        {
+          "offset": 7,
+          "bytes": "cd",
+          "opcode": "Star1",
+          "operands": ""
+        },
+        {
+          "offset": 8,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 10,
+          "bytes": "cc",
+          "opcode": "Star2",
+          "operands": ""
+        },
+        {
+          "offset": 11,
+          "bytes": "0b f7",
+          "opcode": "Ldar",
+          "operands": "r2"
+        },
+        {
+          "offset": 13,
+          "bytes": "3f f8 00",
+          "opcode": "Add",
+          "operands": "r1, [0]"
+        },
+        {
+          "offset": 16,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "initialized-shadowed-const",
+      "functionName": "initializedShadowedConst",
+      "source": "function initializedShadowedConst() {\n  const p2 = 1;\n  {\n    const p2 = 7;\n    const p3 = p2;\n    return p3;\n  }\n}",
+      "bytecodeLength": 8,
+      "parameterCount": 1,
+      "registerCount": 3,
+      "frameSize": 24,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "0d 01",
+          "opcode": "LdaSmi",
+          "operands": "[1]"
+        },
+        {
+          "offset": 2,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 3,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 5,
+          "bytes": "cd",
+          "opcode": "Star1",
+          "operands": ""
+        },
+        {
+          "offset": 6,
+          "bytes": "cc",
+          "opcode": "Star2",
+          "operands": ""
+        },
+        {
+          "offset": 7,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
+    },
+    {
+      "id": "intentional-function-var",
+      "functionName": "intentionalFunctionVar",
+      "source": "function intentionalFunctionVar(mode) {\n  if (mode === \"cache\") {\n    var result = 7;\n  } else if (mode === \"network\") {\n    var result = 5;\n  }\n  return result;\n}",
+      "bytecodeLength": 25,
+      "parameterCount": 2,
+      "registerCount": 1,
+      "frameSize": 8,
+      "instructions": [
+        {
+          "offset": 0,
+          "bytes": "13 00",
+          "opcode": "LdaConstant",
+          "operands": "[0]"
+        },
+        {
+          "offset": 2,
+          "bytes": "74 03 00",
+          "opcode": "TestEqualStrict",
+          "operands": "a0, [0]"
+        },
+        {
+          "offset": 5,
+          "bytes": "a3 07",
+          "opcode": "JumpIfFalse",
+          "operands": "[7]"
+        },
+        {
+          "offset": 7,
+          "bytes": "0d 07",
+          "opcode": "LdaSmi",
+          "operands": "[7]"
+        },
+        {
+          "offset": 9,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 10,
+          "bytes": "93 0c",
+          "opcode": "Jump",
+          "operands": "[12]"
+        },
+        {
+          "offset": 12,
+          "bytes": "13 01",
+          "opcode": "LdaConstant",
+          "operands": "[1]"
+        },
+        {
+          "offset": 14,
+          "bytes": "74 03 01",
+          "opcode": "TestEqualStrict",
+          "operands": "a0, [1]"
+        },
+        {
+          "offset": 17,
+          "bytes": "a3 05",
+          "opcode": "JumpIfFalse",
+          "operands": "[5]"
+        },
+        {
+          "offset": 19,
+          "bytes": "0d 05",
+          "opcode": "LdaSmi",
+          "operands": "[5]"
+        },
+        {
+          "offset": 21,
+          "bytes": "ce",
+          "opcode": "Star0",
+          "operands": ""
+        },
+        {
+          "offset": 22,
+          "bytes": "0b f9",
+          "opcode": "Ldar",
+          "operands": "r0"
+        },
+        {
+          "offset": 24,
+          "bytes": "b3",
+          "opcode": "Return",
+          "operands": ""
+        }
+      ]
     }
   ],
-  "captureSha256": "58d41984b5eb00a5d94b35c11f93f9c37cca84278fb954bb70af3f03c5687348"
+  "captureSha256": "c44bbd9c213a94e481cd51083897e1d7e6e79a63bc8d8e5c9e93d6f394271f44"
 }

@@ -1,6 +1,6 @@
 "use strict";
 
-/* eslint-disable @typescript-eslint/no-unused-vars -- this fixture intentionally captures shadowed and unreachable bindings */
+/* eslint-disable @typescript-eslint/no-unused-vars, no-redeclare, no-useless-assignment -- this fixture intentionally captures shadowed, repeated, and unreachable bindings */
 
 function varAcrossBranch(flag) {
   if (flag) return value;
@@ -53,6 +53,42 @@ function initializedShadowedLet() {
   }
 }
 
+function nestedWithoutShadowing() {
+  let p2 = 1;
+  {
+    p2 = 7;
+    let p3 = p2;
+    return p3;
+  }
+}
+
+function shadowedConstBeforeDeclaration() {
+  const p2 = 1;
+  {
+    const p3 = p2;
+    const p2 = 7;
+    return p3 + p2;
+  }
+}
+
+function initializedShadowedConst() {
+  const p2 = 1;
+  {
+    const p2 = 7;
+    const p3 = p2;
+    return p3;
+  }
+}
+
+function intentionalFunctionVar(mode) {
+  if (mode === "cache") {
+    var result = 7;
+  } else if (mode === "network") {
+    var result = 5;
+  }
+  return result;
+}
+
 console.log(String(varAcrossBranch(true)));
 
 for (const candidate of [letAcrossBranch, constAcrossBranch]) {
@@ -73,3 +109,13 @@ try {
 }
 
 console.log(initializedShadowedLet());
+console.log(nestedWithoutShadowing());
+
+try {
+  shadowedConstBeforeDeclaration();
+} catch (error) {
+  console.log(error.name);
+}
+
+console.log(initializedShadowedConst());
+console.log(intentionalFunctionVar("cache"), String(intentionalFunctionVar("none")));
