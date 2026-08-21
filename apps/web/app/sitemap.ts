@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://human-ecmascript.github.io/human-ecmascript";
+  const base = "https://mr-lexus.github.io/human-ecmascript";
   return ["en", "ru"].flatMap((locale) => [
     { url: `${base}/${locale}/`, changeFrequency: "monthly" as const, priority: 1 },
     {

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://human-ecmascript.github.io/human-ecmascript/"),
+  metadataBase: new URL("https://mr-lexus.github.io/human-ecmascript/"),
   title: { default: "Human ECMAScript", template: "%s · Human ECMAScript" },
   description: "A bilingual, evidence-backed field guide to ECMA-262.",
 };
