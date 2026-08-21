@@ -65,6 +65,29 @@ a {
   margin-inline: auto;
 }
 
+.alpha-notice {
+  border-bottom: 1px solid #d7a05d;
+  background: #fff1d9;
+  color: #493519;
+}
+.alpha-notice-inner {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding-block: 9px;
+  font-size: 12px;
+}
+.alpha-notice strong {
+  flex: 0 0 auto;
+  color: #9a4c18;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+.alpha-notice p {
+  margin: 0;
+}
+
 .app-header {
   position: sticky;
   top: 0;
@@ -72,6 +95,16 @@ a {
   border-bottom: 1px solid rgba(34, 35, 56, 0.12);
   background: rgba(247, 245, 239, 0.9);
   backdrop-filter: blur(16px);
+}
+
+@media (max-width: 700px) {
+  .alpha-notice-inner {
+    display: block;
+    padding-block: 10px;
+  }
+  .alpha-notice p {
+    margin-top: 4px;
+  }
 }
 .header-inner {
   height: 74px;
@@ -551,6 +584,7 @@ a {
 .article-hero h1 {
   max-width: 780px;
   font-size: clamp(50px, 6vw, 78px);
+  line-height: 0.86;
 }
 .article-dek {
   font-size: 19px;

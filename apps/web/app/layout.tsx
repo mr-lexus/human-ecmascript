@@ -1,6 +1,7 @@
 import "@mantine/core/styles.css";
 import "./styles.css";
 import type { Metadata } from "next";
+import { AlphaNotice } from "../components/AlphaNotice";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="en">
       <body>
+        <AlphaNotice />
         <Providers>{children}</Providers>
       </body>
     </html>
