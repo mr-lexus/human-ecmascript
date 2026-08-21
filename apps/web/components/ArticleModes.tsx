@@ -5,6 +5,7 @@ import type {
   ArticleSection,
   Citation,
   ClaimClassification,
+  ExampleManifest,
   V8BytecodeArtifact,
   V8ValueRepresentationArtifact,
 } from "@human-ecmascript/model";
@@ -87,20 +88,22 @@ function RichText({ children }: Readonly<{ children: string }>) {
 
 export function ArticleModes({
   sections,
+  examples,
   citations,
   bytecodeArtifacts,
   representationArtifacts,
   locale,
 }: Readonly<{
   sections: ArticleSection[];
+  examples: ExampleManifest[];
   citations: Citation[];
   bytecodeArtifacts: Record<string, V8BytecodeArtifact>;
   representationArtifacts: Record<string, V8ValueRepresentationArtifact>;
   locale: "en" | "ru";
 }>) {
-  const [activeMode, setActiveMode] = useState<ArticleSection["mode"]>("human");
+  const [activeSectionId, setActiveSectionId] = useState(sections[0]!.id);
   const [operationId, setOperationId] = useState<string | null>(null);
-  const activeSection = sections.find(({ mode }) => mode === activeMode) ?? sections[0]!;
+  const activeSection = sections.find(({ id }) => id === activeSectionId) ?? sections[0]!;
   const citationMap = useMemo(
     () => new Map(citations.map((citation) => [citation.id, citation])),
     [citations],
@@ -111,6 +114,10 @@ export function ArticleModes({
     .find(({ id }) => id === operationId);
   const operationCitation = operation ? citationMap.get(operation.citationId) : undefined;
   const labels = modeLabels[locale];
+  const exampleMap = useMemo(
+    () => new Map(examples.map((example) => [example.id, example])),
+    [examples],
+  );
 
   return (
     <div className="mode-layout">
@@ -122,16 +129,23 @@ export function ArticleModes({
         {sections.map((section, index) => (
           <button
             key={section.id}
+            id={`section-tab-${section.id}`}
             role="tab"
-            aria-selected={section.mode === activeMode}
-            onClick={() => setActiveMode(section.mode)}
+            aria-controls={`section-panel-${section.id}`}
+            aria-selected={section.id === activeSection.id}
+            onClick={() => setActiveSectionId(section.id)}
           >
             <span>{String(index + 1).padStart(2, "0")}</span>
-            {labels[section.mode]}
+            {section.tabLabel ?? labels[section.mode]}
           </button>
         ))}
       </div>
-      <article className="mode-panel" role="tabpanel">
+      <article
+        className="mode-panel"
+        id={`section-panel-${activeSection.id}`}
+        role="tabpanel"
+        aria-labelledby={`section-tab-${activeSection.id}`}
+      >
         <div className="mode-panel-heading">
           <span>{labels[activeSection.mode]}</span>
           <h2>{activeSection.title}</h2>
@@ -239,6 +253,24 @@ export function ArticleModes({
             </aside>
           );
         })}
+        {activeSection.exampleIds?.length ? (
+          <nav
+            className="related-examples"
+            aria-label={locale === "ru" ? "Связанные примеры" : "Related examples"}
+          >
+            <span>{locale === "ru" ? "Проверить на примерах" : "Verify with examples"}</span>
+            <div>
+              {activeSection.exampleIds.map((exampleId) => {
+                const example = exampleMap.get(exampleId);
+                return example ? (
+                  <a href={`#example-${example.id}`} key={example.id}>
+                    {example.title} ↓
+                  </a>
+                ) : null;
+              })}
+            </div>
+          </nav>
+        ) : null}
       </article>
       <Drawer
         opened={Boolean(operation)}

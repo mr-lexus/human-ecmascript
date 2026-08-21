@@ -2,7 +2,7 @@ id: reference-call-this-ru
 slug: reference-call-this
 locale: ru
 translationOf: reference-call-this
-sourceContentHash: 6d6b90ec1941ba90
+sourceContentHash: 8eaddc9fe2482eda
 title: "Почему this зависит от способа вызова"
 eyebrow: "От obj.method до запуска функции"
 dek: >-
@@ -138,19 +138,22 @@ sections:
             confidence: 1
             reviewStatus: READY
   - id: construction-call
-    title: "`new` запрашивает конструирование, а не означает «создать объект»"
+    title: "Как `new` задаёт `this` и выбирает итоговый объект"
+    tabLabel: "`new` и `this`"
     mode: normative
+    exampleIds:
+      [new-this-binding, new-return-object, new-return-primitive, new-proxy-result, new-arrow]
     blocks:
       - id: construction-prose
         type: prose
         body: >-
-          Фраза «`new` создаёт объект» подходит как первое приближение, но не как определение
-          оператора. Лексически `new` — зарезервированное ключевое слово; в выражении ECMA-262
-          описывает его как оператор `new`. EvaluateNew вычисляет значение после `new` и аргументы,
-          отклоняет значение, которое не является конструктором, и передаёт работу операции
-          Construct. Та вызывает внутренний метод `[[Construct]]` выбранного значения. Создание
-          объекта и выбор итогового результата относятся к протоколу конструирования, а не к самому
-          токену `new`.
+          В `new C()` значение `this` подготавливает не сам токен `new`, а внутренний метод
+          `[[Construct]]` выбранного конструктора. Для обычной базовой функции он создаёт
+          объект-кандидат и связывает его с `this` перед выполнением тела. Этот кандидат и результат
+          всего выражения — не одно и то же по определению: явно возвращённый Object заменяет
+          кандидата, а примитив — нет. Поэтому фраза «`new` создаёт новый объект» годится только как
+          грубое приближение. Точно: EvaluateNew проверяет IsConstructor и передаёт работу Construct,
+          которая вызывает собственный `[[Construct]]` конструктора.
       - id: construction-trace
         type: trace
         steps:
@@ -227,7 +230,7 @@ sections:
           правила: «любую функцию можно вызвать с `new`» и «любой конструктор можно вызвать и с
           `new`, и без него».
   - id: observable-cases
-    title: "Проверьте это на восьми примерах"
+    title: "Проверьте это на двенадцати примерах"
     mode: observable
     blocks:
       - id: observable-prose
@@ -449,21 +452,46 @@ examples:
     expectedOutput: ["TypeError"]
     claimIds: [claim-evaluatecall-this]
     citationIds: [evaluate-call, call]
-  - id: new-construction
-    title: "Конструирование, замена результата и отказ"
-    goal: "Отличить обычный объект-кандидат `this` от итогового результата и увидеть ошибку для стрелочной функции."
-    sourcePath: examples/new-construction.js
+  - id: new-this-binding
+    title: "Как `new` связывает `this`"
+    goal: "Убедиться, что обычный конструктор получает в `this` тот объект, который становится результатом."
+    sourcePath: examples/new-this-binding.js
     timeoutMs: 1200
-    expectedOutput: ["Ada", "true", "true", "true", "true", "TypeError"]
-    claimIds:
-      [
-        claim-new-delegates,
-        claim-ordinary-construct-this,
-        claim-constructability-not-return,
-        claim-new-result-not-fresh,
-      ]
-    citationIds:
-      [evaluate-new, construct, function-construct, arrow-function-instantiation, proxy-construct]
+    expectedOutput: ["true", "true", "Ada"]
+    claimIds: [claim-ordinary-construct-this]
+    citationIds: [function-construct]
+  - id: new-return-object
+    title: "Object заменяет объект `this`"
+    goal: "Увидеть, что явно возвращённый Object становится результатом вместо кандидата, связанного с `this`."
+    sourcePath: examples/new-return-object.js
+    timeoutMs: 1200
+    expectedOutput: ["true", "true", "candidate"]
+    claimIds: [claim-ordinary-construct-this, claim-new-result-not-fresh]
+    citationIds: [function-construct]
+  - id: new-return-primitive
+    title: "Примитив не заменяет объект `this`"
+    goal: "Проверить, что возвращённый примитив игнорируется и результатом остаётся кандидат `this`."
+    sourcePath: examples/new-return-primitive.js
+    timeoutMs: 1200
+    expectedOutput: ["true", "true"]
+    claimIds: [claim-ordinary-construct-this]
+    citationIds: [function-construct]
+  - id: new-proxy-result
+    title: "Proxy возвращает существующий объект"
+    goal: "Проверить, что протокол `[[Construct]]` может вернуть уже существующий Object."
+    sourcePath: examples/new-proxy-result.js
+    timeoutMs: 1200
+    expectedOutput: ["true"]
+    claimIds: [claim-new-delegates, claim-new-result-not-fresh]
+    citationIds: [construct, proxy-construct]
+  - id: new-arrow
+    title: "Стрелка не получает `this` от `new`"
+    goal: "Увидеть TypeError: у стрелочной функции нет `[[Construct]]`."
+    sourcePath: examples/new-arrow.js
+    timeoutMs: 1200
+    expectedOutput: ["TypeError"]
+    claimIds: [claim-constructability-not-return]
+    citationIds: [evaluate-new, arrow-function-instantiation]
 engineResults:
   - exampleId: method-call
     engine: V8
@@ -515,12 +543,40 @@ engineResults:
     status: verified
     output: ["TypeError"]
     capturedAt: "2026-08-06"
-  - exampleId: new-construction
+  - exampleId: new-this-binding
     engine: V8
     version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
-    binaryHash: d6c664df3f3f6145
+    binaryHash: f3432a45b03b2da0
     status: verified
-    output: ["Ada", "true", "true", "true", "true", "TypeError"]
+    output: ["true", "true", "Ada"]
+    capturedAt: "2026-08-21"
+  - exampleId: new-return-object
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: f3432a45b03b2da0
+    status: verified
+    output: ["true", "true", "candidate"]
+    capturedAt: "2026-08-21"
+  - exampleId: new-return-primitive
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: f3432a45b03b2da0
+    status: verified
+    output: ["true", "true"]
+    capturedAt: "2026-08-21"
+  - exampleId: new-proxy-result
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: f3432a45b03b2da0
+    status: verified
+    output: ["true"]
+    capturedAt: "2026-08-21"
+  - exampleId: new-arrow
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: f3432a45b03b2da0
+    status: verified
+    output: ["TypeError"]
     capturedAt: "2026-08-21"
   - exampleId: method-call
     engine: SpiderMonkey

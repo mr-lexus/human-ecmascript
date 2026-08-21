@@ -87,9 +87,25 @@ export function GuideArticlePage({
       <section className="page-shell article-content">
         <ArticleModes
           sections={article.sections}
+          examples={article.examples}
           citations={article.citations}
           bytecodeArtifacts={article.bytecodeArtifacts}
           representationArtifacts={article.representationArtifacts}
+          locale={locale}
+        />
+      </section>
+
+      <section className="page-shell lab-section" id="examples">
+        <div className="section-heading compact">
+          <div>
+            <p className="overline">{labels.lab}</p>
+            <h2>{labels.lab}</h2>
+          </div>
+        </div>
+        <ExampleLab
+          examples={article.examples}
+          sources={article.exampleSources}
+          engineResults={article.engineResults}
           locale={locale}
         />
       </section>
@@ -105,21 +121,6 @@ export function GuideArticlePage({
           </div>
           <KnowledgeMap nodes={article.graph.nodes} edges={article.graph.edges} />
         </div>
-      </section>
-
-      <section className="page-shell lab-section">
-        <div className="section-heading compact">
-          <div>
-            <p className="overline">{labels.lab}</p>
-            <h2>{labels.lab}</h2>
-          </div>
-        </div>
-        <ExampleLab
-          examples={article.examples}
-          sources={article.exampleSources}
-          engineResults={article.engineResults}
-          locale={locale}
-        />
       </section>
 
       <section className="sources-section">

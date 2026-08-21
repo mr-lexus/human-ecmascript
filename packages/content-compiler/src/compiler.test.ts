@@ -27,6 +27,28 @@ describe("content compiler", () => {
     expect(declarations.exampleSources["declaration-tdz"]).toContain("let value");
   });
 
+  it("keeps the new-and-this section reachable and links focused examples", () => {
+    const article = loadArticle("ru", "reference-call-this");
+    const tabLabels = article.sections.map((section) => section.tabLabel ?? section.mode);
+    const construction = article.sections.find(({ id }) => id === "construction-call");
+
+    expect(new Set(tabLabels).size).toBe(tabLabels.length);
+    expect(construction?.tabLabel).toBe("`new` и `this`");
+    expect(construction?.exampleIds).toEqual([
+      "new-this-binding",
+      "new-return-object",
+      "new-return-primitive",
+      "new-proxy-result",
+      "new-arrow",
+    ]);
+    expect(article.exampleSources["new-this-binding"]).toContain(
+      "observation.receivedThis === person",
+    );
+    expect(article.exampleSources["new-return-object"]).toContain(
+      "result !== observation.candidateThis",
+    );
+  });
+
   it("loads the pinned TDZ bytecode artifact and its normalized guard", () => {
     const declarations = loadArticle("en", "const-let-var");
     const artifact = declarations.bytecodeArtifacts["const-let-var-tdz"];

@@ -124,7 +124,9 @@ export type ContentBlock = z.infer<typeof contentBlockSchema>;
 export const articleSectionSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
+  tabLabel: z.string().min(1).optional(),
   mode: z.enum(["human", "normative", "observable", "v8"]),
+  exampleIds: z.array(z.string().min(1)).optional(),
   blocks: z.array(contentBlockSchema).min(1),
 });
 export type ArticleSection = z.infer<typeof articleSectionSchema>;
@@ -275,8 +277,28 @@ export const articleSchema = z
   })
   .superRefine((article, context) => {
     const citationIds = new Set(article.citations.map(({ id }) => id));
+    const exampleIds = new Set(article.examples.map(({ id }) => id));
     const claimIds = new Set<string>();
+    const sectionIds = new Set<string>();
+    const sectionTabLabels = new Set<string>();
     for (const section of article.sections) {
+      if (sectionIds.has(section.id)) {
+        context.addIssue({ code: "custom", message: `Duplicate section id ${section.id}` });
+      }
+      sectionIds.add(section.id);
+      const tabLabel = section.tabLabel ?? section.mode;
+      if (sectionTabLabels.has(tabLabel)) {
+        context.addIssue({ code: "custom", message: `Duplicate section tab label ${tabLabel}` });
+      }
+      sectionTabLabels.add(tabLabel);
+      for (const exampleId of section.exampleIds ?? []) {
+        if (!exampleIds.has(exampleId)) {
+          context.addIssue({
+            code: "custom",
+            message: `Section ${section.id} references missing example ${exampleId}`,
+          });
+        }
+      }
       for (const block of section.blocks) {
         if (block.type === "claims") {
           for (const claim of block.claims) {

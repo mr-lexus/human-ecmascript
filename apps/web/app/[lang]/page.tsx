@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { loadArticle } from "@human-ecmascript/content-compiler";
 import { SearchBox } from "../../components/SearchBox";
 
 const copy = {
@@ -13,7 +14,7 @@ const copy = {
     pathLabel: "Learning paths",
     pathTitle: "References, calls, and this",
     pathBody:
-      "Follow `obj.method()` through seven specification transitions and seven observable pressure tests.",
+      "Follow `obj.method()` and `new C()` from receiver selection to focused observable checks.",
     declarationTitle: "const, let, and var without folklore",
     declarationBody:
       "Trace initialization, TDZ, scopes, loop bindings, and the real performance boundary behind each declaration.",
@@ -35,7 +36,7 @@ const copy = {
     explore: "Посмотреть операции",
     pathLabel: "Учебные темы",
     pathTitle: "Ссылки, вызовы и this",
-    pathBody: "Разберём `obj.method()` по шагам и проверим выводы на семи коротких примерах.",
+    pathBody: "Разберём `obj.method()` и `new C()`: от выбора `this` до проверок в коде.",
     declarationTitle: "const, let и var — без мифов",
     declarationBody:
       "Разберём инициализацию, TDZ, области видимости, циклы и честные правила выбора без мифов о скорости.",
@@ -65,6 +66,7 @@ export async function generateMetadata({
 export default async function HomePage({ params }: { params: Promise<{ lang: "en" | "ru" }> }) {
   const { lang } = await params;
   const t = copy[lang];
+  const referenceArticle = loadArticle(lang, "reference-call-this");
   return (
     <main>
       <section className="home-hero">
@@ -132,8 +134,12 @@ export default async function HomePage({ params }: { params: Promise<{ lang: "en
               <p>{t.pathBody}</p>
             </div>
             <div className="path-meta">
-              <span>18–20 min</span>
-              <span>7 examples</span>
+              <span>
+                {referenceArticle.readingMinutes} {lang === "ru" ? "мин" : "min"}
+              </span>
+              <span>
+                {referenceArticle.examples.length} {lang === "ru" ? "примеров" : "examples"}
+              </span>
               <span aria-hidden="true">→</span>
             </div>
           </Link>

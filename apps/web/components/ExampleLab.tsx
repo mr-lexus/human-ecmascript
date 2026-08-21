@@ -2,7 +2,7 @@
 
 import { Badge } from "@mantine/core";
 import type { EngineResult, ExampleManifest } from "@human-ecmascript/model";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { parseSandboxRunMessage, sandboxDocument } from "../lib/exampleSandbox";
 import { CodeEditor } from "./CodeEditor";
 
@@ -100,17 +100,29 @@ export function ExampleLab({
     () => engineResults.filter(({ exampleId }) => exampleId === selected.id),
     [engineResults, selected.id],
   );
-  const choose = (id: string) => {
-    if (runTimeout.current) clearTimeout(runTimeout.current);
-    runTimeout.current = null;
-    activeRun.current = null;
-    pendingRun.current = null;
-    setSandboxMounted(false);
-    setSelectedId(id);
-    setSource(sources[id] ?? "");
-    setOutput([]);
-    setRunState("idle");
-  };
+  const choose = useCallback(
+    (id: string) => {
+      if (runTimeout.current) clearTimeout(runTimeout.current);
+      runTimeout.current = null;
+      activeRun.current = null;
+      pendingRun.current = null;
+      setSandboxMounted(false);
+      setSelectedId(id);
+      setSource(sources[id] ?? "");
+      setOutput([]);
+      setRunState("idle");
+    },
+    [sources],
+  );
+  useEffect(() => {
+    const chooseFromHash = () => {
+      const id = window.location.hash.replace(/^#example-/, "");
+      if (examples.some((example) => example.id === id)) choose(id);
+    };
+    chooseFromHash();
+    window.addEventListener("hashchange", chooseFromHash);
+    return () => window.removeEventListener("hashchange", chooseFromHash);
+  }, [choose, examples]);
   const run = () => {
     if (source.length > 10_000) {
       setOutput([labels.tooLong]);
@@ -165,6 +177,7 @@ export function ExampleLab({
       >
         {examples.map((example, index) => (
           <button
+            id={`example-${example.id}`}
             role="tab"
             aria-selected={example.id === selected.id}
             key={example.id}

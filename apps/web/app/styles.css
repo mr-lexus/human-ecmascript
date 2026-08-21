@@ -688,6 +688,39 @@ a {
   font-size: clamp(36px, 4vw, 54px);
   font-weight: 400;
   letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+.related-examples {
+  display: grid;
+  gap: 12px;
+  margin-top: 34px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+.related-examples > span {
+  color: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.related-examples > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.related-examples a {
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--indigo);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.related-examples a:hover {
+  border-color: var(--orange);
 }
 .rich-text {
   max-width: 790px;
