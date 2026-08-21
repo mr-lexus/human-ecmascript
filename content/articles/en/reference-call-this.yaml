@@ -1,7 +1,7 @@
 id: reference-call-this
 slug: reference-call-this
 locale: en
-sourceContentHash: cd536c686ffae3b6
+sourceContentHash: 6d6b90ec1941ba90
 title: "Where `this` really comes from"
 eyebrow: "Reference Records → property access → calls"
 dek: >-
@@ -9,10 +9,11 @@ dek: >-
   created by a member expression and see how the call expression turns it into `this`.
 status: READY
 sourceSnapshot: ECMA-262-ES2026
-readingMinutes: 18
+readingMinutes: 22
 learningObjectives:
   - Distinguish a Reference Record from the value obtained through GetValue.
   - Explain why method syntax preserves a receiver while a detached function call does not.
+  - Explain why `new` delegates to a constructor instead of directly promising a fresh object.
   - Predict property-key, getter, argument, and call evaluation order.
 prerequisites:
   - Expressions produce intermediate specification values.
@@ -134,8 +135,95 @@ sections:
             sourceFingerprint: d833185a549caf49
             confidence: 1
             reviewStatus: READY
+  - id: construction-call
+    title: "`new` requests construction; it does not mean “create an object”"
+    mode: normative
+    blocks:
+      - id: construction-prose
+        type: prose
+        body: >-
+          “`new` creates an object” is a useful first approximation, but it is not a definition of
+          the operator. Lexically, `new` is a reserved keyword; in an expression, ECMA-262 specifies
+          it as the `new` operator. EvaluateNew evaluates the value after `new` and the arguments,
+          rejects a value that is not a constructor, and delegates to Construct. Construct then
+          invokes that value's `[[Construct]]` internal method. Object allocation and the choice of
+          the final result belong to that construction protocol, not to the `new` token by itself.
+      - id: construction-trace
+        type: trace
+        steps:
+          - id: construct-evaluate
+            label: "1. Evaluate the constructor and arguments"
+            operation: EvaluateNew
+            detail: "Obtain the candidate constructor value and build its argument list."
+            citationId: evaluate-new
+          - id: construct-check
+            label: "2. Check constructability"
+            operation: IsConstructor
+            detail: "Throw TypeError when the value has no `[[Construct]]` internal method."
+            citationId: evaluate-new
+          - id: construct-delegate
+            label: "3. Delegate construction"
+            operation: Construct
+            detail: "Call the constructor object's own `[[Construct]]` internal method."
+            citationId: construct
+          - id: construct-this
+            label: "4. Prepare `this` for an ordinary base constructor"
+            operation: "[[Construct]]"
+            detail: "Create a candidate object from `newTarget.prototype` and bind that object as `this`."
+            citationId: function-construct
+          - id: construct-body
+            label: "5. Run the constructor body"
+            operation: OrdinaryCallEvaluateBody
+            detail: "Execute the function body with the prepared `this` and the evaluated arguments."
+            citationId: function-construct
+          - id: construct-result
+            label: "6. Select the result"
+            operation: "[[Construct]]"
+            detail: "Return an explicitly returned Object; otherwise, for a base constructor, return the prepared `this` object."
+            citationId: function-construct
+      - id: construction-claims
+        type: claims
+        claims:
+          - id: claim-new-delegates
+            classification: NORMATIVE
+            text: "The `new` operator does not itself run an object-allocation algorithm: EvaluateNew checks IsConstructor and delegates to Construct, which invokes the selected object's `[[Construct]]` internal method."
+            citationIds: [evaluate-new, construct]
+            sourceFingerprint: d7fa66217a54d5fc
+            confidence: 1
+            reviewStatus: READY
+          - id: claim-ordinary-construct-this
+            classification: NORMATIVE
+            text: "For an ordinary base constructor, `[[Construct]]` creates a candidate object, binds it as `this`, runs the body, and returns either an explicitly returned Object or that candidate. Returning a primitive does not replace the candidate."
+            citationIds: [function-construct]
+            sourceFingerprint: e3697be72d88fbdc
+            confidence: 1
+            reviewStatus: READY
+          - id: claim-constructability-not-return
+            classification: NORMATIVE
+            text: "Whether a function is constructable is determined by the presence of `[[Construct]]`, not by whether its body has a `return`. Ordinary function declarations are made constructors when created; arrow functions are not."
+            citationIds: [ordinary-function-instantiation, arrow-function-instantiation]
+            sourceFingerprint: fea937096e9edc96
+            confidence: 1
+            reviewStatus: READY
+          - id: claim-new-result-not-fresh
+            classification: OBSERVABLE
+            text: "The object produced by `new C()` is not guaranteed to be the fresh candidate associated with `this`: an ordinary constructor can return another Object, and a Proxy construct trap can return an already existing Object."
+            citationIds: [function-construct, proxy-construct]
+            sourceFingerprint: 0e7686fbf7e0d47c
+            confidence: 1
+            reviewStatus: READY
+      - id: construction-boundaries
+        type: note
+        tone: warning
+        title: "Callable and constructable are separate capabilities"
+        body: >-
+          Ordinary `function` declarations and expressions normally have both `[[Call]]` and
+          `[[Construct]]`. Arrow, async, generator, and concise method functions are callable but
+          are not constructors. Classes are constructors but throw when called without `new`.
+          Therefore neither “every function can be used with `new`” nor “every constructor can be
+          called with and without `new`” is a safe rule.
   - id: observable-cases
-    title: "Seven observable pressure tests"
+    title: "Eight observable pressure tests"
     mode: observable
     blocks:
       - id: observable-prose
@@ -258,6 +346,48 @@ citations:
     url: https://v8.dev/docs/ignition
     relevance: "Identifies Ignition as V8's interpreter and bytecode pipeline."
     evidenceHash: 50f2ac0e841920ca
+  - id: evaluate-new
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-evaluatenew
+    label: "ECMA-262 — EvaluateNew"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-evaluatenew
+    relevance: "Defines evaluation of `new`, the IsConstructor check, and delegation to Construct."
+    evidenceHash: 19a6963b8824c002
+  - id: construct
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-construct
+    label: "ECMA-262 — Construct"
+    url: https://tc39.es/ecma262/2026/multipage/abstract-operations.html#sec-construct
+    relevance: "Defines delegation to a constructor object's `[[Construct]]` internal method."
+    evidenceHash: d4084787424e6b8c
+  - id: function-construct
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-ecmascript-function-objects-construct-argumentslist-newtarget
+    label: "ECMA-262 — ECMAScript function `[[Construct]]`"
+    url: https://tc39.es/ecma262/2026/multipage/ordinary-and-exotic-objects-behaviours.html#sec-ecmascript-function-objects-construct-argumentslist-newtarget
+    relevance: "Defines candidate-object creation, `this` binding, body evaluation, and result selection for ordinary constructors."
+    evidenceHash: cc7cfd60f68209df
+  - id: ordinary-function-instantiation
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-runtime-semantics-instantiateordinaryfunctionobject
+    label: "ECMA-262 — InstantiateOrdinaryFunctionObject"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html#sec-runtime-semantics-instantiateordinaryfunctionobject
+    relevance: "Shows that ordinary function declarations are made constructors when the function object is instantiated."
+    evidenceHash: 182c2342e45a0db9
+  - id: arrow-function-instantiation
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-runtime-semantics-instantiatearrowfunctionexpression
+    label: "ECMA-262 — InstantiateArrowFunctionExpression"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html#sec-runtime-semantics-instantiatearrowfunctionexpression
+    relevance: "Creates an arrow with lexical `this` and without applying MakeConstructor."
+    evidenceHash: 318b0991a7fc76c9
+  - id: proxy-construct
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-proxy-object-internal-methods-and-internal-slots-construct-argumentslist-newtarget
+    label: "ECMA-262 — Proxy `[[Construct]]`"
+    url: https://tc39.es/ecma262/2026/multipage/ordinary-and-exotic-objects-behaviours.html#sec-proxy-object-internal-methods-and-internal-slots-construct-argumentslist-newtarget
+    relevance: "Allows a construct trap to provide the resulting Object, including an already existing one."
+    evidenceHash: 95eb380c966fcc9a
 examples:
   - id: method-call
     title: "Method-call receiver"
@@ -315,6 +445,21 @@ examples:
     expectedOutput: ["TypeError"]
     claimIds: [claim-evaluatecall-this]
     citationIds: [evaluate-call, call]
+  - id: new-construction
+    title: "Construction, replacement, and rejection"
+    goal: "Distinguish the ordinary `this` candidate from the final result and observe a non-constructable arrow."
+    sourcePath: examples/new-construction.js
+    timeoutMs: 1200
+    expectedOutput: ["Ada", "true", "true", "true", "true", "TypeError"]
+    claimIds:
+      [
+        claim-new-delegates,
+        claim-ordinary-construct-this,
+        claim-constructability-not-return,
+        claim-new-result-not-fresh,
+      ]
+    citationIds:
+      [evaluate-new, construct, function-construct, arrow-function-instantiation, proxy-construct]
 engineResults:
   - exampleId: method-call
     engine: V8
@@ -366,6 +511,13 @@ engineResults:
     status: verified
     output: ["TypeError"]
     capturedAt: "2026-08-06"
+  - exampleId: new-construction
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["Ada", "true", "true", "true", "true", "TypeError"]
+    capturedAt: "2026-08-21"
   - exampleId: method-call
     engine: SpiderMonkey
     version: not-installed
