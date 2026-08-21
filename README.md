@@ -27,6 +27,49 @@ The project is not a replacement for the specification, a browser compatibility 
 performance benchmark. It is a learning and investigation surface that points back to primary
 sources.
 
+## How we establish knowledge
+
+The methodology starts with a concrete JavaScript question, not with an attempt to retell an entire
+specification chapter. We reduce that question to small claims and require each claim to carry its
+own evidence and authority label. An article is assembled through the following process:
+
+1. **Frame a falsifiable question.** We begin with behavior a reader can recognize, such as why a
+   method call receives a particular `this` value or when a lexical binding becomes initialized.
+   The question is split into claims that can be supported, challenged, or marked unresolved.
+2. **Establish the normative baseline.** The stable, pinned ECMA-262 edition is the primary source
+   for language semantics. We locate the relevant grammar, definitions, abstract operations, and
+   algorithm steps and preserve their clause IDs and links. An isolated quotation is not enough:
+   the investigation follows the complete chain of operations that produces the behavior.
+3. **Build an explicit reasoning trace.** When the specification does not state a reader-facing
+   conclusion verbatim, we derive it step by step from cited algorithms. Derived explanations are
+   kept distinct from normative statements so that the reasoning can be inspected rather than
+   accepted on authority.
+4. **Design pressure tests.** Small executable examples target the boundary of each claim: detached
+   calls, getters, computed keys, TDZ access, shadowing, aliasing, mutation, and similar cases. A
+   test demonstrates observable behavior in a stated runtime; it does not rewrite or replace the
+   specification.
+5. **Inspect implementations only when the question requires it.** Claims about storage, bytecode,
+   or optimization use pinned engine documentation, source code, and reproducible artifacts from a
+   specific engine build. Version, V8 revision, platform, command, source fingerprint, and binary
+   hash are recorded. Implementation evidence is never promoted to a universal JavaScript rule.
+6. **Triangulate and classify the result.** Each published statement is classified as normative,
+   derived, observable, host-defined, or implementation-specific. If specification text,
+   experiment, and engine evidence appear to disagree, we narrow the claim or leave it unresolved;
+   we do not silently blend the layers together.
+7. **Review language and meaning separately.** English content is researched and technically
+   reviewed first. The Russian version preserves the same sections, claims, trace steps, citations,
+   and examples, while a controlled terminology list keeps technical vocabulary consistent.
+   Semantic parity and editorial quality are checked independently.
+8. **Invalidate knowledge when its inputs change.** Source fragments and normalized artifacts are
+   fingerprinted. A changed specification clause, example, engine binary, or derived artifact marks
+   dependent material stale until it is reviewed again.
+
+AI may assist with search, bounded-context synthesis, drafting, translation, and consistency checks,
+but it is not treated as a source. It receives a limited source package, must produce structured
+drafts, and cannot by itself promote material to a verified publication state. Primary-source
+mapping, technical interpretation, claim entailment, translation semantics, and final publication
+remain review decisions.
+
 ## How the site is made
 
 The public site is a static Next.js export. There is no runtime server, database, account system,
