@@ -2,7 +2,7 @@ id: reference-call-this-ru
 slug: reference-call-this
 locale: ru
 translationOf: reference-call-this
-sourceContentHash: cd536c686ffae3b6
+sourceContentHash: 6d6b90ec1941ba90
 title: "Почему this зависит от способа вызова"
 eyebrow: "От obj.method до запуска функции"
 dek: >-
@@ -10,10 +10,11 @@ dek: >-
   разберём по шагам, что JavaScript делает с выражением `obj.method()`.
 status: READY
 sourceSnapshot: ECMA-262-ES2026
-readingMinutes: 20
+readingMinutes: 24
 learningObjectives:
   - Понимать, зачем спецификации нужен Reference Record и какие данные он хранит.
   - Объяснять, почему `obj.method()` и вызов той же функции через переменную дают разный `this`.
+  - Объяснять, почему `new` передаёт работу конструктору, а не обещает свежий объект напрямую.
   - "Видеть порядок: имя свойства, чтение свойства, аргументы, тело функции."
 prerequisites:
   - Некоторые промежуточные результаты существуют только в описании языка, а не как объекты JavaScript.
@@ -136,8 +137,97 @@ sections:
             sourceFingerprint: d833185a549caf49
             confidence: 1
             reviewStatus: READY
+  - id: construction-call
+    title: "`new` запрашивает конструирование, а не означает «создать объект»"
+    mode: normative
+    blocks:
+      - id: construction-prose
+        type: prose
+        body: >-
+          Фраза «`new` создаёт объект» подходит как первое приближение, но не как определение
+          оператора. Лексически `new` — зарезервированное ключевое слово; в выражении ECMA-262
+          описывает его как оператор `new`. EvaluateNew вычисляет значение после `new` и аргументы,
+          отклоняет значение, которое не является конструктором, и передаёт работу операции
+          Construct. Та вызывает внутренний метод `[[Construct]]` выбранного значения. Создание
+          объекта и выбор итогового результата относятся к протоколу конструирования, а не к самому
+          токену `new`.
+      - id: construction-trace
+        type: trace
+        steps:
+          - id: construct-evaluate
+            label: "1. Вычислить конструктор и аргументы"
+            operation: EvaluateNew
+            detail: "Получить значение — кандидат в конструкторы — и подготовить список аргументов."
+            citationId: evaluate-new
+          - id: construct-check
+            label: "2. Проверить возможность конструирования"
+            operation: IsConstructor
+            detail: "Выбросить TypeError, если у значения нет внутреннего метода `[[Construct]]`."
+            citationId: evaluate-new
+          - id: construct-delegate
+            label: "3. Передать управление конструктору"
+            operation: Construct
+            detail: "Вызвать собственный внутренний метод `[[Construct]]` объекта-конструктора."
+            citationId: construct
+          - id: construct-this
+            label: "4. Подготовить `this` обычного базового конструктора"
+            operation: "[[Construct]]"
+            detail: "Создать объект-кандидат на основе `newTarget.prototype` и связать его с `this`."
+            citationId: function-construct
+          - id: construct-body
+            label: "5. Выполнить тело конструктора"
+            operation: OrdinaryCallEvaluateBody
+            detail: "Запустить тело функции с подготовленным `this` и вычисленными аргументами."
+            citationId: function-construct
+          - id: construct-result
+            label: "6. Выбрать результат"
+            operation: "[[Construct]]"
+            detail: "Вернуть явно возвращённый Object; иначе для базового конструктора вернуть подготовленный объект `this`."
+            citationId: function-construct
+      - id: construction-claims
+        type: claims
+        claims:
+          - id: claim-new-delegates
+            classification: NORMATIVE
+            text: "Оператор `new` сам не выполняет алгоритм выделения объекта: EvaluateNew проверяет IsConstructor и передаёт работу Construct, а та вызывает внутренний метод `[[Construct]]` выбранного объекта."
+            citationIds: [evaluate-new, construct]
+            sourceFingerprint: d7fa66217a54d5fc
+            confidence: 1
+            reviewStatus: READY
+          - id: claim-ordinary-construct-this
+            classification: NORMATIVE
+            text: "Для обычного базового конструктора `[[Construct]]` создаёт объект-кандидат, связывает его с `this`, выполняет тело и возвращает либо явно возвращённый Object, либо этот объект-кандидат. Возврат примитива кандидата не заменяет."
+            citationIds: [function-construct]
+            sourceFingerprint: e3697be72d88fbdc
+            confidence: 1
+            reviewStatus: READY
+          - id: claim-constructability-not-return
+            classification: NORMATIVE
+            text: "Возможность конструирования определяется наличием `[[Construct]]`, а не наличием `return` в теле. Обычные объявления функций становятся конструкторами при создании; стрелочные функции — нет."
+            citationIds: [ordinary-function-instantiation, arrow-function-instantiation]
+            sourceFingerprint: fea937096e9edc96
+            confidence: 1
+            reviewStatus: READY
+          - id: claim-new-result-not-fresh
+            classification: OBSERVABLE
+            text: "Объект, полученный из `new C()`, не обязан быть свежим кандидатом, связанным с `this`: обычный конструктор может вернуть другой Object, а ловушка construct у Proxy — уже существующий Object."
+            citationIds: [function-construct, proxy-construct]
+            sourceFingerprint: 0e7686fbf7e0d47c
+            confidence: 1
+            reviewStatus: READY
+      - id: construction-boundaries
+        type: note
+        tone: warning
+        title: "Возможность вызова и конструирования — разные свойства"
+        body: >-
+          Обычные объявления и выражения `function`, как правило, имеют и `[[Call]]`, и
+          `[[Construct]]`. Стрелочные, async-, generator-функции и функции из краткой записи метода
+          можно вызывать, но нельзя использовать как конструкторы. Классы, наоборот, являются
+          конструкторами, но выбрасывают исключение при вызове без `new`. Поэтому небезопасны оба
+          правила: «любую функцию можно вызвать с `new`» и «любой конструктор можно вызвать и с
+          `new`, и без него».
   - id: observable-cases
-    title: "Проверьте это на семи примерах"
+    title: "Проверьте это на восьми примерах"
     mode: observable
     blocks:
       - id: observable-prose
@@ -260,6 +350,48 @@ citations:
     url: https://v8.dev/docs/ignition
     relevance: "Документация V8 о байткоде и интерпретаторе Ignition."
     evidenceHash: 50f2ac0e841920ca
+  - id: evaluate-new
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-evaluatenew
+    label: "ECMA-262 — EvaluateNew"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-expressions.html#sec-evaluatenew
+    relevance: "Описывает вычисление `new`, проверку IsConstructor и передачу управления операции Construct."
+    evidenceHash: 19a6963b8824c002
+  - id: construct
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-construct
+    label: "ECMA-262 — Construct"
+    url: https://tc39.es/ecma262/2026/multipage/abstract-operations.html#sec-construct
+    relevance: "Описывает передачу управления внутреннему методу `[[Construct]]` объекта-конструктора."
+    evidenceHash: d4084787424e6b8c
+  - id: function-construct
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-ecmascript-function-objects-construct-argumentslist-newtarget
+    label: "ECMA-262 — `[[Construct]]` ECMAScript-функции"
+    url: https://tc39.es/ecma262/2026/multipage/ordinary-and-exotic-objects-behaviours.html#sec-ecmascript-function-objects-construct-argumentslist-newtarget
+    relevance: "Описывает создание объекта-кандидата, привязку `this`, выполнение тела и выбор результата обычного конструктора."
+    evidenceHash: cc7cfd60f68209df
+  - id: ordinary-function-instantiation
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-runtime-semantics-instantiateordinaryfunctionobject
+    label: "ECMA-262 — InstantiateOrdinaryFunctionObject"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html#sec-runtime-semantics-instantiateordinaryfunctionobject
+    relevance: "Показывает, что обычное объявление функции становится конструктором при создании объекта функции."
+    evidenceHash: 182c2342e45a0db9
+  - id: arrow-function-instantiation
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-runtime-semantics-instantiatearrowfunctionexpression
+    label: "ECMA-262 — InstantiateArrowFunctionExpression"
+    url: https://tc39.es/ecma262/2026/multipage/ecmascript-language-functions-and-classes.html#sec-runtime-semantics-instantiatearrowfunctionexpression
+    relevance: "Создаёт стрелочную функцию с лексическим `this`, не применяя MakeConstructor."
+    evidenceHash: 318b0991a7fc76c9
+  - id: proxy-construct
+    snapshot: ECMA-262-ES2026
+    nodeId: sec-proxy-object-internal-methods-and-internal-slots-construct-argumentslist-newtarget
+    label: "ECMA-262 — `[[Construct]]` объекта Proxy"
+    url: https://tc39.es/ecma262/2026/multipage/ordinary-and-exotic-objects-behaviours.html#sec-proxy-object-internal-methods-and-internal-slots-construct-argumentslist-newtarget
+    relevance: "Разрешает ловушке construct предоставить итоговый Object, в том числе уже существующий."
+    evidenceHash: 95eb380c966fcc9a
 examples:
   - id: method-call
     title: "Обычный вызов метода"
@@ -317,6 +449,21 @@ examples:
     expectedOutput: ["TypeError"]
     claimIds: [claim-evaluatecall-this]
     citationIds: [evaluate-call, call]
+  - id: new-construction
+    title: "Конструирование, замена результата и отказ"
+    goal: "Отличить обычный объект-кандидат `this` от итогового результата и увидеть ошибку для стрелочной функции."
+    sourcePath: examples/new-construction.js
+    timeoutMs: 1200
+    expectedOutput: ["Ada", "true", "true", "true", "true", "TypeError"]
+    claimIds:
+      [
+        claim-new-delegates,
+        claim-ordinary-construct-this,
+        claim-constructability-not-return,
+        claim-new-result-not-fresh,
+      ]
+    citationIds:
+      [evaluate-new, construct, function-construct, arrow-function-instantiation, proxy-construct]
 engineResults:
   - exampleId: method-call
     engine: V8
@@ -368,6 +515,13 @@ engineResults:
     status: verified
     output: ["TypeError"]
     capturedAt: "2026-08-06"
+  - exampleId: new-construction
+    engine: V8
+    version: "Node.js 24.18.1 / V8 13.6.233.17-node.50"
+    binaryHash: d6c664df3f3f6145
+    status: verified
+    output: ["Ada", "true", "true", "true", "true", "TypeError"]
+    capturedAt: "2026-08-21"
   - exampleId: method-call
     engine: SpiderMonkey
     version: not-installed
