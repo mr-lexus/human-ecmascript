@@ -3,6 +3,7 @@ import type { CompiledArticle } from "@human-ecmascript/model";
 import { ArticleModes } from "./ArticleModes";
 import { ExampleLab } from "./ExampleLab";
 import { KnowledgeMap } from "./KnowledgeMap";
+import { formatStatus } from "../lib/statusLabels";
 
 export function GuideArticlePage({
   article,
@@ -27,8 +28,6 @@ export function GuideArticlePage({
               : "Схема вызова",
           lab: "Примеры, которые можно запустить",
           sources: "На что мы опираемся",
-          status:
-            article.status === "READY" ? "Сверено с ES2026" : "На технической проверке · ES2026",
           minutes: "мин",
           examples: "примеров",
         }
@@ -38,11 +37,10 @@ export function GuideArticlePage({
           map: isDeclarationTopic ? "Binding map" : isValueTopic ? "Value map" : "Evaluation map",
           lab: "Example laboratory",
           sources: "Sources and provenance",
-          status:
-            article.status === "READY" ? "Verified against ES2026" : "Technical review · ES2026",
           minutes: "min",
           examples: "examples",
         };
+  const statusLabel = formatStatus(article.status, article.sourceSnapshot, locale);
 
   return (
     <main>
@@ -69,8 +67,8 @@ export function GuideArticlePage({
               <span>
                 {article.examples.length} {labels.examples}
               </span>
-              <span className="verified-dot">●</span>
-              <span>{labels.status}</span>
+              <span className={article.status === "READY" ? "verified-dot" : "pending-dot"}>●</span>
+              <span>{statusLabel}</span>
             </div>
           </div>
           <aside className="objectives-card">
@@ -92,6 +90,8 @@ export function GuideArticlePage({
           bytecodeArtifacts={article.bytecodeArtifacts}
           representationArtifacts={article.representationArtifacts}
           locale={locale}
+          slug={article.slug}
+          sourceSnapshot={article.sourceSnapshot}
         />
       </section>
 

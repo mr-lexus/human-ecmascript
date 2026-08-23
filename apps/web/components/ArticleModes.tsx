@@ -10,6 +10,7 @@ import type {
   V8ValueRepresentationArtifact,
 } from "@human-ecmascript/model";
 import { Fragment, useMemo, useState } from "react";
+import { challengeIssueUrl } from "../lib/challengeIssueUrl";
 import { V8BytecodeBlock } from "./V8BytecodeBlock";
 import { V8ValueRepresentationBlock } from "./V8ValueRepresentationBlock";
 
@@ -21,6 +22,7 @@ const modeLabels = {
     v8: "V8 layer",
     evidence: "Evidence",
     open: "Open operation",
+    challenge: "Challenge this claim ↗",
   },
   ru: {
     human: "Простое объяснение",
@@ -29,6 +31,7 @@ const modeLabels = {
     v8: "Как делает V8",
     evidence: "Источник",
     open: "Подробнее",
+    challenge: "Оспорить утверждение ↗",
   },
 } as const;
 
@@ -93,6 +96,8 @@ export function ArticleModes({
   bytecodeArtifacts,
   representationArtifacts,
   locale,
+  slug,
+  sourceSnapshot,
 }: Readonly<{
   sections: ArticleSection[];
   examples: ExampleManifest[];
@@ -100,6 +105,8 @@ export function ArticleModes({
   bytecodeArtifacts: Record<string, V8BytecodeArtifact>;
   representationArtifacts: Record<string, V8ValueRepresentationArtifact>;
   locale: "en" | "ru";
+  slug: string;
+  sourceSnapshot: string;
 }>) {
   const [activeSectionId, setActiveSectionId] = useState(sections[0]!.id);
   const [operationId, setOperationId] = useState<string | null>(null);
@@ -183,6 +190,26 @@ export function ArticleModes({
                         ) : null;
                       })}
                     </div>
+                    <a
+                      className="challenge-link"
+                      href={challengeIssueUrl({
+                        slug,
+                        locale,
+                        claimId: claim.id,
+                        classification: claim.classification,
+                        reviewStatus: claim.reviewStatus,
+                        sourceSnapshot,
+                        claimText: claim.text,
+                        citations: claim.citationIds
+                          .map((id) => citationMap.get(id))
+                          .filter((citation): citation is Citation => Boolean(citation))
+                          .map(({ id, label, url }) => ({ id, label, url })),
+                      })}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {labels.challenge}
+                    </a>
                   </article>
                 ))}
               </div>
