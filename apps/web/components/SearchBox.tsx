@@ -3,27 +3,15 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-const entries = {
+export type SearchEntry = {
+  title: string;
+  detail: string;
+  terms: string;
+  href: string;
+};
+
+const staticEntries = {
   en: [
-    {
-      title: "References, calls, and this",
-      detail: "Learning path · 18 min",
-      terms: "reference property method this evaluatecall",
-      href: "/en/guide/reference-call-this/",
-    },
-    {
-      title: "const, let, and var",
-      detail: "Bindings and performance · 22 min",
-      terms: "const let var tdz scope binding hoisting performance loop closure",
-      href: "/en/guide/const-let-var/",
-    },
-    {
-      title: "Primitive values, Reference Records, and actual storage",
-      detail: "Specification types and V8 storage · 34 min",
-      terms:
-        "primitive value reference record environment resolvebinding object identity heap stack context smi symbol bigint number",
-      href: "/en/guide/values-types-memory/",
-    },
     {
       title: "GetValue",
       detail: "Abstract operation",
@@ -45,26 +33,6 @@ const entries = {
   ],
   ru: [
     {
-      title: "Ссылки, вызовы и this",
-      detail: "Первая тема · 20 минут",
-      terms: "reference свойство метод this evaluatecall",
-      href: "/ru/guide/reference-call-this/",
-    },
-    {
-      title: "const, let и var",
-      detail: "Переменные и производительность · 24 минуты",
-      terms:
-        "const let var tdz область видимости переменная всплытие производительность цикл замыкание",
-      href: "/ru/guide/const-let-var/",
-    },
-    {
-      title: "Primitive value, Reference Record и реальное хранение",
-      detail: "Типы спецификации и хранение V8 · 36 минут",
-      terms:
-        "primitive value reference record environment resolvebinding ссылочный тип объект идентичность heap stack context smi symbol bigint number",
-      href: "/ru/guide/values-types-memory/",
-    },
-    {
       title: "GetValue",
       detail: "Абстрактная операция",
       terms: "getvalue reference значение свойство",
@@ -85,15 +53,22 @@ const entries = {
   ],
 } as const;
 
-export function SearchBox({ locale }: Readonly<{ locale: "en" | "ru" }>) {
+export function SearchBox({
+  locale,
+  articleEntries = [],
+}: Readonly<{
+  locale: "en" | "ru";
+  articleEntries?: ReadonlyArray<SearchEntry>;
+}>) {
   const [query, setQuery] = useState("");
   const results = useMemo(() => {
+    const entries = [...articleEntries, ...staticEntries[locale]];
     const normalized = query.trim().toLocaleLowerCase(locale);
-    if (!normalized) return entries[locale].slice(0, 2);
-    return entries[locale].filter((entry) =>
+    if (!normalized) return entries.slice(0, 2);
+    return entries.filter((entry) =>
       `${entry.title} ${entry.terms}`.toLocaleLowerCase(locale).includes(normalized),
     );
-  }, [locale, query]);
+  }, [articleEntries, locale, query]);
   return (
     <div className="search-box">
       <label>
