@@ -11,9 +11,11 @@
 
 ## What this project is
 
-Human ECMAScript is a bilingual (English/Russian), evidence-backed field guide to ECMAScript and
-the ECMA-262 specification. It is designed to make specification algorithms navigable without
-pretending that every statement has the same authority.
+Human ECMAScript is an evidence-backed research and learning platform for ECMAScript. Instead of
+treating prose as the source of truth, the project models individual technical claims and connects
+them to ECMA-262 algorithms, executable observations, and versioned engine evidence. The public
+website is only the presentation layer: the source of truth is the structured content, the pinned
+sources, and the validation pipeline that compiles them.
 
 The first vertical slice follows familiar JavaScript questions all the way down to the model used
 by the standard:
@@ -26,6 +28,17 @@ by the standard:
 The project is not a replacement for the specification, a browser compatibility database, or a
 performance benchmark. It is a learning and investigation surface that points back to primary
 sources.
+
+## What this project is not
+
+Human ECMAScript is not:
+
+- a replacement for ECMA-262 — it points back to the specification and never republishes it;
+- another MDN — it investigates selected questions deeply instead of covering the web platform;
+- a compatibility database — engine results are pinned evidence about specific builds, not browser matrices;
+- a generic performance guide — it does not rank constructs by speed;
+- a V8 documentation mirror — V8 artifacts are one engine's evidence, explicitly non-normative;
+- an AI-generated encyclopedia — AI may assist search, synthesis, drafting, and translation, but AI output is never treated as evidence. Published claims trace back to primary specifications and documentation, reproducible observable behavior, versioned implementation evidence, and explicit human review.
 
 ## How we establish knowledge
 
@@ -72,6 +85,8 @@ remain review decisions.
 
 ## How the site is made
 
+The public website is the presentation layer, not the project's source of truth.
+
 The public site is a static Next.js export. There is no runtime server, database, account system,
 or live execution service behind the deployed pages.
 
@@ -90,6 +105,21 @@ or live execution service behind the deployed pages.
    bounded input, output, and execution time. The resulting site is exported to `apps/web/out`.
 7. **GitHub Actions publishes it.** A push to `main` runs the checks, builds the export, uploads the
    Pages artifact, and deploys it to GitHub Pages.
+
+## Why so much machinery for a few articles?
+
+Because the current articles are a vertical slice of the system, not the intended scope of the
+system. The slice exists to validate whether evidence-backed technical knowledge can be represented,
+checked, translated, invalidated, and published repeatably — before scaling content volume. The
+machinery is the point of the experiment; the article count is not.
+
+## Current implementation status
+
+To keep the project honest about its alpha state:
+
+- **Implemented now:** structured claim model with authority classifications and review states; EN/RU semantic parity validation; executable examples with expected output verified on every build; pinned V8 baselines plus bytecode and value-representation artifacts with source, capture, and binary fingerprints; pinned upstream sources (ECMA-262 ES2026, Ecmarkup, Test262 archive); browser sandbox for examples; static export; article-local knowledge graphs and bounded-context primitives.
+- **Partial:** V8 implementation evidence covers one pinned Node/V8 build for the current slice only; review states are modeled and enforced, but review is performed by the project author — independent review at scale is a goal; staleness protection currently means fingerprints checked at build time (source hashes, artifact hashes, EN/RU source-content hashes).
+- **Roadmap, not implemented:** complete ECMA-262 ingestion; Test262 indexing (the source is pinned for future indexing); SpiderMonkey and JavaScriptCore execution (engine pins pending); automatic invalidation driven by upstream specification changes; the ESMeta layer; a scaled knowledge graph.
 
 ## Repository map
 
@@ -151,6 +181,14 @@ repository Pages setting must use **GitHub Actions** as its source. The expected
 
 The project-base path is configured for the repository name `human-ecmascript`. If the repository
 is renamed, update the Next.js base path and the canonical metadata/sitemap URLs before deploying.
+
+## Reporting mistakes and contributing
+
+The site is the presentation layer; the repository is where claims are challenged. You can:
+
+- inspect the repository: <https://github.com/mr-lexus/human-ecmascript>;
+- report a technical mistake: open an issue (article pages and individual claims link to prefilled issue templates);
+- contribute or inspect the methodology: see [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/planning](docs/planning/README.md).
 
 ## Scope and limitations
 
