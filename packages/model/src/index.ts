@@ -317,6 +317,12 @@ export const articleSchema = z
                 message: `READY article contains UNCERTAIN claim ${claim.id}`,
               });
             }
+            if (article.status === "READY" && claim.reviewStatus !== "READY") {
+              context.addIssue({
+                code: "custom",
+                message: `READY article contains claim ${claim.id} in review state ${claim.reviewStatus}`,
+              });
+            }
           }
         }
       }
