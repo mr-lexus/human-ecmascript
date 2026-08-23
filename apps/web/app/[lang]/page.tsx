@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Fragment } from "react";
 import { computeSiteStats, loadArticle } from "@human-ecmascript/content-compiler";
 import { SearchBox } from "../../components/SearchBox";
 import { REPO_URL } from "../../lib/challengeIssueUrl";
@@ -406,10 +407,10 @@ export default async function HomePage({ params }: { params: Promise<{ lang: "en
         <p className="section-lead">{t.hoodBody}</p>
         <div className="hood-chain">
           {hoodChain[lang].map((item, index) => (
-            <span key={item}>
+            <Fragment key={item}>
               {index > 0 && <b aria-hidden="true">→</b>}
-              {item}
-            </span>
+              <span>{item}</span>
+            </Fragment>
           ))}
         </div>
         <p className="hood-thesis">{t.hoodThesis}</p>
