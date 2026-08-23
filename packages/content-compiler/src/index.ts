@@ -92,6 +92,68 @@ export function listArticleSlugs(locale: Locale, root = findWorkspaceRoot()): st
     .sort();
 }
 
+export type SiteStats = {
+  bilingualTopics: number;
+  claims: number;
+  citations: number;
+  examples: number;
+  verifiedV8Baselines: number;
+  pendingEngineBaselines: number;
+  bytecodeArtifacts: number;
+  representationArtifacts: number;
+  snapshot: string;
+};
+
+export function computeSiteStats(root = findWorkspaceRoot()): SiteStats {
+  const enSlugs = listArticleSlugs("en", root);
+  const ruSlugs = listArticleSlugs("ru", root);
+  if (enSlugs.length !== ruSlugs.length) throw new Error("EN/RU article inventories differ");
+
+  const enArticles = enSlugs.map((slug) => loadArticle("en", slug, root));
+  const allArticles = [...enArticles, ...ruSlugs.map((slug) => loadArticle("ru", slug, root))];
+  const snapshots = new Set(allArticles.map((article) => article.sourceSnapshot));
+  if (snapshots.size !== 1) throw new Error("Articles disagree on sourceSnapshot");
+
+  return {
+    bilingualTopics: enSlugs.length,
+    claims: enArticles.reduce(
+      (total, article) =>
+        total +
+        article.sections
+          .flatMap(({ blocks }) => blocks)
+          .reduce(
+            (blockTotal, block) => blockTotal + (block.type === "claims" ? block.claims.length : 0),
+            0,
+          ),
+      0,
+    ),
+    citations: enArticles.reduce((total, article) => total + article.citations.length, 0),
+    examples: enArticles.reduce((total, article) => total + article.examples.length, 0),
+    verifiedV8Baselines: enArticles.reduce(
+      (total, article) =>
+        total +
+        article.engineResults.filter(
+          (result) => result.engine === "V8" && result.status === "verified",
+        ).length,
+      0,
+    ),
+    pendingEngineBaselines: enArticles.reduce(
+      (total, article) =>
+        total + article.engineResults.filter((result) => result.status === "pending").length,
+      0,
+    ),
+    bytecodeArtifacts: enArticles.reduce(
+      (total, article) => total + Object.keys(article.bytecodeArtifacts).length,
+      0,
+    ),
+    representationArtifacts: enArticles.reduce(
+      (total, article) => total + Object.keys(article.representationArtifacts).length,
+      0,
+    ),
+    snapshot: [...snapshots][0]!,
+  };
+}
+
 function semanticShape(article: Article): string[] {
   return article.sections.flatMap((section) => [
     `section:${section.id}`,

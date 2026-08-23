@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { listArticleSlugs, loadArticle, validateContentPair } from "./index";
+import { computeSiteStats, listArticleSlugs, loadArticle, validateContentPair } from "./index";
 
 describe("content compiler", () => {
   it.each(["const-let-var", "reference-call-this", "values-types-memory"])(
@@ -18,6 +18,20 @@ describe("content compiler", () => {
       "values-types-memory",
     ]);
     expect(listArticleSlugs("ru")).toEqual(listArticleSlugs("en"));
+  });
+
+  it("derives the verification snapshot from real bilingual content", () => {
+    expect(computeSiteStats()).toEqual({
+      bilingualTopics: 3,
+      claims: 53,
+      citations: 55,
+      examples: 27,
+      verifiedV8Baselines: 27,
+      pendingEngineBaselines: 2,
+      bytecodeArtifacts: 3,
+      representationArtifacts: 1,
+      snapshot: "ECMA-262-ES2026",
+    });
   });
 
   it("loads executable sources for both slices", () => {
