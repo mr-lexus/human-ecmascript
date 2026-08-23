@@ -6,4 +6,5 @@ coverage/
 docs/planning/roadmap.json
 pnpm-lock.yaml
 LICENSE
-
+.omo/
+.serena/
