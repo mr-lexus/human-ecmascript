@@ -5,8 +5,7 @@ import { computeSiteStats, loadArticle } from "@human-ecmascript/content-compile
 import { SearchBox } from "../../components/SearchBox";
 import { REPO_URL } from "../../lib/challengeIssueUrl";
 import { formatStatus } from "../../lib/statusLabels";
-
-const slugs = ["reference-call-this", "const-let-var", "values-types-memory"] as const;
+import { featuredTopics } from "../../lib/featuredTopics";
 
 const copy = {
   en: {
@@ -17,15 +16,6 @@ const copy = {
     start: "Start the first path",
     explore: "Explore operations",
     pathLabel: "Learning paths",
-    pathTitle: "References, calls, and this",
-    pathBody:
-      "Follow `obj.method()` and `new C()` from receiver selection to focused observable checks.",
-    declarationTitle: "const, let, and var without folklore",
-    declarationBody:
-      "Trace initialization, TDZ, scopes, loop bindings, and the real performance boundary behind each declaration.",
-    valuesTitle: "Primitive values, Reference Records, and actual storage",
-    valuesBody:
-      "Trace name resolution in ECMA-262, then compare local and captured Smi, String, and Symbol storage in pinned V8 bytecode.",
     evidence: "Evidence layers",
     evidenceTitle: "Four layers, four authorities",
     evidenceBody:
@@ -94,14 +84,6 @@ const copy = {
     start: "Разобрать первую тему",
     explore: "Посмотреть операции",
     pathLabel: "Учебные темы",
-    pathTitle: "Ссылки, вызовы и this",
-    pathBody: "Разберём `obj.method()` и `new C()`: от выбора `this` до проверок в коде.",
-    declarationTitle: "const, let и var — без мифов",
-    declarationBody:
-      "Разберём инициализацию, TDZ, области видимости, циклы и честные правила выбора без мифов о скорости.",
-    valuesTitle: "Primitive value, Reference Record и реальное хранение",
-    valuesBody:
-      "Проследим поиск имени по ECMA-262 и сравним хранение локальных и захваченных Smi, String и Symbol в закреплённом V8.",
     evidence: "Откуда мы это знаем",
     evidenceTitle: "Четыре уровня, четыре авторитетности",
     evidenceBody:
@@ -167,19 +149,6 @@ const copy = {
   },
 } as const;
 
-const searchTerms = {
-  en: [
-    "reference property method this evaluatecall",
-    "const let var tdz scope binding hoisting performance loop closure",
-    "primitive value reference record environment resolvebinding object identity heap stack context smi symbol bigint number",
-  ],
-  ru: [
-    "reference свойство метод this evaluatecall",
-    "const let var tdz область видимости переменная всплытие производительность цикл замыкание",
-    "primitive value reference record environment resolvebinding ссылочный тип объект идентичность heap stack context smi symbol bigint number",
-  ],
-} as const;
-
 const evidenceLabels = ["NORMATIVE", "DERIVED", "OBSERVABLE", "V8_IMPLEMENTATION"] as const;
 const hoodChain = {
   en: [
@@ -220,13 +189,11 @@ export async function generateMetadata({
 export default async function HomePage({ params }: { params: Promise<{ lang: "en" | "ru" }> }) {
   const { lang } = await params;
   const t = copy[lang];
-  const articles = slugs.map((slug) => loadArticle(lang, slug));
+  const topics = featuredTopics.map((topic) => ({
+    ...topic.copy[lang],
+    article: loadArticle(lang, topic.slug),
+  }));
   const stats = computeSiteStats();
-  const pathCopies = [
-    { title: t.pathTitle, body: t.pathBody },
-    { title: t.declarationTitle, body: t.declarationBody },
-    { title: t.valuesTitle, body: t.valuesBody },
-  ];
 
   return (
     <main>
@@ -277,19 +244,19 @@ export default async function HomePage({ params }: { params: Promise<{ lang: "en
         <div className="section-heading">
           <div>
             <p className="overline">{t.pathLabel}</p>
-            <h2>{t.pathTitle}</h2>
+            <h2>{lang === "ru" ? "Темы и связи между ними" : "Topics and their connections"}</h2>
           </div>
           <div className="coverage-ring">
-            <strong>{articles.length}</strong>
+            <strong>{topics.length}</strong>
             <span>
-              / {articles.length}
+              / {topics.length}
               <br />
               {t.now}
             </span>
           </div>
         </div>
         <div className="path-list">
-          {articles.map((article, index) => (
+          {topics.map(({ article, title, body }, index) => (
             <Link className="path-card" href={`/${lang}/guide/${article.slug}/`} key={article.slug}>
               <div className="path-number">{String(index + 1).padStart(2, "0")}</div>
               <div>
@@ -302,8 +269,8 @@ export default async function HomePage({ params }: { params: Promise<{ lang: "en
                     {formatStatus(article.status, article.sourceSnapshot, lang)}
                   </span>
                 </div>
-                <h3>{pathCopies[index]!.title}</h3>
-                <p>{pathCopies[index]!.body}</p>
+                <h3>{title}</h3>
+                <p>{body}</p>
               </div>
               <div className="path-meta">
                 <span>
@@ -450,13 +417,13 @@ export default async function HomePage({ params }: { params: Promise<{ lang: "en
         <p className="overline">{t.search}</p>
         <SearchBox
           locale={lang}
-          articleEntries={articles.map((article, index) => ({
+          articleEntries={topics.map(({ article, searchTerms }) => ({
             title: article.title,
             detail:
               lang === "ru"
                 ? `Тема · ${article.readingMinutes} мин`
                 : `Learning path · ${article.readingMinutes} min`,
-            terms: searchTerms[lang][index]!,
+            terms: searchTerms,
             href: `/${lang}/guide/${article.slug}/`,
           }))}
         />

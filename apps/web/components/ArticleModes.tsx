@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge, Button, Drawer } from "@mantine/core";
+import Link from "next/link";
 import type {
   ArticleSection,
   Citation,
@@ -77,14 +78,20 @@ function RichText({ children }: Readonly<{ children: string }>) {
   return (
     <p className="rich-text">
       {children
-        .split(/(`[^`]+`)/g)
-        .map((part, index) =>
-          part.startsWith("`") && part.endsWith("`") ? (
-            <code key={index}>{part.slice(1, -1)}</code>
+        .split(/(`[^`]+`|\[[^\]\n]+\]\(\/(?:en|ru)\/guide\/[a-z0-9-]+\/\))/g)
+        .map((part, index) => {
+          if (part.startsWith("`") && part.endsWith("`")) {
+            return <code key={index}>{part.slice(1, -1)}</code>;
+          }
+          const link = part.match(/^\[([^\]\n]+)\]\((\/(?:en|ru)\/guide\/[a-z0-9-]+\/)\)$/);
+          return link ? (
+            <Link key={index} href={link[2]!}>
+              {link[1]}
+            </Link>
           ) : (
             <Fragment key={index}>{part}</Fragment>
-          ),
-        )}
+          );
+        })}
     </p>
   );
 }

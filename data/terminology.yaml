@@ -1,4 +1,4 @@
-version: 1
+version: 2
 terms:
   - term: Reference Record
     ru: Reference Record
@@ -15,3 +15,33 @@ terms:
   - term: internal method
     ru: внутренний метод
     policy: Preserve double-bracket spellings such as [[Get]].
+  - term: ECMAScript language type
+    ru: тип языка ECMAScript
+    policy: Preserve capitalized type names such as Null and Object; distinguish them from quoted typeof result strings.
+  - term: ECMAScript specification type
+    ru: спецификационный тип ECMAScript
+    policy: Do not present specification records as JavaScript values.
+  - term: unresolvable Reference
+    ru: неразрешимая Reference Record
+    policy: Explain through IsUnresolvableReference and the unresolvable Base; never equate it with an uninitialized binding.
+  - term: Environment Record
+    ru: Environment Record
+    policy: Keep the specification name in formal traces and explain its role in Russian.
+  - term: binding
+    ru: привязка
+    policy: Use привязка in formal claims; переменная is acceptable in explanatory prose where it does not erase binding state.
+  - term: uninitialized binding
+    ru: неинициализированная привязка
+    policy: Distinguish existence from initialization; initialized is инициализированная.
+  - term: TDZ
+    ru: TDZ
+    policy: Explain as the interval when a lexical binding exists but is uninitialized.
+  - term: callability
+    ru: возможность вызова
+    policy: In structural specification claims define this through [[Call]], without promising normal completion.
+  - term: constructability
+    ru: возможность конструирования
+    policy: Define through [[Construct]], independently of typeof and successful construction.
+  - term: host-defined
+    ru: задаваемый средой
+    policy: Name the host specification; do not confuse with implementation-defined.

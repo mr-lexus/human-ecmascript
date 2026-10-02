@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { topicSequence } from "../../../../lib/featuredTopics";
 import { loadArticle } from "@human-ecmascript/content-compiler";
 import { GuideArticlePage } from "../../../../components/GuideArticlePage";
 
@@ -21,5 +22,11 @@ export async function generateMetadata({
 export default async function GuidePage({ params }: { params: Promise<{ lang: "en" | "ru" }> }) {
   const { lang } = await params;
   const article = loadArticle(lang, "reference-call-this");
-  return <GuideArticlePage article={article} locale={lang} sequence={1} />;
+  return (
+    <GuideArticlePage
+      article={article}
+      locale={lang}
+      sequence={topicSequence("reference-call-this")}
+    />
+  );
 }

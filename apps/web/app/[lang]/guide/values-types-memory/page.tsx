@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { topicSequence } from "../../../../lib/featuredTopics";
 import { loadArticle } from "@human-ecmascript/content-compiler";
 import { GuideArticlePage } from "../../../../components/GuideArticlePage";
 
@@ -28,5 +29,11 @@ export default async function ValuesTypesMemoryPage({
 }) {
   const { lang } = await params;
   const article = loadArticle(lang, "values-types-memory");
-  return <GuideArticlePage article={article} locale={lang} sequence={3} />;
+  return (
+    <GuideArticlePage
+      article={article}
+      locale={lang}
+      sequence={topicSequence("values-types-memory")}
+    />
+  );
 }

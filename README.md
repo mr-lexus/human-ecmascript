@@ -23,6 +23,7 @@ by the standard:
 - how `obj.method()` becomes a Reference Record, property access, and a `this` binding;
 - how `const`, `let`, and `var` differ during initialization, TDZ checks, scoping, and loops;
 - how primitive values, bindings, and Reference Records relate to observable JavaScript behavior;
+- how `typeof` classifies evaluated operands, including TDZ, callable objects, and the HTML host boundary;
 - where a claim is about ECMA-262, a derived explanation, an observable test, or a V8 detail.
 
 The project is not a replacement for the specification, a browser compatibility database, or a
@@ -117,7 +118,7 @@ machinery is the point of the experiment; the article count is not.
 
 To keep the project honest about its alpha state:
 
-- **Implemented now:** structured claim model with authority classifications and review states; EN/RU semantic parity validation; executable examples with expected output verified on every build; pinned V8 baselines plus bytecode and value-representation artifacts with source, capture, and binary fingerprints; pinned upstream sources (ECMA-262 ES2026, Ecmarkup, Test262 archive); browser sandbox for examples; static export; article-local knowledge graphs and bounded-context primitives.
+- **Implemented now:** structured claim model with authority classifications and review states; EN/RU semantic parity validation; executable examples with expected output verified on every build; pinned V8 baselines plus bytecode and value-representation artifacts with source, capture, and binary fingerprints; pinned upstream sources (ECMA-262 ES2026, Ecmarkup, Test262 archive, WHATWG HTML); browser sandbox for examples; static export; article-local knowledge graphs and bounded-context primitives.
 - **Partial:** V8 implementation evidence covers one pinned Node/V8 build for the current slice only; review states are modeled and enforced, but review is performed by the project author — independent review at scale is a goal; staleness protection currently means fingerprints checked at build time (source hashes, artifact hashes, EN/RU source-content hashes).
 - **Roadmap, not implemented:** complete ECMA-262 ingestion; Test262 indexing (the source is pinned for future indexing); SpiderMonkey and JavaScriptCore execution (engine pins pending); automatic invalidation driven by upstream specification changes; the ESMeta layer; a scaled knowledge graph.
 
@@ -171,6 +172,13 @@ lesson into a component:
 4. Add executable examples under `examples/` with bounded expected output.
 5. Run `pnpm validate:content`, the artifact checks, and the full `pnpm check`.
 6. Review the generated page in both languages before publishing.
+
+The `typeof` slice also has an optional primary-source audit:
+`pnpm exec tsx scripts/check-typeof-evidence.mts`. It fetches the exact ECMA-262 and HTML
+commits, checks citation fragments and claim dependencies, and writes no files. Citation hashes
+cover complete ECMA source clauses (or the HTMLAllCollection section / Document.all definition),
+with line endings normalized to LF. Claim fingerprints cover the ordered citation hashes and
+the source hashes of linked executable examples. This audit is separate from the offline build.
 
 ## Deployment
 

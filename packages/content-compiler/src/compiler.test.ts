@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { computeSiteStats, listArticleSlugs, loadArticle, validateContentPair } from "./index";
 
 describe("content compiler", () => {
-  it.each(["const-let-var", "reference-call-this", "values-types-memory"])(
+  it.each(listArticleSlugs("en"))(
     "loads the bilingual %s slice with matching semantic structure",
     (slug) => {
       const en = loadArticle("en", slug);
@@ -15,6 +15,7 @@ describe("content compiler", () => {
     expect(listArticleSlugs("en")).toEqual([
       "const-let-var",
       "reference-call-this",
+      "typeof-not-type-query",
       "values-types-memory",
     ]);
     expect(listArticleSlugs("ru")).toEqual(listArticleSlugs("en"));
@@ -22,10 +23,10 @@ describe("content compiler", () => {
 
   it("derives the verification snapshot from real bilingual content", () => {
     expect(computeSiteStats()).toEqual({
-      bilingualTopics: 3,
-      claims: 53,
-      citations: 55,
-      examples: 27,
+      bilingualTopics: 4,
+      claims: 69,
+      citations: 80,
+      examples: 33,
       verifiedV8Baselines: 27,
       pendingEngineBaselines: 2,
       bytecodeArtifacts: 3,
@@ -34,11 +35,74 @@ describe("content compiler", () => {
     });
   });
 
-  it("loads executable sources for both slices", () => {
+  it("loads executable sources for the existing slices", () => {
     const en = loadArticle("en", "reference-call-this");
     const declarations = loadArticle("en", "const-let-var");
     expect(en.exampleSources["method-call"]).toContain("obj.method");
     expect(declarations.exampleSources["declaration-tdz"]).toContain("let value");
+  });
+
+  it("keeps typeof evidence, traces, examples, and review states aligned in both locales", () => {
+    const en = loadArticle("en", "typeof-not-type-query");
+    const ru = loadArticle("ru", "typeof-not-type-query");
+    expect(en.status).toBe("TECH_REVIEW");
+    expect(ru.status).toBe("LOCALE_REVIEW");
+    const evidenceShape = (article: typeof en) => ({
+      claims: article.sections
+        .flatMap(({ blocks }) => blocks)
+        .flatMap((block) =>
+          block.type === "claims" ? block.claims.map(({ text: _text, ...claim }) => claim) : [],
+        ),
+      citations: article.citations.map(
+        ({ label: _label, relevance: _relevance, ...citation }) => citation,
+      ),
+      sections: article.sections.map(({ id, mode, exampleIds }) => ({ id, mode, exampleIds })),
+      examples: article.examples.map(({ title: _title, goal: _goal, ...example }) => example),
+      graph: article.graph,
+    });
+    expect(evidenceShape(ru)).toEqual(evidenceShape(en));
+    expect(evidenceShape(en).claims).toHaveLength(16);
+    expect(
+      evidenceShape(en).claims.every(({ reviewStatus }) => reviewStatus === "TECH_REVIEW"),
+    ).toBe(true);
+    expect(en.examples.map(({ id }) => id)).toEqual([
+      "typeof-primitive-results",
+      "typeof-object-collapse",
+      "typeof-name-resolution",
+      "typeof-evaluation-effects",
+      "typeof-call-construct",
+      "typeof-proxy-boundary",
+    ]);
+    const traces = en.sections
+      .flatMap(({ blocks }) => blocks)
+      .filter((block) => block.type === "trace");
+    expect(traces.map(({ id }) => id)).toEqual([
+      "trace-typeof-missing-name",
+      "trace-typeof-tdz",
+      "trace-typeof-callable-object",
+    ]);
+    expect(
+      traces.find(({ id }) => id === "trace-typeof-tdz")?.steps.map(({ operation }) => operation),
+    ).toEqual([
+      "BlockDeclarationInstantiation",
+      "ResolveBinding → GetIdentifierReference",
+      "typeof → GetValue",
+      "GetBindingValue",
+    ]);
+    expect(en.sections.find(({ id }) => id === "typeof-references")?.exampleIds).toContain(
+      "typeof-name-resolution",
+    );
+    expect(en.sections.find(({ id }) => id === "typeof-capabilities")?.exampleIds).toEqual([
+      "typeof-call-construct",
+      "typeof-proxy-boundary",
+    ]);
+    expect(en.sections.find(({ id }) => id === "typeof-host-boundary")?.exampleIds).toEqual([]);
+    expect(en.engineResults).toEqual([]);
+    expect(en.bytecodeArtifacts).toEqual({});
+    expect(en.representationArtifacts).toEqual({});
+    expect(en.examples.find(({ id }) => id === "typeof-call-construct")?.expectedOutput).toContain(
+      "explicit-class-call:TypeError",
+    );
   });
 
   it("keeps the new-and-this section reachable and links focused examples", () => {

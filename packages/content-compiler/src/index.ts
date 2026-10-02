@@ -9,6 +9,7 @@ import {
   v8ValueRepresentationArtifactSchema,
 } from "@human-ecmascript/model";
 import { parse } from "yaml";
+export { validateSourceLock } from "./sourceLock";
 
 export function findWorkspaceRoot(start = process.cwd()): string {
   let current = resolve(start);

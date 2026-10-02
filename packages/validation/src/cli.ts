@@ -6,6 +6,7 @@ import {
   listArticleSlugs,
   loadArticle,
   validateContentPair,
+  validateSourceLock,
 } from "@human-ecmascript/content-compiler";
 
 const slugs = listArticleSlugs("en");
@@ -87,18 +88,8 @@ for (const slug of slugs) {
 }
 
 const sourceLock = readFileSync(join(process.cwd(), "data", "sources.lock.yaml"), "utf8");
-const archiveHashes = [...sourceLock.matchAll(/archiveSha256:\s*([a-f0-9]{64})/g)];
-const resolvedCommits = [...sourceLock.matchAll(/resolvedCommit:\s*([a-f0-9]{40})/g)];
-if (
-  archiveHashes.length !== 3 ||
-  resolvedCommits.length !== 3 ||
-  sourceLock.includes("pending-upstream")
-) {
-  throw new Error(
-    "Every registered source must have a resolved 40-character commit and 64-character archive SHA-256",
-  );
-}
+validateSourceLock(sourceLock);
 
 console.log(
-  `Content validation passed: ${slugs.length} bilingual articles, ${exampleCount} verified V8 examples, EN/RU parity`,
+  `Content validation passed: ${slugs.length} bilingual articles, ${exampleCount} executable examples, EN/RU parity`,
 );

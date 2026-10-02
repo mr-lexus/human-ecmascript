@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { topicSequence } from "../../../../lib/featuredTopics";
 import { loadArticle } from "@human-ecmascript/content-compiler";
 import { GuideArticlePage } from "../../../../components/GuideArticlePage";
 
@@ -25,5 +26,7 @@ export default async function ConstLetVarPage({
 }) {
   const { lang } = await params;
   const article = loadArticle(lang, "const-let-var");
-  return <GuideArticlePage article={article} locale={lang} sequence={2} />;
+  return (
+    <GuideArticlePage article={article} locale={lang} sequence={topicSequence("const-let-var")} />
+  );
 }

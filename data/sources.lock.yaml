@@ -1,5 +1,5 @@
 schemaVersion: 1
-resolvedAt: "2026-08-06"
+resolvedAt: "2026-10-03"
 sources:
   - id: ecma262-es2026
     role: normative
@@ -29,3 +29,12 @@ sources:
     license: BSD-3-Clause
     notice: https://github.com/tc39/test262/blob/main/LICENSE
     redistribution: metadata-and-links
+  - id: whatwg-html
+    role: host-normative
+    url: https://github.com/whatwg/html.git
+    ref: 58eecd01b9a2e8fa1cbaffc888305ba4f7dcfb2e
+    resolvedCommit: 58eecd01b9a2e8fa1cbaffc888305ba4f7dcfb2e
+    archiveSha256: 98518e37bc8446b044137e335cba1ddbf34a225d7437d327c1feed2c056726d7
+    license: CC-BY-4.0; portions incorporated into source code BSD-3-Clause
+    notice: https://github.com/whatwg/html/blob/58eecd01b9a2e8fa1cbaffc888305ba4f7dcfb2e/LICENSE
+    redistribution: links-and-derived-structure
