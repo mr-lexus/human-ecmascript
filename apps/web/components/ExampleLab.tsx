@@ -45,6 +45,8 @@ export function ExampleLab({
           output: "Что вывел браузер",
           matrix: "Результаты в движках",
           pending: "ещё не проверено",
+          uncaptured: "нет сохранённого результата",
+          noCapture: "Версия и хеш бинарника не зафиксированы.",
           verified: "проверено",
           idle: "Запустите код, чтобы увидеть вывод.",
           timeout: "Код выполнялся слишком долго, поэтому мы его остановили.",
@@ -58,6 +60,8 @@ export function ExampleLab({
           output: "Browser output",
           matrix: "Engine evidence",
           pending: "pending verification",
+          uncaptured: "no recorded result",
+          noCapture: "No recorded version or binary hash.",
           verified: "verified",
           idle: "Run the code to see its output.",
           timeout: "Execution stopped at the time limit.",
@@ -258,11 +262,15 @@ export function ExampleLab({
                   color={result?.status === "verified" ? "teal" : "gray"}
                   variant="light"
                 >
-                  {result?.status === "verified" ? labels.verified : labels.pending}
+                  {result?.status === "verified"
+                    ? labels.verified
+                    : result
+                      ? labels.pending
+                      : labels.uncaptured}
                 </Badge>
               </div>
               <code>{result?.output.length ? result.output.join("\n") : "—"}</code>
-              <small>{result?.version ?? "not captured"}</small>
+              <small>{result?.version ?? labels.noCapture}</small>
             </article>
           );
         })}
